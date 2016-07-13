@@ -1,0 +1,22 @@
+<div class="event">
+    <div class="content">
+        <div class="header">
+            <div class="actor">
+                <span class="name">
+                    <a href="#">
+                        <?= (!is_null($data->admin_id))? $data->admin->first_name .' ' . $data->admin->last_name :$data->ticket->user->first_name.' '.$data->ticket->user->last_name </a>
+                </span>
+                <span class="time">
+                    <?= Yii::app()->jdate->date('Y-m-d H:i', $data->date) </span>
+            </div>
+        </div>
+        <div class="body">
+            <div>
+                <?= $data->text</div>
+            <?if(isset($data->file) AND !is_null($data->file) AND $data->file!=''):<a class="attached-file" href="<?= Yii::app()->theme->getBaseUrl(TRUE).'upload/files/'.$data->file?>" target="_blank">
+                    <i class="fa fa-file"></i>
+                    فایل ضمیمه
+                </a>
+            <?endif</div>
+    </div>
+</div>
