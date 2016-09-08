@@ -8,11 +8,6 @@ class ApiController extends Controller
 	 */
 	Const APPLICATION_ID = 'ASCCPE';
 
-	/**
-	 * Default response format
-	 * either 'json' or 'xml'
-	 */
-	private $format = 'json';
 	private $_token = '$2a$12$AK01s106Iqf7utPhANEf7uG5qup61kIPXoToAges5qo43Rm8mb28a';
 
 	/**
@@ -33,7 +28,7 @@ class ApiController extends Controller
 	{
 		if(isset($_POST['entity']) && $entity = $_POST['entity'])
 		{
-			switch ($entity) {
+			switch (trim($entity)) {
 				case 'places':
 					$list = UsersPlaces::model()->findAll();
 					break;
@@ -47,7 +42,7 @@ class ApiController extends Controller
 			if($list) {
 				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'list' => $list]), 'application/json');
 			}else
-				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجو نیست.']), 'application/json');
+				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
 		}
 	}
 
