@@ -3,10 +3,10 @@ return array(
     'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
     'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 	'basePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'آوای شهیر',
+	'name'=>'گوهر',
     'timeZone' => 'Asia/Tehran',
     'theme' => 'abound',
-    'language' => 'fa',
+    'language' => 'fa_ir',
 	// preloading 'log' component
 	'preload'=>array('log'),
 
@@ -15,8 +15,6 @@ return array(
         'application.vendor.*',
         'application.models.*',
 		'application.components.*',
-		'ext.EasyMultiLanguage.*',
-		'ext.yiiSortableModel.models.*',
 		'application.modules.users.models.*',
 	),
 
@@ -116,9 +114,6 @@ return array(
             'coreScriptPosition' => CClientScript::POS_HEAD,
             'defaultScriptFilePosition' => CClientScript::POS_END,
         ),
-		'coreMessages'=>array(
-				'basePath'=>null,
-		),
     ),
     'controllerMap' => array(
         'min' => array(
@@ -131,11 +126,6 @@ return array(
 		// this is used in contact page
 		'adminEmail'=>'pardis@avayeshahir.com',
 		'no-reply-email' => 'noreply@avayeshahir.com',
-		'languages'=>array(
-				'fa' => 'فارسی',
-				'en' => 'English',
-		),
-		'default_language' => 'fa',
 		'mailTheme'=>
 				'<div style="display: block;width: 100%;"><h2 style="margin-bottom:0;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;display: block;width: 100%;background-color: #0b3762;line-height:60px;color:#fff;font-size: 24px;text-align: right;padding-right: 50px">پردیس آوای شهیر<span style="font-size: 14px;color:#f0f0f0"> - موسسه فرهنگی هنری زبان</span></h2></div>
              <div style="display: inline-block;width: 100%;font-family:tahoma;line-height: 28px;">

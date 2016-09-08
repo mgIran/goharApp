@@ -54,7 +54,8 @@ class Users extends iWebActiveRecord
 
         return array(
             array('role_id,email', 'required','on'=>'insert,update'),
-            array('role_id', 'default' ,'value' => 1,'on'=>'app_insert'),
+            array('role_id', 'default' ,'value' => 5,'on'=>'app_insert'),
+            array('work_city_id', 'default' ,'value' => 1,'on'=>'app_insert'),
             array('first_name,last_name', 'required','on'=>'register'),
             array($required, 'required', 'on' => 'changePassword'),
             array('user_name, password,repeat_password', 'required', 'on' => 'insert,register'),
@@ -111,9 +112,9 @@ class Users extends iWebActiveRecord
 
             //bank details
             array('account_number, bank_name', 'length', 'max' => 30),
-            array('card_number', 'validateCardBankLength', 'except'=>'upload,changePassword'),
+            array('card_number', 'validateCardBankLength', 'except'=>'upload,changePassword,app_insert'),
             array('card_number', 'length', 'max'=>20),
-                array('iban', 'length', 'is'=>24),
+            array('iban', 'length', 'is'=>24),
             array('holder_name', 'length', 'max' => 100),
             array('iban', 'unique'),
         );

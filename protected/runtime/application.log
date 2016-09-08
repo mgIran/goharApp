@@ -18972,3 +18972,39 @@ in C:\wamp\www\Yusef\gohar-app\protected\extensions\starship\RESTFullYii\behavio
 in C:\wamp\www\Yusef\gohar-app\protected\extensions\starship\RESTFullYii\events\ERestEventListenerRegistry.php (79)
 in C:\wamp\www\Yusef\gohar-app\protected\extensions\starship\RESTFullYii\events\Eventor\Eventor.php (170)
 in C:\wamp\www\Yusef\gohar-app\protected\extensions\starship\RESTFullYii\behaviors\ERestBehavior.php (108)
+2016/09/06 11:40:43 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:41:17 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:41:34 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:41:36 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:43:19 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:43:27 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:43:51 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (60)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/06 11:44:50 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/09/07 11:13:54 [warning] [application] Failed to set unsafe attribute "subject" of "Events".
+in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
+in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
+in E:\wamp\www\yusef\gohar-app\index.php (11)

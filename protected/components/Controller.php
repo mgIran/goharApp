@@ -55,7 +55,6 @@ class Controller extends CController
     }
 
     public function init(){
-        // for multi language
         Yii::app()->clientScript->registerScript('js-requirement','
             var baseUrl = "'.Yii::app()->getBaseUrl(true).'";
         ',CClientScript::POS_HEAD);
@@ -63,136 +62,11 @@ class Controller extends CController
         parent::init();
     }
 
-    public static function createAdminMenu()
-    {
-        if(Yii::app()->user->type === 'admin')
-            return array(
-                array(
-                    'label' => 'Ù¾ÛŒØ´Ø®ÙˆØ§Ù†' ,
-                    'url' => array('/admins/dashboard')
-                ) ,
-                array(
-                    'label' => 'Ø¢Ù…ÙˆØ²Ø´<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => ' Ø¯ÙˆØ±Ù‡ Ù‡Ø§' ,'url' => Yii::app()->createUrl('/courses/manage/admin/')) ,
-                        array('label' => ' Ú©Ù„Ø§Ø³ Ù‡Ø§' ,'url' => Yii::app()->createUrl('/courses/classes/admin/')) ,
-                        array('label' => ' Ú¯Ø±ÙˆÙ‡ Ù‡Ø§' ,'url' => Yii::app()->createUrl('/courses/categories/admin/')) ,
-                        array('label' => ' ØªÚ¯ Ù‡Ø§' ,'url' => Yii::app()->createUrl('/courses/tags/admin/'))
-                    )
-                ) ,
-                array(
-                    'label' => 'Ø§Ø³Ø§ØªÛŒØ¯<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/users/teachers')) ,
-                        array('label' => 'Ø§ÙØ²ÙˆØ¯Ù†' ,'url' => Yii::app()->createUrl('/users/teachers/create')) ,
-                    )
-                ) ,
-
-                array(
-                    'label' => 'Ú©Ø§Ø±Ù…Ù†Ø¯Ø§Ù† <span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/personnel/manage')) ,
-                        array('label' => 'Ø§ÙØ²ÙˆØ¯Ù†' ,'url' => Yii::app()->createUrl('/personnel/manage/create')) ,
-                    )
-                ) ,
-
-                array(
-                    'label' => 'Ú¯Ø§Ù„Ø±ÛŒ ØªØµØ§ÙˆÛŒØ±<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/gallery/manage/admin')) ,
-                        array('label' => 'Ø§ÙØ²ÙˆØ¯Ù†' ,'url' => Yii::app()->createUrl('/gallery/manage/create')) ,
-                    )
-                ) ,
-                //                array(
-                //                    'label' => 'Ù†Ø¸Ø±Ø§Øª<span class="caret"></span>' ,
-                //                    'url' => '#' ,
-                //                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                //                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                //                    'items' => array(
-                //                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/comments/comment/admin')) ,
-                //                    )
-                //                ) ,
-                array(
-                    'label' => 'Ú¯ÙˆÚ¯Ù„ Ø§Ø±Ø«<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/map/manage/update')) ,
-                    )
-                ) ,
-                array(
-                    'label' => 'Ù…Ø¯ÛŒØ±Ø§Ù† <span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/admins/manage')) ,
-                        array('label' => 'Ø§ÙØ²ÙˆØ¯Ù†' ,'url' => Yii::app()->createUrl('/admins/manage/create')) ,
-                    )
-                ) ,
-                array(
-                    'label' => 'Ú©Ø§Ø±Ø¨Ø±Ø§Ù† <span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ù…Ø¯ÛŒØ±ÛŒØª' ,'url' => Yii::app()->createUrl('/users/manage')) ,
-                    )
-                ) ,
-
-                array(
-                    'label' => 'ØµÙØ­Ø§Øª Ù…ØªÙ†ÛŒ<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'ØµÙØ­Ø§Øª Ø§ØµÙ„ÛŒ Ø³Ø§ÛŒØª' ,'url' => Yii::app()->createUrl('/pages/manage/admin/slug/base')) ,
-                        array('label' => 'Ù‚ÙˆØ§Ù†ÛŒÙ†' ,'url' => Yii::app()->createUrl('/pages/manage/update/id/5/slug/rules')) ,
-                        array('label' => 'ØµÙØ­Ø§Øª Ø±Ø§Ù‡Ù†Ù…Ø§' ,'url' => Yii::app()->createUrl('/pages/manage/admin/slug/guide')) ,
-                        array('label' => 'ØµÙØ­Ø§Øª Ø¢Ø²Ø§Ø¯' ,'url' => Yii::app()->createUrl('/pages/manage/admin/')) ,
-                    )
-                ) ,
-                array(
-                    'label' => 'ØªÙ†Ø¸ÛŒÙ…Ø§Øª<span class="caret"></span>' ,
-                    'url' => '#' ,
-                    'itemOptions' => array('class' => 'dropdown' ,'tabindex' => "-1") ,
-                    'linkOptions' => array('class' => 'dropdown-toggle' ,'data-toggle' => "dropdown") ,
-                    'items' => array(
-                        array('label' => 'Ø¹Ù…ÙˆÙ…ÛŒ' ,'url' => Yii::app()->createUrl('/setting/siteSettingManage/changeSetting')) ,
-                        array('label' => 'Ù¾ÛŒØ§Ù… ÙˆØ¨Ø³Ø§ÛŒØª' ,'url' => Yii::app()->createUrl('/setting/siteSettingManage/siteMessage')) ,
-                    )
-                ) ,
-                array(
-                    'label' => 'ÙˆØ±ÙˆØ¯' ,
-                    'url' => array('/admins/login') ,
-                    'visible' => Yii::app()->user->isGuest
-                ) ,
-                array(
-                    'label' => 'Ø®Ø±ÙˆØ¬' ,
-                    'url' => array('/admins/login/logout') ,
-                    'visible' => !Yii::app()->user->isGuest) ,
-            );
-        else
-            return array();
-    }
-
     /**
      * @param $model
      * @return string
      */
-    public function implodeErrors($model)
+    public static function implodeErrors($model)
     {
         $errors = '';
         foreach($model->getErrors() as $err){
