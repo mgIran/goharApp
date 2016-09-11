@@ -1,52 +1,105 @@
 <?php
 class ModulesUserIdentity extends CUserIdentity
 {
+    const USERNAME_PASSWORD = 'username_password';
+    const TOKEN = 'token';
+    const ERROR_TOKEN_INVALID=3;
     const ERROR_NOT_VERIFIED = 101;
     const ERROR_INACTIVE = 102;
     const ERROR_DISABLE_LOGIN = 103;
 
+    public $authMode = self::USERNAME_PASSWORD;
+    public $appToken = NULL;
+
+    /**
+     * Override Constructor.
+     * @param string $username username or app token
+     * @param string $password password
+     */
+    public function __construct($username,$password=NULL)
+    {
+        if(!empty($password))
+        {
+            parent::__construct($username,$password);
+        }else
+            $this->appToken = $username;
+    }
+
     public function authenticate($withoutCheck=false)
     {
         $loginFlag = false;
-        $user = Users::model()->findByAttributes(array('user_name'=>$this->username),'deleted = 0');
-        if(empty($user))
-            $this->errorCode=self::ERROR_PASSWORD_INVALID;
-        elseif($user->activePlan->plansBuys->plan->disable_login == 1){
-            $this->errorCode = self::ERROR_DISABLE_LOGIN;
-            return $this->errorCode;
-        }
-        elseif($user->status == Users::STATUS_NOT_VERIFIED){
-            $this->errorCode = self::ERROR_NOT_VERIFIED;
-            return $this->errorCode;
-        }
-        elseif($user->status == Users::STATUS_INACTIVE){
-            $this->errorCode = self::ERROR_INACTIVE;
-            return $this->errorCode;
-        }
-        else
-        {
-            /* log for last login */
-            $log = new UsersLogins;
-            $log->user_id = $user->id;
-            if(!$withoutCheck){
-                $bCrypt = new Bcrypt;
-                if(!$bCrypt->verify(md5(sha1($this->password)), $user->password)){
-                    $this->errorCode=self::ERROR_PASSWORD_INVALID;
+        if($this->authMode == self::USERNAME_PASSWORD) {
+            $user = Users::model()->findByAttributes(array('user_name' => $this->username), 'deleted = 0');
+            if(empty($user))
+                $this->errorCode=self::ERROR_PASSWORD_INVALID;
+            elseif($user->activePlan->plansBuys->plan->disable_login == 1){
+                $this->errorCode = self::ERROR_DISABLE_LOGIN;
+                return $this->errorCode;
+            }
+            elseif($user->status == Users::STATUS_NOT_VERIFIED){
+                $this->errorCode = self::ERROR_NOT_VERIFIED;
+                return $this->errorCode;
+            }
+            elseif($user->status == Users::STATUS_INACTIVE){
+                $this->errorCode = self::ERROR_INACTIVE;
+                return $this->errorCode;
+            }
+            else
+            {
+                /* log for last login */
+                $log = new UsersLogins;
+                $log->user_id = $user->id;
+                if(!$withoutCheck){
+                    $bCrypt = new Bcrypt;
+                    if(!$bCrypt->verify(md5(sha1($this->password)), $user->password)){
+                        $this->errorCode=self::ERROR_PASSWORD_INVALID;
+                    }
+                    else
+                        $loginFlag = true;
                 }
                 else
                     $loginFlag = true;
+
+                if($loginFlag) {
+                    $log->status = 1;
+                    $this->login($user);
+                    $this->errorCode=self::ERROR_NONE;
+                }
+                $log->save();
+                /* log for last login */
+            }
+        }elseif($this->authMode == self::TOKEN) {
+            $user = Users::model()->findByAttributes(array('app_token' => $this->appToken), 'deleted = 0');
+            if(empty($user))
+                $this->errorCode=self::ERROR_TOKEN_INVALID;
+            elseif($user->activePlan->plansBuys->plan->disable_login == 1){
+                $this->errorCode = self::ERROR_DISABLE_LOGIN;
+                return $this->errorCode;
+            }
+            elseif($user->status == Users::STATUS_NOT_VERIFIED){
+                $this->errorCode = self::ERROR_NOT_VERIFIED;
+                return $this->errorCode;
+            }
+            elseif($user->status == Users::STATUS_INACTIVE){
+                $this->errorCode = self::ERROR_INACTIVE;
+                return $this->errorCode;
             }
             else
+            {
+                /* log for last login */
+                $log = new UsersLogins;
+                $log->user_id = $user->id;
                 $loginFlag = true;
-
-            if($loginFlag) {
-                $log->status = 1;
-                $this->login($user);
-                $this->errorCode=self::ERROR_NONE;
+                if($loginFlag) {
+                    $log->status = 1;
+                    $this->login($user);
+                    $this->errorCode=self::ERROR_NONE;
+                }
+                $log->save();
+                /* log for last login */
             }
-            $log->save();
-            /* log for last login */
         }
+
         return !$this->errorCode;
     }
 
