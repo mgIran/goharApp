@@ -50,23 +50,37 @@ class ModulesAdminIdentity extends CUserIdentity
             if (empty($admin))
                 $this->errorCode = self::ERROR_TOKEN_INVALID;
             else {
-                $bCrypt = new Bcrypt;
-                if (!$bCrypt->verify(md5(sha1($this->password)), $admin->password))
-                    $this->errorCode = self::ERROR_PASSWORD_INVALID;
-                else {
-                    $this->setState('userID', $admin->id);
-                    $this->setState('fullName', $admin->first_name . ' ' . $admin->last_name);
-                    $this->setState('role', $admin->AdminsRoles->title);
-                    $this->setState('avatar', $admin->avatar);
-                    $this->setState('type', 'admin');
-                    if ($admin->AdminsRoles->name = 'admin')
-                        $this->username = 'admin';
-
-                    $this->errorCode = self::ERROR_NONE;
-                }
+                $this->setState('userID', $admin->id);
+                $this->setState('fullName', $admin->first_name . ' ' . $admin->last_name);
+                $this->setState('role', $admin->AdminsRoles->title);
+                $this->setState('avatar', $admin->avatar);
+                $this->setState('type', 'admin');
+                if ($admin->AdminsRoles->name = 'admin')
+                    $this->username = 'admin';
+                $this->errorCode = self::ERROR_NONE;
             }
         }
         return !$this->errorCode;
     }
 
+    public function getErrorMessage()
+    {
+        switch ($this->errorCode)
+        {
+            case self::ERROR_USERNAME_INVALID:
+            case self::ERROR_PASSWORD_INVALID:
+                $text = 'نام کاربری یا کلمه عبور اشتباه است.';
+                break;
+            case self::ERROR_TOKEN_INVALID:
+                $text = 'Token is invalid.';
+                break;
+            case self::ERROR_UNKNOWN_IDENTITY:
+                $text = 'Unknown Identity.';
+                break;
+            default:
+                $text = '';
+                break;
+        }
+        return $text;
+    }
 }

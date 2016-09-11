@@ -131,4 +131,33 @@ class ModulesUserIdentity extends CUserIdentity
         $user->userInfoStatus();
     }
 
+    public function getErrorMessage()
+    {
+        switch ($this->errorCode)
+        {
+            case self::ERROR_USERNAME_INVALID:
+            case self::ERROR_PASSWORD_INVALID:
+                $text = 'نام کاربری یا کلمه عبور اشتباه است.';
+                break;
+            case self::ERROR_TOKEN_INVALID:
+                $text = 'Token is invalid.';
+                break;
+            case self::ERROR_DISABLE_LOGIN:
+                $text = 'ورود به سیستم غیرفعال است.';
+                break;
+            case self::ERROR_INACTIVE:
+                $text = 'کاربر موردنظر غیرفعال است.';
+                break;
+            case self::ERROR_NOT_VERIFIED:
+                $text = 'کاربر موردنظر احراز هویت نشده است.';
+                break;
+            case self::ERROR_UNKNOWN_IDENTITY:
+                $text = 'Unknown Identity.';
+                break;
+            default:
+                $text = '';
+                break;
+        }
+        return $text;
+    }
 }
