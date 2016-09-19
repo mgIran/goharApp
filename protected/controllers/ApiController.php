@@ -111,7 +111,7 @@ class ApiController extends ApiBaseController
 
 	public function actionCheckNumber()
 	{
-		if(isset($_POST['sim']) && isset($_POST['activateCode'])) {
+		if(isset($_POST['token']) && isset($_POST['sim']) && isset($_POST['activateCode'])) {
 			Yii::import('users.models.*');
 			$_POST['sim'] = strpos($_POST['sim'], '0') === 0 ? $_POST['sim'] : '0'.$_POST['sim'];
 			$sim = strpos($_POST['sim'], '0') === 0 ? substr($_POST['sim'], 1) : $_POST['sim'];
@@ -120,7 +120,7 @@ class ApiController extends ApiBaseController
 			$criteria->compare('text', 'GoharActivate', true);
 			$criteria->compare('sender', $sim);
 			$criteria->addCondition('date <= :date');
-			$criteria->params[':date'] = time() - 10 * 60;
+			$criteria->params[':date'] = time() - 2 * 60;
 			$criteria->order = 'date DESC';
 			TextMessagesReceive::model()->deleteAll($criteria);
 			//
@@ -128,7 +128,7 @@ class ApiController extends ApiBaseController
 			$criteria->compare('text', 'GoharActivate', true);
 			$criteria->compare('sender', $sim);
 			$criteria->addCondition('date >= :date');
-			$criteria->params[':date'] = time() - 10 * 60;
+			$criteria->params[':date'] = time() - 2 * 60;
 			$criteria->order = 'date DESC';
 			$messages = TextMessagesReceive::model()->findAll($criteria);
 			$flag = false;
