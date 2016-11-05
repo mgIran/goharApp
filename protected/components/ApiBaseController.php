@@ -3,11 +3,17 @@
  * Controller is the customized base controller class.
  * All controller classes for this application should extend from this base class.
  *
- * @property SearchForm $searchModel
+ * @property [] $loginArray
  */
 class ApiBaseController extends Controller
 {
     private $_token = '$2a$12$AK01s106Iqf7utPhANEf7uG5qup61kIPXoToAges5qo43Rm8mb28a';
+
+    /**
+     * @var array of user login detail
+     */
+    private $_loginArray = array();
+
     /**
      * @param string $token
      * @return bool
@@ -123,16 +129,20 @@ class ApiBaseController extends Controller
             $identity = new ModulesAdminIdentity($token);
             $identity->authMode = $identity::TOKEN;
             $identity->authenticate();
+            $this->_loginArray = $identity->getAppLoginArray();
         } elseif($userType == 'user') {
             Yii::app()->getModule('users');
             $identity = new ModulesUserIdentity($token);
             $identity->authMode = $identity::TOKEN;
             $identity->authenticate();
+            $this->_loginArray = $identity->getAppLoginArray();
         }
-        if($identity && $identity->errorCode===$identity::ERROR_NONE)
+        if($identity && $identity->errorCode===$identity::ERROR_NONE && $this->getLoginArray())
             return true;
         elseif($identity && $identity->errorCode!==$identity::ERROR_NONE)
             $this->_sendResponse(401, 'Error: '.$identity->getErrorMessage());
+        elseif(!$this->getLoginArray())
+            $this->_sendResponse(401, 'Error: Not Authorized.');
         return true;
     }
 
@@ -178,4 +188,12 @@ class ApiBaseController extends Controller
             throw new CHttpException(400,Yii::t('yii','Your request is invalid.'));
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @return array get $_loginArray Property
+     */
+    public function getLoginArray()
+    {
+        return $this->_loginArray;
+    }
 }

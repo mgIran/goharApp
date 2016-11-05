@@ -60,7 +60,7 @@ class EventsController extends Controller
 			if ($model->save())
 			{
 				if(!$rest)
-					$this->redirect(array('view','id'=>$model->id));
+					$this->redirect(array('admin','id'=>$model->id));
 				else
 					$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 			}else

@@ -30,6 +30,7 @@ return array(
         'admins',
         'users',
         'setting',
+        'tickets',
 	),
 
 	// application components

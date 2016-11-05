@@ -8,7 +8,8 @@ class ModulesAdminIdentity extends CUserIdentity
 
     public $authMode = self::USERNAME_PASSWORD;
     public $appToken = NULL;
-
+    private $_appLoginArray = array();
+    
     /**
      * Override Constructor.
      * @param string $username username or app token
@@ -55,6 +56,14 @@ class ModulesAdminIdentity extends CUserIdentity
                 $this->setState('role', $admin->AdminsRoles->title);
                 $this->setState('avatar', $admin->avatar);
                 $this->setState('type', 'admin');
+
+                $this->_appLoginArray = array(
+                    'type'=> 'admin',
+                    'userID' => $admin->id,
+                    'fullName' => $admin->first_name . ' ' . $admin->last_name,
+                    'role'=> $admin->AdminsRoles->title,
+                    'avatar'=> $admin->avatar
+                );
                 if ($admin->AdminsRoles->name = 'admin')
                     $this->username = 'admin';
                 $this->errorCode = self::ERROR_NONE;
@@ -82,5 +91,11 @@ class ModulesAdminIdentity extends CUserIdentity
                 break;
         }
         return $text;
+    }
+
+
+    public function getAppLoginArray()
+    {
+        return $this->_appLoginArray;
     }
 }

@@ -10,6 +10,7 @@ class ModulesUserIdentity extends CUserIdentity
 
     public $authMode = self::USERNAME_PASSWORD;
     public $appToken = NULL;
+    private $_appLoginArray = array();
 
     /**
      * Override Constructor.
@@ -128,6 +129,15 @@ class ModulesUserIdentity extends CUserIdentity
         $this->setState('avatar', $user->avatar);
         $this->setState('type', 'user');
 
+        $this->_appLoginArray = array(
+            'type'=> 'user',
+            'userID' => $user->id,
+            'fullName' => $user->first_name. ' '.$user->last_name,
+            'role'=> $user->UsersRoles->title,
+            'plan'=> json_encode($planArray),
+            'avatar'=> $user->avatar
+        );
+
         $user->userInfoStatus();
     }
 
@@ -159,5 +169,10 @@ class ModulesUserIdentity extends CUserIdentity
                 break;
         }
         return $text;
+    }
+
+    public function getAppLoginArray()
+    {
+        return $this->_appLoginArray;
     }
 }

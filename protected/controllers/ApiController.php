@@ -13,8 +13,8 @@ class ApiController extends ApiBaseController
 	public function filters()
 	{
 		return array(
-			'RestAccessControl + getLastVer,downloadApp,getBaseLine,checkNumber',
-			'RestUserAccessControl + test',
+			'RestAccessControl + getLastVer,downloadApp,getBaseLine,checkNumber,getList,createCeremony,create',
+			'RestUserAccessControl + test,ticketList',
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -30,6 +30,10 @@ class ApiController extends ApiBaseController
 				case 'ceremonies':
 					$list = Events::model()->findAll();
 					break;
+				case 'notifications':
+					Yii::app()->getModule('notifications');
+					$list = Notifications::model()->findAll();
+					break;
 				default:
 					$list = array();
 					break;
@@ -41,12 +45,80 @@ class ApiController extends ApiBaseController
 		}
 	}
 
+    public function actionGetTicketList()
+    {
+        if($this->loginArray && $this->loginArray['type'] == 'user') {
+            Yii::app()->getModule('tickets');
+            $list = Tickets::model()->findAll(array(
+                'condition' => 'user_id = :user_id',
+                'params' => array(':user_id'=>$this->loginArray['userID'])
+            ));
+            if ($list) {
+                $this->_sendResponse(200, CJSON::encode(['status' => 'success', 'list' => $list]), 'application/json');
+            } else
+                $this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
+        }
+    }
+
+	/**
+	 * Create Model from Entity
+	 */
+	public function actionCreate()
+	{
+		if (isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))) {
+			if (isset($_POST[$entity])) {
+				switch ($entity) {
+					case 'Ceremony':
+						$model = new Events;
+						$model->attributes = $_POST[$entity];
+						if ($model->save())
+							$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
+						break;
+					case 'Tickets':
+						Yii::app()->getModule('tickets');
+						$model = new Tickets();
+						if ($this->loginArray['type'] == 'admin')
+							$model->scenario = 'admin_insert';
+						$model->attributes = $_POST[$entity];
+						$model->status = Tickets::STATUS_NO_REPLY;
+						$model->user_id = $this->loginArray['userID'];
+						if ($model->save()) {
+							$ticketsContentModel = new TicketsContent;
+							$ticketsContentModel->attributes = $_POST[$entity];
+							$ticketsContentModel->ticket_id = $model->id;
+							$ticketsContentModel->text = $model->text;
+							$ticketsContentModel->file = $model->file;
+							$ticketsContentModel->save();
+							$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'تیکت با موفقیت ارسال شد.']), 'application/json');
+						}
+						break;
+					default:
+						$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'دسترسی به موجودیت مورد نظر امکان ندارد']), 'application/json');
+						break;
+				}
+				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
+			}
+			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+		}
+		$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
+	}
+
+	public function actionCreateCeremony()
+	{
+		if(isset($_POST['Ceremony'])) {
+			list($eventsController) = Yii::app()->createController('events');
+			$eventsController->actionCreate(true);
+		}else
+			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعات ثبت مراسم ارسال نشده است.']), 'application/json');
+	}
+	/**************************************************** Base Actions ***********************************************************/
 	public function actionGetLastVer()
 	{
 		if(isset($_POST['version']) && isset($_POST['sim'])) {
+			$baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
 			$lastVer = SiteOptions::model()->findByAttributes(['name' => 'app_version']);
 			if($_POST['version'] == $lastVer->value)
-				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'نسخه نرم افزار به روز می باشد.']), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'نسخه نرم افزار به روز می باشد.', 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			else {
 				$fileName = 'gohar-v'.$lastVer->value.'.apk';
 				$downloadToken = DownloadTokens::model()->findByAttributes(['app_version' => $lastVer->value, 'sim' => $_POST['sim']]);
@@ -75,7 +147,7 @@ class ApiController extends ApiBaseController
 						@copy(Yii::getPathOfAlias('webroot').'/uploads/app/'.$fileName, Yii::getPathOfAlias('webroot').'/temp/'.$copyFileName);
 				}
 				$fileLink = Yii::app()->createAbsoluteUrl('/api/downloadApp/'.$downloadToken->token);
-				$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'newVersionLink' => $fileLink]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'newVersionLink' => $fileLink, 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			}
 		} elseif(!isset($_POST['version']))
 			$this->_sendResponse(400,CJSON::encode(['status' => 'failed','message' => 'مقدار نسخه فعلی ارسال نشده است.']), 'application/json');
@@ -100,15 +172,6 @@ class ApiController extends ApiBaseController
 		$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'message' => 'لینک منقضی شده است.']), 'application/json');
 	}
 
-	public function actionGetBaseLine()
-	{
-		$baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
-		if($baseLine)
-			$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'baseLine' => $baseLine->value]), 'application/json');
-		else
-			$this->_sendResponse(500, CJSON::encode(['status' => 'failed', 'message' => 'خط ارسال پیام در سیستم ثبت نشده است.']), 'application/json');
-	}
-
 	public function actionCheckNumber()
 	{
 		if(isset($_POST['token']) && isset($_POST['sim']) && isset($_POST['activateCode'])) {
@@ -117,10 +180,8 @@ class ApiController extends ApiBaseController
 			$sim = strpos($_POST['sim'], '0') === 0 ? substr($_POST['sim'], 1) : $_POST['sim'];
 			// Delete Old Activate messages From this Mobile number
 			$criteria = new CDbCriteria();
-			$criteria->compare('text', 'GoharActivate', true);
-			$criteria->compare('sender', $sim);
 			$criteria->addCondition('date <= :date');
-			$criteria->params[':date'] = time() - 2 * 60;
+			$criteria->params[':date'] = time() - 10 * 60;
 			$criteria->order = 'date DESC';
 			TextMessagesReceive::model()->deleteAll($criteria);
 			//
@@ -128,7 +189,7 @@ class ApiController extends ApiBaseController
 			$criteria->compare('text', 'GoharActivate', true);
 			$criteria->compare('sender', $sim);
 			$criteria->addCondition('date >= :date');
-			$criteria->params[':date'] = time() - 2 * 60;
+			$criteria->params[':date'] = time() - 10 * 60;
 			$criteria->order = 'date DESC';
 			$messages = TextMessagesReceive::model()->findAll($criteria);
 			$flag = false;
@@ -160,18 +221,9 @@ class ApiController extends ApiBaseController
 			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'شماره سیم کارت  یا کد فعالسازی ارسال نشده است.']), 'application/json');
 	}
 
-	public function actionCreateCeremony()
-	{
-		if(isset($_POST['Ceremony'])) {
-			list($eventsController) = Yii::app()->createController('events');
-			$eventsController->actionCreate(true);
-		}else
-			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعات ثبت مراسم ارسال نشده است.']), 'application/json');
-	}
-
 	public function actionTest()
 	{
-		var_dump(1);exit;
+		var_dump($this->loginArray);exit;
 	}
 }
 ?>
