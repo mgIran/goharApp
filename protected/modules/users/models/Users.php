@@ -112,11 +112,15 @@ class Users extends iWebActiveRecord
 
             //bank details
             array('account_number, bank_name', 'length', 'max' => 30),
-            array('card_number', 'validateCardBankLength', 'except'=>'upload,changePassword,app_insert'),
+            array('card_number', 'validateCardBankLength', 'except'=>'upload, changePassword, app_insert, app_update'),
             array('card_number', 'length', 'max'=>20),
             array('iban', 'length', 'is'=>24),
             array('holder_name', 'length', 'max' => 100),
             array('iban', 'unique'),
+
+            //app token
+            array('app_token', 'required', 'on'=>'app_update'),
+            array('app_token', 'unique', 'on'=>'app_update'),
         );
     }
 
@@ -542,5 +546,13 @@ class Users extends iWebActiveRecord
             if ($option->options == 'user_info_status_time' OR $option->options == 'user_info_status')
                 $option->delete();
         }
+    }
+
+    public function createAppToken(){
+        $tokenize = new bCrypt();
+        $this->app_token = $tokenize->hash($this->mobile);
+        while($this->findByAttributes(array('app_token'=>$this->app_token)))
+            $this->app_token = $tokenize->hash($this->mobile);
+        return $this;
     }
 }

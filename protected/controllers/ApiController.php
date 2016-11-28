@@ -13,8 +13,8 @@ class ApiController extends ApiBaseController
 	public function filters()
 	{
 		return array(
-			'RestAccessControl + getLastVer,downloadApp,getBaseLine,checkNumber,getList,createCeremony,create',
-			'RestUserAccessControl + test,ticketList',
+			'RestAccessControl + getLastVer,downloadApp,getBaseLine,checkNumber',
+			'RestUserAccessControl + test, getUserList, getList, createCeremony, create',
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -23,16 +23,29 @@ class ApiController extends ApiBaseController
 	{
 		if(isset($_POST['entity']) && $entity = $_POST['entity'])
 		{
+			$criteria = new CDbCriteria();
+			if(isset($_POST['lastId']) && !empty($_POST['lastId']) && $lastId = (int)$_POST['lastId'])
+			{
+				$criteria->addCondition('t.id > :last_id');
+				$criteria->params[':last_id'] = $lastId;
+			}
 			switch (trim($entity)) {
 				case 'places':
-					$list = UsersPlaces::model()->findAll();
+					$list = UsersPlaces::model()->findAll($criteria);
 					break;
 				case 'ceremonies':
-					$list = Events::model()->findAll();
+					$list = Events::model()->findAll($criteria);
+					break;
+				case 'tickets':
+					Yii::app()->getModule('tickets');
+					$criteria->addCondition('user_id = :user_id AND user_type = :user_type');
+					$criteria->params[':user_id'] = $this->loginArray['userID'];
+					$criteria->params[':user_type'] = $this->loginArray['type'];
+					$list = Tickets::model()->findAll($criteria);
 					break;
 				case 'notifications':
 					Yii::app()->getModule('notifications');
-					$list = Notifications::model()->findAll();
+					$list = Notifications::model()->findAll($criteria);
 					break;
 				default:
 					$list = array();
@@ -44,21 +57,6 @@ class ApiController extends ApiBaseController
 				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
 		}
 	}
-
-    public function actionGetTicketList()
-    {
-        if($this->loginArray && $this->loginArray['type'] == 'user') {
-            Yii::app()->getModule('tickets');
-            $list = Tickets::model()->findAll(array(
-                'condition' => 'user_id = :user_id',
-                'params' => array(':user_id'=>$this->loginArray['userID'])
-            ));
-            if ($list) {
-                $this->_sendResponse(200, CJSON::encode(['status' => 'success', 'list' => $list]), 'application/json');
-            } else
-                $this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
-        }
-    }
 
 	/**
 	 * Create Model from Entity
@@ -178,7 +176,7 @@ class ApiController extends ApiBaseController
 			Yii::import('users.models.*');
 			$_POST['sim'] = strpos($_POST['sim'], '0') === 0 ? $_POST['sim'] : '0'.$_POST['sim'];
 			$sim = strpos($_POST['sim'], '0') === 0 ? substr($_POST['sim'], 1) : $_POST['sim'];
-			// Delete Old Activate messages From this Mobile number
+			// Delete Old Activate messages
 			$criteria = new CDbCriteria();
 			$criteria->addCondition('date <= :date');
 			$criteria->params[':date'] = time() - 10 * 60;
@@ -203,14 +201,26 @@ class ApiController extends ApiBaseController
 			$model = Users::model()->findByAttributes(array('mobile' => $_POST['sim']));
 			if($model) {
 				$model->password = null;
-				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'isUser' => 1,'newUser' => 0, 'user' => $model]), 'application/json');
+				if(!$model->app_token || empty($model->app_token))
+				{
+					$model->scenario = 'app_update';
+					if($model->createAppToken()->save())
+						$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+							'isUser' => 1, 'newUser' => 0, 'userToken' => $model->app_token,
+							'user' => $model]), 'application/json');
+				}else
+					$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+						'isUser' => 1, 'newUser' => 0, 'userToken' => $model->app_token,
+						'user' => $model]), 'application/json');
 			} else {
 				$signUpStatus = SiteOptions::model()->findByAttributes(['name' => 'signup_status']);
 				if($signUpStatus->value == 1) {
 					$model = new Users('app_insert');
 					$model->mobile = $_POST['sim'];
-					if($model->save())
-						$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'isUser' => 1, 'newUser' => 1, 'user' => $model]), 'application/json');
+					if($model->createAppToken()->save())
+						$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+							'isUser' => 1, 'newUser' => 1, 'userToken' => $model->app_token,
+							'user' => $model]), 'application/json');
 					else
 						$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'isUser' => 0, 'message' => 'در ثبت نام مشکلی ایجاد شده است، لطفا مجددا تلاش کنید.', 'errors' => $model->errors]), 'application/json');
 				}
@@ -226,4 +236,3 @@ class ApiController extends ApiBaseController
 		var_dump($this->loginArray);exit;
 	}
 }
-?>

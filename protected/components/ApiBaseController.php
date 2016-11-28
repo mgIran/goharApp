@@ -5,10 +5,9 @@
  *
  * @property [] $loginArray
  */
-class ApiBaseController extends Controller
+class ApiBaseController extends CController
 {
     private $_token = '$2a$12$AK01s106Iqf7utPhANEf7uG5qup61kIPXoToAges5qo43Rm8mb28a';
-
     /**
      * @var array of user login detail
      */

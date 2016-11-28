@@ -57,10 +57,12 @@ class EventsController extends Controller
 		$model=new Events;
 		if(isset($_POST['Ceremony'])) {
 			$model->attributes = $_POST['Ceremony'];
+//			if($rest)
+//				$model->u$this->loginArray['userID'];
 			if ($model->save())
 			{
 				if(!$rest)
-					$this->redirect(array('admin','id'=>$model->id));
+					$this->redirect(array('admin'));
 				else
 					$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 			}else

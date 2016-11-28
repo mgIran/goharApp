@@ -5,7 +5,7 @@
  *
  * @property SearchForm $searchModel
  */
-class Controller extends CController
+class Controller extends ApiBaseController
 {
     /**
      * @var string the default layout for the controller views. Defaults to '//layouts/column1',
