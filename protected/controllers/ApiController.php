@@ -13,7 +13,7 @@ class ApiController extends ApiBaseController
 	public function filters()
 	{
 		return array(
-			'RestAccessControl + getLastVer,downloadApp,getBaseLine,checkNumber',
+			'RestAccessControl + getLastVer,downloadApp,checkNumber',
 			'RestUserAccessControl + test, getUserList, getList, createCeremony, create',
 //			'RestAdminAccessControl +'
 		);
@@ -52,9 +52,9 @@ class ApiController extends ApiBaseController
 					break;
 			}
 			if($list) {
-				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'list' => $list]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => true, 'list' => $list]), 'application/json');
 			}else
-				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
+				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
 		}
 	}
 
@@ -70,7 +70,7 @@ class ApiController extends ApiBaseController
 						$model = new Events;
 						$model->attributes = $_POST[$entity];
 						if ($model->save())
-							$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 						break;
 					case 'Tickets':
 						Yii::app()->getModule('tickets');
@@ -87,18 +87,18 @@ class ApiController extends ApiBaseController
 							$ticketsContentModel->text = $model->text;
 							$ticketsContentModel->file = $model->file;
 							$ticketsContentModel->save();
-							$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'تیکت با موفقیت ارسال شد.']), 'application/json');
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'تیکت با موفقیت ارسال شد.']), 'application/json');
 						}
 						break;
 					default:
-						$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'دسترسی به موجودیت مورد نظر امکان ندارد']), 'application/json');
+						$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'دسترسی به موجودیت مورد نظر امکان ندارد']), 'application/json');
 						break;
 				}
-				$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
+				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
 			}
-			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
 		}
-		$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
+		$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
 
 	public function actionCreateCeremony()
@@ -107,7 +107,7 @@ class ApiController extends ApiBaseController
 			list($eventsController) = Yii::app()->createController('events');
 			$eventsController->actionCreate(true);
 		}else
-			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'اطلاعات ثبت مراسم ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت مراسم ارسال نشده است.']), 'application/json');
 	}
 	/**************************************************** Base Actions ***********************************************************/
 	public function actionGetLastVer()
@@ -116,7 +116,7 @@ class ApiController extends ApiBaseController
 			$baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
 			$lastVer = SiteOptions::model()->findByAttributes(['name' => 'app_version']);
 			if($_POST['version'] == $lastVer->value)
-				$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'message' => 'نسخه نرم افزار به روز می باشد.', 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'نسخه نرم افزار به روز می باشد.', 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			else {
 				$fileName = 'gohar-v'.$lastVer->value.'.apk';
 				$downloadToken = DownloadTokens::model()->findByAttributes(['app_version' => $lastVer->value, 'sim' => $_POST['sim']]);
@@ -145,12 +145,12 @@ class ApiController extends ApiBaseController
 						@copy(Yii::getPathOfAlias('webroot').'/uploads/app/'.$fileName, Yii::getPathOfAlias('webroot').'/temp/'.$copyFileName);
 				}
 				$fileLink = Yii::app()->createAbsoluteUrl('/api/downloadApp/'.$downloadToken->token);
-				$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'newVersionLink' => $fileLink, 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'newVersionLink' => $fileLink, 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			}
 		} elseif(!isset($_POST['version']))
-			$this->_sendResponse(400,CJSON::encode(['status' => 'failed','message' => 'مقدار نسخه فعلی ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(400,CJSON::encode(['status' => false,'message' => 'مقدار نسخه فعلی ارسال نشده است.']), 'application/json');
 		elseif(!isset($_POST['sim']))
-			$this->_sendResponse(400,CJSON::encode(['status' => 'failed','message'=> 'شماره سیم کارت ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(400,CJSON::encode(['status' => false,'message'=> 'شماره سیم کارت ارسال نشده است.']), 'application/json');
 	}
 
 	public function actionDownloadApp($token)
@@ -160,14 +160,14 @@ class ApiController extends ApiBaseController
 			$copyFileName = 'gohar-v'.$downloadToken->app_version.'-'.$downloadToken->request_time.'.apk';
 			if(!file_exists(Yii::getPathOfAlias('webroot').'/temp/'.$copyFileName)) {
 				$downloadToken->delete();
-				$this->_sendResponse(200, CJSON::encode(['getBaseLine'=>[['status' => 'failed', 'message' => 'نسخه جدید برنامه در سرور موجود نیست.لطفا مجددا درخواست کنید.']]]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['getBaseLine'=>[['status' => false, 'message' => 'نسخه جدید برنامه در سرور موجود نیست.لطفا مجددا درخواست کنید.']]]), 'application/json');
 			}
 			$fileLink = Yii::app()->createAbsoluteUrl('/temp/'.$copyFileName);
-			$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'directLink' => $fileLink]), 'application/json');
+			$this->_sendResponse(200, CJSON::encode(['status' => true, 'directLink' => $fileLink]), 'application/json');
 		}
 		if($downloadToken)
 			$downloadToken->delete();
-		$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'message' => 'لینک منقضی شده است.']), 'application/json');
+		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'لینک منقضی شده است.']), 'application/json');
 	}
 
 	public function actionCheckNumber()
@@ -197,7 +197,7 @@ class ApiController extends ApiBaseController
 						$flag = true;
 			}
 			if(!$flag)
-				$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'sms_send' => false, 'message' => 'پیامک کد فعالسازی ارسال نشده است.']), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'smsSend' => false, 'message' => 'پیامک کد فعالسازی ارسال نشده است.']), 'application/json');
 			$model = Users::model()->findByAttributes(array('mobile' => $_POST['sim']));
 			if($model) {
 				$model->password = null;
@@ -205,11 +205,11 @@ class ApiController extends ApiBaseController
 				{
 					$model->scenario = 'app_update';
 					if($model->createAppToken()->save())
-						$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+						$this->_sendResponse(200, CJSON::encode(['status' => true,
 							'isUser' => 1, 'newUser' => 0, 'userToken' => $model->app_token,
 							'user' => $model]), 'application/json');
 				}else
-					$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+					$this->_sendResponse(200, CJSON::encode(['status' => true,
 						'isUser' => 1, 'newUser' => 0, 'userToken' => $model->app_token,
 						'user' => $model]), 'application/json');
 			} else {
@@ -218,17 +218,17 @@ class ApiController extends ApiBaseController
 					$model = new Users('app_insert');
 					$model->mobile = $_POST['sim'];
 					if($model->createAppToken()->save())
-						$this->_sendResponse(200, CJSON::encode(['status' => 'success',
+						$this->_sendResponse(200, CJSON::encode(['status' => true,
 							'isUser' => 1, 'newUser' => 1, 'userToken' => $model->app_token,
 							'user' => $model]), 'application/json');
 					else
-						$this->_sendResponse(200, CJSON::encode(['status' => 'failed', 'isUser' => 0, 'message' => 'در ثبت نام مشکلی ایجاد شده است، لطفا مجددا تلاش کنید.', 'errors' => $model->errors]), 'application/json');
+						$this->_sendResponse(200, CJSON::encode(['status' => false, 'isUser' => 0, 'message' => 'در ثبت نام مشکلی ایجاد شده است، لطفا مجددا تلاش کنید.', 'errors' => $model->errors]), 'application/json');
 				}
 				else
-					$this->_sendResponse(200, CJSON::encode(['status' => 'success', 'isUser' => 0, 'signup_status' => 0, 'message' => 'متاسفانه در حال حاضر امکان عضویت جدید وجود ندارد، لطفا بعدا اقدام فرمایید.']), 'application/json');
+					$this->_sendResponse(200, CJSON::encode(['status' => true, 'isUser' => 0, 'signupStatus' => false, 'message' => 'متاسفانه در حال حاضر امکان عضویت جدید وجود ندارد، لطفا بعدا اقدام فرمایید.']), 'application/json');
 			}
 		} else
-			$this->_sendResponse(400, CJSON::encode(['status' => 'failed', 'message' => 'شماره سیم کارت  یا کد فعالسازی ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'شماره سیم کارت  یا کد فعالسازی ارسال نشده است.']), 'application/json');
 	}
 
 	public function actionTest()

@@ -73,10 +73,6 @@ class ModulesUserIdentity extends CUserIdentity
             $user = Users::model()->findByAttributes(array('app_token' => $this->appToken), 'deleted = 0');
             if(empty($user))
                 $this->errorCode=self::ERROR_TOKEN_INVALID;
-            elseif($user->activePlan->plansBuys->plan->disable_login == 1){
-                $this->errorCode = self::ERROR_DISABLE_LOGIN;
-                return $this->errorCode;
-            }
             elseif($user->status == Users::STATUS_NOT_VERIFIED){
                 $this->errorCode = self::ERROR_NOT_VERIFIED;
                 return $this->errorCode;
@@ -106,7 +102,7 @@ class ModulesUserIdentity extends CUserIdentity
 
     public function login($user){
         $this->setState('userID', $user->id);
-        $this->setState('fullName', $user->first_name. ' '.$user->last_name);
+        $this->setState('fullName', $user->first_name&&$user->last_name?$user->first_name. ' '.$user->last_name:'');
         $this->setState('role', $user->UsersRoles->title);
         if(!@class_exists('PlansBuys'))
             Yii::import('application.modules.plans.models.PlansBuys');
@@ -115,30 +111,29 @@ class ModulesUserIdentity extends CUserIdentity
             'condition'=>'user_id = :user AND status = :status AND active = 1',
             'params' => array(':user'=>$user->id,':status'=>Buys::STATUS_DONE),
         ));
-        if(!@class_exists('Plans'))
-            Yii::import('application.modules.plans.models.Plans');
-
-        $plan = $planUser->plan;
-        $planArray = array(
-            'id' => $plan->id,
-            'date' => $planUser->buy->date,
-            'name' => $plan->name,
-            'expire_date' => $planUser->expire_date,
-        );
-        $this->setState('plan', json_encode($planArray));
+        $planArray=array();
+        if($planUser) {
+            if (!@class_exists('Plans'))
+                Yii::import('application.modules.plans.models.Plans');
+            $plan = $planUser->plan;
+            $planArray = array(
+                'id' => $plan->id,
+                'date' => $planUser->buy->date,
+                'name' => $plan->name,
+                'expire_date' => $planUser->expire_date,
+            );
+            $this->setState('plan', json_encode($planArray));
+        }
         $this->setState('avatar', $user->avatar);
         $this->setState('type', 'user');
-
         $this->_appLoginArray = array(
             'type'=> 'user',
             'userID' => $user->id,
-            'fullName' => $user->first_name. ' '.$user->last_name,
+            'fullName' => $user->first_name&&$user->last_name?$user->first_name. ' '.$user->last_name:'',
             'role'=> $user->UsersRoles->title,
             'plan'=> json_encode($planArray),
             'avatar'=> $user->avatar
         );
-
-        $user->userInfoStatus();
     }
 
     public function getErrorMessage()

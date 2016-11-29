@@ -60,7 +60,7 @@ class ModulesAdminIdentity extends CUserIdentity
                 $this->_appLoginArray = array(
                     'type'=> 'admin',
                     'userID' => $admin->id,
-                    'fullName' => $admin->first_name . ' ' . $admin->last_name,
+                    'fullName' => $admin->first_name&&$admin->last_name?$admin->first_name . ' ' . $admin->last_name:'',
                     'role'=> $admin->AdminsRoles->title,
                     'avatar'=> $admin->avatar
                 );
