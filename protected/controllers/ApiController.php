@@ -14,7 +14,7 @@ class ApiController extends ApiBaseController
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + test, getUserList, getList, createCeremony, create',
+			'RestUserAccessControl + test, getList, create',
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -38,10 +38,9 @@ class ApiController extends ApiBaseController
 					break;
 				case 'Ticket':
 					Yii::app()->getModule('tickets');
-					$criteria->addCondition('user_id = :user_id AND user_type = :user_type');
+					$criteria->addCondition('user_id = :user_id');
 					$criteria->params[':user_id'] = $this->loginArray['userID'];
-					$criteria->params[':user_type'] = $this->loginArray['type'];
-					$list = Tickets::model()->findAll($criteria);
+					$list = Tickets::model()->with('ticketsContents')->findAll($criteria);
 					break;
 				case 'Notification':
 					Yii::app()->getModule('notifications');
