@@ -44,7 +44,7 @@ class ApiController extends ApiBaseController
 					break;
 				case 'Notification':
 					Yii::app()->getModule('notifications');
-					$criteria->addCondition('send_date < :time AND  expire_date < :time');
+					$criteria->addCondition('send_date < :time AND  expire_date > :time');
 					$criteria->params[':time'] = time();
 					$list = Notifications::model()->findAll($criteria);
 					break;
