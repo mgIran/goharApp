@@ -74,7 +74,7 @@ class ApiController extends ApiBaseController
 						if ($model->save())
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 						break;
-					case 'Ticket':
+					case 'Tickets':
 						Yii::app()->getModule('tickets');
 						$model = new Tickets();
 						if ($this->loginArray['type'] == 'admin')
