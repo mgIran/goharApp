@@ -31,6 +31,7 @@ return array(
         'users',
         'setting',
         'tickets',
+		'notifications',
 	),
 
 	// application components

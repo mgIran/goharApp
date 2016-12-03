@@ -30,21 +30,23 @@ class ApiController extends ApiBaseController
 				$criteria->params[':last_id'] = $lastId;
 			}
 			switch (trim($entity)) {
-				case 'places':
+				case 'Place':
 					$list = UsersPlaces::model()->findAll($criteria);
 					break;
-				case 'ceremonies':
+				case 'Ceremony':
 					$list = Events::model()->findAll($criteria);
 					break;
-				case 'tickets':
+				case 'Ticket':
 					Yii::app()->getModule('tickets');
 					$criteria->addCondition('user_id = :user_id AND user_type = :user_type');
 					$criteria->params[':user_id'] = $this->loginArray['userID'];
 					$criteria->params[':user_type'] = $this->loginArray['type'];
 					$list = Tickets::model()->findAll($criteria);
 					break;
-				case 'notifications':
+				case 'Notification':
 					Yii::app()->getModule('notifications');
+					$criteria->addCondition('send_date < :time AND  expire_date < :time');
+					$criteria->params[':time'] = time();
 					$list = Notifications::model()->findAll($criteria);
 					break;
 				default:
@@ -72,7 +74,7 @@ class ApiController extends ApiBaseController
 						if ($model->save())
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 						break;
-					case 'Tickets':
+					case 'Ticket':
 						Yii::app()->getModule('tickets');
 						$model = new Tickets();
 						if ($this->loginArray['type'] == 'admin')
@@ -99,15 +101,6 @@ class ApiController extends ApiBaseController
 			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
 		}
 		$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
-	}
-
-	public function actionCreateCeremony()
-	{
-		if(isset($_POST['Ceremony'])) {
-			list($eventsController) = Yii::app()->createController('events');
-			$eventsController->actionCreate(true);
-		}else
-			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت مراسم ارسال نشده است.']), 'application/json');
 	}
 	/**************************************************** Base Actions ***********************************************************/
 	public function actionGetLastVer()

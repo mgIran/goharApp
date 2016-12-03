@@ -104,25 +104,27 @@ class ModulesUserIdentity extends CUserIdentity
         $this->setState('userID', $user->id);
         $this->setState('fullName', $user->first_name&&$user->last_name?$user->first_name. ' '.$user->last_name:'');
         $this->setState('role', $user->UsersRoles->title);
-        if(!@class_exists('PlansBuys'))
-            Yii::import('application.modules.plans.models.PlansBuys');
-        $planUser = PlansBuys::model()->find(array(
-            'with' => 'buy',
-            'condition'=>'user_id = :user AND status = :status AND active = 1',
-            'params' => array(':user'=>$user->id,':status'=>Buys::STATUS_DONE),
-        ));
-        $planArray=array();
-        if($planUser) {
-            if (!@class_exists('Plans'))
-                Yii::import('application.modules.plans.models.Plans');
-            $plan = $planUser->plan;
-            $planArray = array(
-                'id' => $plan->id,
-                'date' => $planUser->buy->date,
-                'name' => $plan->name,
-                'expire_date' => $planUser->expire_date,
-            );
-            $this->setState('plan', json_encode($planArray));
+        if($this->authMode != self::TOKEN) {
+            if (!@class_exists('PlansBuys'))
+                Yii::import('application.modules.plans.models.PlansBuys');
+            $planUser = PlansBuys::model()->find(array(
+                'with' => 'buy',
+                'condition' => 'user_id = :user AND status = :status AND active = 1',
+                'params' => array(':user' => $user->id, ':status' => Buys::STATUS_DONE),
+            ));
+            $planArray = array();
+            if ($planUser) {
+                if (!@class_exists('Plans'))
+                    Yii::import('application.modules.plans.models.Plans');
+                $plan = $planUser->plan;
+                $planArray = array(
+                    'id' => $plan->id,
+                    'date' => $planUser->buy->date,
+                    'name' => $plan->name,
+                    'expire_date' => $planUser->expire_date,
+                );
+                $this->setState('plan', json_encode($planArray));
+            }
         }
         $this->setState('avatar', $user->avatar);
         $this->setState('type', 'user');
@@ -131,7 +133,6 @@ class ModulesUserIdentity extends CUserIdentity
             'userID' => $user->id,
             'fullName' => $user->first_name&&$user->last_name?$user->first_name. ' '.$user->last_name:'',
             'role'=> $user->UsersRoles->title,
-            'plan'=> json_encode($planArray),
             'avatar'=> $user->avatar
         );
     }
