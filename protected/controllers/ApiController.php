@@ -108,7 +108,9 @@ class ApiController extends ApiBaseController
 			$baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
 			$lastVer = SiteOptions::model()->findByAttributes(['name' => 'app_version']);
 			if($_POST['version'] == $lastVer->value)
-				$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'نسخه نرم افزار به روز می باشد.', 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'نسخه نرم افزار به روز می باشد.',
+					'serverTime' => time(),
+					'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			else {
 				$fileName = 'gohar-v'.$lastVer->value.'.apk';
 				$downloadToken = DownloadTokens::model()->findByAttributes(['app_version' => $lastVer->value, 'sim' => $_POST['sim']]);
@@ -137,7 +139,7 @@ class ApiController extends ApiBaseController
 						@copy(Yii::getPathOfAlias('webroot').'/uploads/app/'.$fileName, Yii::getPathOfAlias('webroot').'/temp/'.$copyFileName);
 				}
 				$fileLink = Yii::app()->createAbsoluteUrl('/api/downloadApp/'.$downloadToken->token);
-				$this->_sendResponse(200, CJSON::encode(['status' => false, 'newVersionLink' => $fileLink, 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'newVersionLink' => $fileLink,'serverTime' => time(), 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			}
 		} elseif(!isset($_POST['version']))
 			$this->_sendResponse(400,CJSON::encode(['status' => false,'message' => 'مقدار نسخه فعلی ارسال نشده است.']), 'application/json');
