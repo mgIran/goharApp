@@ -19008,3 +19008,15 @@ in E:\wamp\www\yusef\gohar-app\index.php (11)
 in E:\wamp\www\yusef\gohar-app\protected\controllers\EventsController.php (59)
 in E:\wamp\www\yusef\gohar-app\protected\controllers\ApiController.php (156)
 in E:\wamp\www\yusef\gohar-app\index.php (11)
+2016/12/20 10:41:39 [warning] [application] Failed to set unsafe attribute "verifyCode" of "AdminsLogin".
+in E:\Projects\wamp\www\goharApp\protected\modules\admins\controllers\AdminsLoginController.php (86)
+in E:\Projects\wamp\www\goharApp\index.php (11)
+2016/12/21 09:40:32 [warning] [application] Failed to set unsafe attribute "verifyCode" of "AdminsLogin".
+in E:\Projects\wamp\www\goharApp\protected\modules\admins\controllers\AdminsLoginController.php (86)
+in E:\Projects\wamp\www\goharApp\index.php (11)
+2016/12/22 09:53:45 [warning] [application] Failed to set unsafe attribute "verifyCode" of "AdminsLogin".
+in E:\Projects\wamp\www\goharApp\protected\modules\admins\controllers\AdminsLoginController.php (86)
+in E:\Projects\wamp\www\goharApp\index.php (11)
+2016/12/22 13:40:20 [warning] [application] Failed to set unsafe attribute "verifyCode" of "AdminsLogin".
+in E:\Projects\wamp\www\goharApp\protected\modules\admins\controllers\AdminsLoginController.php (86)
+in E:\Projects\wamp\www\goharApp\index.php (11)

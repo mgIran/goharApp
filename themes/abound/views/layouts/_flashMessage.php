@@ -13,4 +13,9 @@ if(!isset($prefix))
         <button class="close close-sm" type="button" data-dismiss="alert"><i class="icon-remove"></i></button>
         <?php echo Yii::app()->user->getFlash($prefix.'failed');?>
     </div>
+<?php elseif(Yii::app()->user->hasFlash($prefix.'warning')):?>
+    <div class="alert alert-warning fade in">
+        <button class="close close-sm" type="button" data-dismiss="alert"><i class="icon-remove"></i></button>
+        <?php echo Yii::app()->user->getFlash($prefix.'warning');?>
+    </div>
 <?php endif;?>

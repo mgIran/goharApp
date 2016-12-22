@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Yusef-PC
+ * User: App-PC
  * Date: 12/10/2015
  * Time: 10:04 PM
  */
@@ -166,7 +166,7 @@ class dropZoneUploader extends CWidget
                     var mockFile = { name: value.name, size: value.size ,serverName : value.name ,accepted : true};
                     if ((thisDropzone.options.maxFiles != null) && thisDropzone.getAcceptedFiles().length < thisDropzone.options.maxFiles) {
                         thisDropzone.options.addedfile.call(thisDropzone, mockFile);
-                        if($.inArray(value.name.split(\'.\').pop().toLowerCase(), extArr) > -1)
+                        if($.inArray(value.name.split(\'.\').pop(), extArr) > -1)
                         {
                             thisDropzone.createThumbnailFromUrl(mockFile , value.src);
                             thisDropzone.options.thumbnail.call(thisDropzone, mockFile, value.src);
@@ -179,13 +179,12 @@ class dropZoneUploader extends CWidget
                 ';
             }else
             {
-                //var_dump($data);exit;
                 $filesAddScript = '
                 var value = '.$data.';
                 var mockFile = { name: value.name, size: value.size ,serverName : value.name ,accepted : true};
                 if ((thisDropzone.options.maxFiles != null) && thisDropzone.getAcceptedFiles().length < thisDropzone.options.maxFiles) {
                     thisDropzone.options.addedfile.call(thisDropzone, mockFile);
-                    if($.inArray(value.name.split(\'.\').pop().toLowerCase(), extArr) > -1)
+                    if($.inArray(value.name.split(\'.\').pop(), extArr) > -1)
                     {
                         thisDropzone.createThumbnailFromUrl(mockFile , value.src);
                         thisDropzone.options.thumbnail.call(thisDropzone, mockFile, value.src);

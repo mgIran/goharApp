@@ -536,7 +536,7 @@
         this.element.setAttribute("enctype", "multipart/form-data");
       }
       if (this.element.classList.contains("dropzone") && !this.element.querySelector(".dz-message")) {
-        this.element.appendChild(Dropzone.createElement("<div class=\"dz-default dz-message\"><span style='display: block;'>" + this.options.dictDefaultMessage + "</span><span style='font-size:11px;display: block;'>تعداد فایل مجاز : "+this.options.maxFiles+"</span><span class='dz-accepted' >" + this.options.acceptedFiles + "</span></div>"));
+        this.element.appendChild(Dropzone.createElement("<div class=\"dz-default dz-message\"><span style='display: block;'>" + this.options.dictDefaultMessage + "</span>"+((this.options.maxFiles=='null')?"":"<span style='font-size:11px;display: block;'>تعداد فایل مجاز : "+this.options.maxFiles+"</span>")+"<span class='dz-accepted' >" + this.options.acceptedFiles + "</span></div>"));
       }
       if (this.clickableElements.length) {
         setupHiddenFileInput = (function(_this) {

@@ -3,7 +3,7 @@ return array(
     'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
     'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 	'basePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'گوهر',
+	'name'=>'پنل مدیریت اپلیکیشن گهر',
     'timeZone' => 'Asia/Tehran',
     'theme' => 'abound',
     'language' => 'fa_ir',
