@@ -1,6 +1,6 @@
 <?php
 Yii::import('admins.models.*');
-class ApiController extends ApiBaseController
+class ApiController extends Controller
 {
 	/**
 	 * Key which has to be in HTTP USERNAME and PASSWORD headers
@@ -70,10 +70,12 @@ class ApiController extends ApiBaseController
 					case 'Ceremony':
 						$model = new Events;
 						$model->attributes = $_POST[$entity];
+						$model->creator_type = $this->loginArray['type'];
+						$model->creator_id = $this->loginArray['userID'];
 						if ($model->save())
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 						break;
-					case 'Tickets':
+					case 'Ticket':
 						Yii::app()->getModule('tickets');
 						$model = new Tickets();
 						if ($this->loginArray['type'] == 'admin')
@@ -92,7 +94,7 @@ class ApiController extends ApiBaseController
 						}
 						break;
 					default:
-						$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'دسترسی به موجودیت مورد نظر امکان ندارد']), 'application/json');
+						$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
 						break;
 				}
 				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');

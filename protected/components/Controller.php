@@ -64,13 +64,17 @@ class Controller extends ApiBaseController
 
     /**
      * @param $model
+     * @param bool $html
      * @return string
      */
-    public static function implodeErrors($model)
+    public static function implodeErrors($model, $html=false)
     {
-        $errors = '';
-        foreach($model->getErrors() as $err){
-            $errors .= implode('<br>' ,$err) . '<br>';
+        $errors = $html?'':array();
+        foreach($model->getErrors() as $key => $err){
+            if($html)
+                $errors .= implode('<br>' ,$err) . '<br>';
+            else
+                $errors[$key] = $err[0];
         }
         return $errors;
     }

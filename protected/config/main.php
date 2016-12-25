@@ -64,7 +64,7 @@ return array(
 				array('api/update', 'pattern'=>'api/update/<model:\w+>/<id:\d+>', 'verb'=>'PUT'),
 				array('api/delete', 'pattern'=>'api/delete/<model:\w+>/<id:\d+>', 'verb'=>'DELETE'),
 				array('api/create', 'pattern'=>'api/create/<model:\w+>', 'verb'=>'POST'),
-				array('<module>/<controller>/create', 'pattern'=>'api/<module:\w+>/<controller:\w+>/create', 'verb'=>'POST'),
+//				array('<module>/<controller>/create', 'pattern'=>'api/<module:\w+>/<controller:\w+>/create', 'verb'=>'POST'),
 				array('api/<action>', 'pattern'=>'api/<action:\w+>', 'verb'=>'POST'),
 				array('api/<action>', 'pattern'=>'api/<action:\w+>', 'verb'=>'GET'),
 				'<action:(login|logout|register|dashboard)>' => 'users/public/<action>',
