@@ -2,6 +2,7 @@
 /* @var $this NotificationsManageController */
 /* @var $model Notifications */
 /* @var $form CActiveForm */
+/* @var $poster array */
 ?>
 
 <div class="form">
@@ -12,10 +13,10 @@
 	// controller action is handling ajax validation correctly.
 	// There is a call to performAjaxValidation() commented in generated controller code.
 	// See class documentation of CActiveForm for details on this.
-	'enableAjaxValidation'=>false,
+	'enableAjaxValidation'=>true,
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+	<?php $this->renderPartial('//layouts/_flashMessage'); ?>
 
 	<?php echo $form->errorSummary($model); ?>
 
@@ -27,13 +28,27 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'send_date'); ?>
-		<?php echo $form->textField($model,'send_date',array('size'=>20,'maxlength'=>20)); ?>
+		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+			'id'=>'send-date',
+			'model'=>$model,
+			'attribute'=>'send_date',
+			'options'=>array(
+				'format'=>'DD MMMM YYYY'
+			),
+		));?>
 		<?php echo $form->error($model,'send_date'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'expire_date'); ?>
-		<?php echo $form->textField($model,'expire_date',array('size'=>20,'maxlength'=>20)); ?>
+		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+			'id'=>'expire-date',
+			'model'=>$model,
+			'attribute'=>'expire_date',
+			'options'=>array(
+				'format'=>'DD MMMM YYYY'
+			),
+		));?>
 		<?php echo $form->error($model,'expire_date'); ?>
 	</div>
 
@@ -45,24 +60,38 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'status'); ?>
-		<?php echo $form->textField($model,'status',array('size'=>7,'maxlength'=>7)); ?>
+		<?php echo $form->dropDownList($model, 'status', $model->statusLabels) ?>
 		<?php echo $form->error($model,'status'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'poster'); ?>
-		<?php echo $form->textField($model,'poster',array('size'=>60,'maxlength'=>500)); ?>
+		<?php $this->widget('ext.dropZoneUploader.dropZoneUploader', array(
+			'id' => 'poster-uploader',
+			'model' => $model,
+			'name' => 'poster',
+			'maxFiles' => 1,
+			'maxFileSize' => 1, //MB
+			'url' => $this->createUrl('/notifications/manage/upload'),
+			'deleteUrl' => $this->createUrl('/notifications/manage/deleteUpload'),
+			'acceptedFiles' => '.jpeg, .jpg, .png, .gif',
+			'serverFiles' => $poster,
+			'onSuccess' => '
+				var responseObj = JSON.parse(res);
+				if(responseObj.status){
+					{serverName} = responseObj.fileName;
+					$(".uploader-message").html("");
+				}
+				else{
+					$(".uploader-message").html(responseObj.message);
+                    this.removeFile(file);
+                }
+		')); ?>
 		<?php echo $form->error($model,'poster'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'visit'); ?>
-		<?php echo $form->textField($model,'visit',array('size'=>10,'maxlength'=>10)); ?>
-		<?php echo $form->error($model,'visit'); ?>
-	</div>
-
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<?php echo CHtml::submitButton($model->isNewRecord ? 'ثبت' : 'ذخیره', array('class'=>'btn btn-success')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

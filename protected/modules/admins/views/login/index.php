@@ -26,14 +26,8 @@ $this->breadcrumbs=array(
             'afterValidate' => 'js:function(form, data, hasError){
             if(hasError)
                 $(".captcha-container img").trigger("click");
-            app.formOnCenter(true);
             return true;
-        }',
-            'afterValidateAttribute' => 'js:function(){
-            app.formOnCenter(true);
-            return true;
-        }'
-        ),
+        }'),
         'htmlOptions' => array(
             'class' => 'col-md-6 col-md-offset-4'
         )
