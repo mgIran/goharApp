@@ -14,7 +14,7 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + test, getList, create',
+			'RestUserAccessControl + test, getList, create, upload',
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -98,6 +98,26 @@ class ApiController extends Controller
 						break;
 				}
 				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
+			}
+			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+		}
+		$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
+	}
+	public function actionUpload()
+	{
+		if (isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))) {
+			var_dump($_POST,$_FILES);exit;
+			if (isset($_POST[$entity])) {
+				switch ($entity) {
+					case 'poster':
+						var_dump($_POST,$_FILES);exit;
+						$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
+						break;
+					default:
+						$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+						break;
+				}
+				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.']), 'application/json');
 			}
 			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
 		}
