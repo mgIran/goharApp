@@ -14,7 +14,7 @@ class ApiController extends ApiBaseController
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + test, getList, create',
+			'RestUserAccessControl + getList, create',
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -227,6 +227,7 @@ class ApiController extends ApiBaseController
 
 	public function actionTest()
 	{
+		var_dump($_POST);exit;
 		var_dump($this->loginArray);exit;
 	}
 }
