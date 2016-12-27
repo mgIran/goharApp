@@ -106,20 +106,27 @@ class ApiController extends Controller
 	public function actionUpload()
 	{
 		if (isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))) {
-			var_dump($_POST,$_FILES);exit;
-			if (isset($_POST[$entity])) {
-				switch ($entity) {
-					case 'poster':
-						var_dump($_POST,$_FILES);exit;
-						$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
-						break;
-					default:
-						$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
-						break;
-				}
-				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.']), 'application/json');
+			$entityUploadClass=CUploadedFile::getInstanceByName($entity);
+			switch ($entity) {
+				case 'poster':
+					$path = Yii::getPathOfAlias('webroot').'/uploads/events/';
+					$link = Yii::app()->baseUrl.'/uploads/events/'.$entityUploadClass->getName();
+					break;
+				default:
+					$path = Yii::getPathOfAlias('webroot').'/uploads/temp/';
+					$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+					break;
 			}
-			$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+			if(!is_dir($path))
+				mkdir($path);
+			if(!$entityUploadClass->getHasError() && $entityUploadClass->saveAs($path.$entityUploadClass->getName()))
+				$this->_sendResponse(200, CJSON::encode(['status' => true,
+					'filename' => $entityUploadClass->getName() ,
+					'link' => $link ,
+					'message' => 'فایل با موفقیت آپلود شد.']), 'application/json');
+			else
+				$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'درآپلود فایل خطایی رخ داده است.',
+					'errors' => $entityUploadClass->getError()]), 'application/json');
 		}
 		$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
