@@ -113,7 +113,6 @@ class ApiController extends Controller
 					$link = Yii::app()->baseUrl.'/uploads/events/'.$entityUploadClass->getName();
 					break;
 				default:
-					$path = Yii::getPathOfAlias('webroot').'/uploads/temp/';
 					$this->_sendResponse(400, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
 					break;
 			}
