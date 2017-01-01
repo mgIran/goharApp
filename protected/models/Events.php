@@ -5,6 +5,8 @@
  *
  * The followings are the available columns in table '{{events}}':
  * @property string $id
+ * @property string $creator_type
+ * @property string $creator_id
  * @property string $type1
  * @property string $type2
  * @property string $subject1
@@ -68,18 +70,20 @@ class Events extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
+			array('creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
 			array('activator_area_code, activator_postal_code', 'numerical', 'integerOnly'=>true),
 			array('subject1, subject2, conductor1, conductor2, reception, ceremony_poster', 'length', 'max'=>256),
 			array('sexed_guest', 'length', 'max'=>6),
 			array('min_age_guests, max_age_guests, long_days_run, max_more_days, more_days, area_code', 'length', 'max'=>2),
 			array('start_date_run, start_time_run, end_time_run', 'length', 'max'=>20),
 			array('state_id, city_id, postal_code', 'length', 'max'=>10),
+			array('creator_type', 'length', 'max'=>50),
+			array('creator_id', 'length', 'max'=>11),
 			array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max'=>25),
 			array('type1, type2, state, city, complete_details, invitees', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('type1, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, max_more_days, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster', 'safe', 'on'=>'search'),
+			array('creator_type, creator_id, type1, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, max_more_days, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -102,6 +106,8 @@ class Events extends CActiveRecord
 	{
 		return array(
 			'id' => 'شناسه',
+			'creator_type' => 'نوع ایجاد کننده',
+			'creator_id' => 'شناسه ایجاد کننده',
 			'subject1' => 'موضوع',
 			'subject2' => 'موضوع',
 			'conductor1' => 'میزبان',
@@ -160,6 +166,8 @@ class Events extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
+		$criteria->compare('creator_type',$this->creator_type,true);
+		$criteria->compare('creator_id',$this->creator_id,true);
 		$criteria->compare('subject1',$this->subject1,true);
 		$criteria->compare('subject2',$this->subject2,true);
 		$criteria->compare('conductor1',$this->conductor1,true);

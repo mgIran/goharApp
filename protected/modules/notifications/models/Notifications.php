@@ -15,6 +15,12 @@
  */
 class Notifications extends CActiveRecord
 {
+	public $statusLabels=array(
+		'waiting'=>'در صف انتظار',
+		'sending'=>'در حال ارسال',
+		'end'=>'ارسال شده'
+	);
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -63,10 +69,10 @@ class Notifications extends CActiveRecord
 			'id' => 'ID',
 			'subject' => 'موضوع',
 			'send_date' => 'تاریخ شروع ارسال',
-			'expire_date' => 'Expire Date',
+			'expire_date' => 'تاریخ انقضاء',
 			'content' => 'محتوا',
 			'status' => 'وضعیت',
-			'poster' => 'Poster',
+			'poster' => 'پوستر',
 			'visit' => 'Visit',
 		);
 	}
@@ -97,6 +103,7 @@ class Notifications extends CActiveRecord
 		$criteria->compare('status',$this->status,true);
 		$criteria->compare('poster',$this->poster,true);
 		$criteria->compare('visit',$this->visit,true);
+		$criteria->order='id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

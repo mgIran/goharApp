@@ -1,29 +1,7 @@
 $(function(){
-    // CALL CALENDAR
-    $('.datepicker').persianDatepicker({
-        altField: '.date',
-        altFormat: 'X',
-        observer: true,
-        format: 'DD MMMM YYYY',
-        persianDigit: false
-    });
-
-    $('.timepicker').persianDatepicker({
-        altField: '.time',
-        altFormat: 'X',
-        format: 'HH:mm a',
-        onlyTimePicker: true
-    });
-
-    // fade out alert messages
     setInterval(function(){
-        $(".alert").fadeTo(500, 0).slideUp(500, function(){
-            $(this).remove();
-        });
-    }, 5000);
-
-
-    //
+        $(".alert").fadeOut(2000);
+    }, 20000);
     $('.nav-tabs > li').click(function(event){
         if ($(this).hasClass('disabled')) {
             return false;
@@ -33,7 +11,7 @@ $(function(){
     $('body').on('click', '.add-multipliable-input', function(){
         var input=document.createElement('input');
         input.type='text';
-        input.name='Apps[permissions]['+$('.multipliable-input').length+']';
+        input.name='Books[permissions]['+$('.multipliable-input').length+']';
         input.placeholder='دسترسی';
         input.className='form-control multipliable-input';
         var container=document.getElementsByClassName('multipliable-input-container');
@@ -47,6 +25,7 @@ $(function(){
         return false;
     });
 });
+
 
 function submitAjaxForm(form ,url ,loading ,callback) {
     loading = typeof loading !== 'undefined' ? loading : null;
@@ -63,9 +42,9 @@ function submitAjaxForm(form ,url ,loading ,callback) {
         success: function (html) {
             if(loading)
                 loading.hide();
-            if (typeof html === "object" && typeof html.state === 'undefined') {
+            if (typeof html === "object" && (typeof html.status === 'undefined' || typeof html.state === 'undefined')) {
                 $.each(html, function (key, value) {
-                    $("#" + key + "_em_").show().html(value.toString()).parent().removeClass('success').addClass('error');
+                    $("#" + key + "_em_").show().html(value.toString());
                 });
             }else
                 eval(callback);

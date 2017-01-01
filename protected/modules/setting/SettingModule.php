@@ -1,11 +1,7 @@
 <?php
 
-class NotificationsModule extends CWebModule
+class SettingModule extends CWebModule
 {
-	public $controllerMap = array(
-		'manage'=>'notifications.controllers.notificationsManageController',
-	);
-
 	public function init()
 	{
 		// this method is called when the module is being created
@@ -13,8 +9,8 @@ class NotificationsModule extends CWebModule
 
 		// import the module-level models and components
 		$this->setImport(array(
-			'notifications.models.*',
-			'notifications.components.*',
+			'setting.models.*',
+			'setting.components.*',
 		));
 	}
 

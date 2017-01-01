@@ -1,14 +1,14 @@
 <?php
 return array(
-    'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
+    'onBeginRequest'=>create_function('$event', 'return ob_start();'),
     'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 	'basePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'گوهر',
+	'name'=>'پنل مدیریت اپلیکیشن گهر',
     'timeZone' => 'Asia/Tehran',
     'theme' => 'abound',
     'language' => 'fa_ir',
 	// preloading 'log' component
-	'preload'=>array('log'),
+	//	'preload'=>array('log'),
 
 	// autoloading model and component classes
 	'import'=>array(
@@ -64,7 +64,7 @@ return array(
 				array('api/update', 'pattern'=>'api/update/<model:\w+>/<id:\d+>', 'verb'=>'PUT'),
 				array('api/delete', 'pattern'=>'api/delete/<model:\w+>/<id:\d+>', 'verb'=>'DELETE'),
 				array('api/create', 'pattern'=>'api/create/<model:\w+>', 'verb'=>'POST'),
-				array('<module>/<controller>/create', 'pattern'=>'api/<module:\w+>/<controller:\w+>/create', 'verb'=>'POST'),
+//				array('<module>/<controller>/create', 'pattern'=>'api/<module:\w+>/<controller:\w+>/create', 'verb'=>'POST'),
 				array('api/<action>', 'pattern'=>'api/<action:\w+>', 'verb'=>'POST'),
 				array('api/<action>', 'pattern'=>'api/<action:\w+>', 'verb'=>'GET'),
 				'<action:(login|logout|register|dashboard)>' => 'users/public/<action>',
