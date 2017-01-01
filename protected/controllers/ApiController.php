@@ -108,7 +108,7 @@ class ApiController extends Controller
 	{
 		if(isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))){
 			$entityUploadClass = CUploadedFile::getInstanceByName($entity);
-			if(!$entityUploadClass->getHasError())
+			if($entityUploadClass->getHasError())
 				$this->_sendResponse(200 ,CJSON::encode(['status' => false ,'message' => 'درآپلود فایل خطایی رخ داده است.' ,
 					'errors' => $entityUploadClass->getError()]) ,'application/json');
 			switch($entity){
