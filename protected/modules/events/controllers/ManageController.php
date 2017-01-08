@@ -79,6 +79,8 @@ class ManageController extends Controller
 
 		$this->performAjaxValidation($model);
 
+        $categories = array('مذهبی', 'فرهنگی', 'هنری', 'سیاسی', 'اجتماعی', 'اقتصادی', 'تجارت', 'ورزشی', 'تفریحی', 'سلامت', 'فناوری', 'علمی', 'راهپیمایی', 'آموزشی', 'خیرات', 'سایر موارد');
+
 		$tmpDIR = Yii::getPathOfAlias("webroot") . '/uploads/temp/';
 		if (!is_dir($tmpDIR))
 			mkdir($tmpDIR);
@@ -92,10 +94,11 @@ class ManageController extends Controller
 		if (isset($_POST['Events'])) {
 			$model->attributes = $_POST['Events'];
 
+            $model->creator_type='admin';
+            $model->creator_id=Yii::app()->user->userID;
 			$model->invitees = CJSON::encode($model->invitees);
-			$model->type1 = $model->selectedCategories[0];
-			$model->type2 = $model->selectedCategories[1];
-			$model->dataSender = 'server';
+			$model->type1 = $categories[$model->selectedCategories[0]];
+			$model->type2 = $categories[$model->selectedCategories[1]];
 
 			if (isset($_POST['Events']['ceremony_poster'])) {
 				$file = $_POST['Events']['ceremony_poster'];
@@ -118,7 +121,6 @@ class ManageController extends Controller
 		}
 
 		$states = CHtml::listData(UsersPlaces::model()->findAll('parent_id IS NULL'), 'id', 'title');
-        $categories = array('مذهبی', 'فرهنگی', 'هنری', 'سیاسی', 'اجتماعی', 'اقتصادی', 'تجارت', 'ورزشی', 'تفریحی', 'سلامت', 'فناوری', 'علمی', 'راهپیمایی', 'آموزشی', 'خیرات', 'سایر موارد');
 
 		$this->render('create', array(
 			'model' => $model,
@@ -136,6 +138,8 @@ class ManageController extends Controller
 	public function actionUpdate($id)
     {
         $model = $this->loadModel($id);
+
+        $categories = array('مذهبی', 'فرهنگی', 'هنری', 'سیاسی', 'اجتماعی', 'اقتصادی', 'تجارت', 'ورزشی', 'تفریحی', 'سلامت', 'فناوری', 'علمی', 'راهپیمایی', 'آموزشی', 'خیرات', 'سایر موارد');
 
         $this->performAjaxValidation($model);
 
@@ -164,10 +168,14 @@ class ManageController extends Controller
 
             $model->invitees = CJSON::encode($model->invitees);
             if (isset($model->selectedCategories[0]))
-                $model->type1 = $model->selectedCategories[0];
+                $model->type1 = $categories[$model->selectedCategories[0]];
+            else
+                $model->type1=null;
+
             if (isset($model->selectedCategories[1]))
-                $model->type2 = $model->selectedCategories[1];
-            $model->dataSender = 'server';
+                $model->type2 = $categories[$model->selectedCategories[1]];
+            else
+                $model->type2=null;
 
             if (isset($_POST['Events']['ceremony_poster']) and file_exists($tmpDIR . $_POST['Events']['ceremony_poster'])) {
                 $file = $_POST['Events']['ceremony_poster'];
@@ -178,11 +186,6 @@ class ManageController extends Controller
                     'serverName' => $file,
                 );
             }
-
-            // delete selected categories from EventCategoryRel
-            /* @var $category EventCategories */
-            foreach ($model->categories as $category)
-                EventCategoryRel::model()->deleteAll('category_id = :id', array(':id' => $category->id));
 
             if ($model->save()) {
                 if ($model->ceremony_poster and file_exists($tmpDIR . $model->ceremony_poster))
@@ -195,8 +198,7 @@ class ManageController extends Controller
         }
 
         $states = CHtml::listData(UsersPlaces::model()->findAll('parent_id IS NULL'), 'id', 'title');
-        $categories = array('مذهبی', 'فرهنگی', 'هنری', 'سیاسی', 'اجتماعی', 'اقتصادی', 'تجارت', 'ورزشی', 'تفریحی', 'سلامت', 'فناوری', 'علمی', 'راهپیمایی', 'آموزشی', 'خیرات', 'سایر موارد');
-        $model->selectedCategories = array($model->type1, $model->type2);
+        $model->selectedCategories = array(array_search($model->type1, $categories), array_search($model->type2, $categories));
 
         $this->render('update', array(
             'model' => $model,

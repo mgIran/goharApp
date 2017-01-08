@@ -45,8 +45,6 @@
  * @property string $city
  * @property string $selectedCategories
  *
- * The followings are the available model relations:
- * @property EventCategories[] $categories
  */
 class Events extends CActiveRecord
 {
@@ -77,7 +75,6 @@ class Events extends CActiveRecord
         'female'=>'بانوان',
         'both'=>'هر دو'
     );
-    public $dataSender='app';
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -254,6 +251,8 @@ class Events extends CActiveRecord
 		$criteria->compare('activator_area_code',$this->activator_area_code);
 		$criteria->compare('activator_postal_code',$this->activator_postal_code);
 		$criteria->compare('ceremony_poster',$this->ceremony_poster,true);
+
+        $criteria->order='id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
