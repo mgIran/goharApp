@@ -58,7 +58,7 @@
 
 
     <div class="row">
-        <div class="col-md-2 pull-left">
+        <div class="pull-left">
             <?php echo CHtml::submitButton('ارسال' , array('class'=>'form-control btn btn-default submit')); ?>
         </div>
     </div>
@@ -66,3 +66,46 @@
     <?php $this->endWidget(); ?>
 
 </div>
+
+<?php Yii::app()->clientScript->registerScript('ajaxSubmitTicket',"
+function ajaxSubmitTicket(form, data, hasError){
+    if(!hasError){
+        form = $('#tickets-content-form');
+        var formSerialize = $(form).serialize()+'&ajaxInsert=true';
+        var options = {
+            url : $(form).attr('action'),
+            data: {'ajaxInsert':true},
+            beforeSubmit:  function(){
+                if($('.submit').hasClass('doing'))
+                    return false;
+                else
+                    $('.submit').addClass('doing').val('در حال ارسال...');
+            },
+            complete: function(response) {
+                $('.submit').removeClass('doing').val('ارسال');
+                if(response != 'false')
+                {
+                    $('.form-container').html(response.responseText);
+                    newForm = $('.form-container').find('form');
+                    newForm.yiiactiveform({
+                        'validateOnChange':false,
+                        'validateOnSubmit' : true,
+                        'afterValidate' : ajaxSubmitTicket,
+                        'attributes':[{
+                            'enableAjaxValidation':true,
+                            'summary':true
+                        }],
+                        'summaryID':newForm.attr('id')+'_es_',
+                        'errorCss':'error'
+                    });
+
+                    $.fn.yiiListView.update('list-view');
+                    $('#TicketsContent_text').val('');
+                }
+            }
+        };
+
+        $(form).ajaxSubmit(options);
+    }
+}
+");?>

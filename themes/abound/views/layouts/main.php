@@ -32,6 +32,7 @@
       $cs->registerScriptFile($baseUrl.'/js/persian-datepicker-0.4.5.min.js');
       $cs->registerScriptFile($baseUrl.'/js/persian-date.js');
 	  $cs->registerScriptFile($baseUrl.'/js/bootstrap.min.js');
+	  $cs->registerScriptFile($baseUrl.'/js/jquery.form.js');
       $cs->registerScriptFile($baseUrl.'/js/scripts.js');
 	?>
   </head>

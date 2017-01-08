@@ -245,11 +245,6 @@ class UsersPlacesController extends Controller
             array(':town_id'=>$id)
         );
         $data = CHtml::listData($models, 'id', 'title');
-        foreach($data as $key=>$value)
-        {
-            echo "<li class='filter-change' data-value='".$key."'>".
-                    "<span>".$value."</span>".
-                 "</li>";
-        }
+        echo CJSON::encode($data);
     }
 }

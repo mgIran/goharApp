@@ -41,12 +41,25 @@
  * @property string $ceremony_poster
  * @property string $state
  * @property string $city
+ * @property string $selectedCategories
  *
  * The followings are the available model relations:
- * @property EventCategories[] $iwEventCategories
+ * @property EventCategories[] $categories
  */
 class Events extends CActiveRecord
 {
+	public $selectedCategories;
+	public $inviteesLabels = array(
+		'executer' => 'مجری',
+		'reader' => 'قاری',
+		'poet' => 'شاعر',
+		'speaker' => 'سخنران',
+		'maddah' => 'مداح',
+		'singer' => 'خواننده',
+		'team' => 'تیم/گروه',
+		'other' => 'سایر',
+	);
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -59,6 +72,12 @@ class Events extends CActiveRecord
 	public $city;
 	public $type1;
 	public $type2;
+	public $sexLabels=array(
+		'male'=>'آقایان',
+		'female'=>'بانوان',
+		'both'=>'هر دو'
+	);
+	public $dataSender='app';
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -77,11 +96,45 @@ class Events extends CActiveRecord
 			array('state_id, city_id, postal_code', 'length', 'max'=>10),
 			array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max'=>25),
 			array('type1, type2, state, city, complete_details, invitees', 'safe'),
+			array('selectedCategories', 'safe'),
+			array('max_more_days', 'checkMoreDays'),
+			array('long_days_run', 'checkLongDays'),
+            array('end_time_run', 'checkEndTime', 'distance'=>15),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('type1, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, max_more_days, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster', 'safe', 'on'=>'search'),
 		);
 	}
+
+    public function checkEndTime($attribute, $params)
+    {
+        $lastDay = $this->start_date_run + ($this->long_days_run * (3600 * 24));
+        $lastDateTime = strtotime(date('Y/m/d', $lastDay) . date(' H:i', $this->end_time_run));
+        if ($lastDateTime < time())
+            $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
+        elseif ($lastDateTime < (time() + ($params['distance'] * 60)))
+            $this->addError($attribute, 'تاریخ و زمان آخرین جلسه از مراسم باید حداقل '.$params['distance'].' دقیقه بعد باشد.');
+    }
+
+    public function checkMoreDays()
+    {
+        Yii::app()->getModule('setting');
+        $showEventMoreThanDefault=SiteOptions::model()->getOption('show_event_more_than_default');
+
+        if($this->max_more_days > $showEventMoreThanDefault)
+            $this->addError('max_more_days', $this->getAttributeLabel('max_more_days').' نمی تواند بیشتر از '.$showEventMoreThanDefault.' باشد.');
+    }
+
+    public function checkLongDays()
+    {
+        Yii::app()->getModule('setting');
+        $eventMaxLongDays=SiteOptions::model()->getOption('event_max_long_days');
+
+        if($this->long_days_run < 1)
+            $this->addError('long_days_run', $this->getAttributeLabel('long_days_run').' نمی تواند کمتر از 1 باشد.');
+        elseif($this->long_days_run > $eventMaxLongDays)
+            $this->addError('long_days_run', $this->getAttributeLabel('long_days_run').' نمی تواند بیشتر از '.$eventMaxLongDays.' باشد.');
+    }
 
 	/**
 	 * @return array relational rules.
@@ -102,10 +155,10 @@ class Events extends CActiveRecord
 	{
 		return array(
 			'id' => 'شناسه',
-			'subject1' => 'موضوع',
-			'subject2' => 'موضوع',
-			'conductor1' => 'میزبان',
-			'conductor2' => 'میزبان',
+			'subject1' => 'موضوع 1',
+			'subject2' => 'موضوع 2',
+			'conductor1' => 'میزبان 1',
+			'conductor2' => 'میزبان 2',
 			'sexed_guest' => 'جنسیت',
 			'min_age_guests' => 'حداقل سن میهمان',
 			'max_age_guests' => 'حداکثر سن میهمان',
@@ -113,7 +166,7 @@ class Events extends CActiveRecord
 			'long_days_run' => 'مدت مراسم',
 			'start_time_run' => 'ساعت شروع',
 			'end_time_run' => 'ساعت پایان',
-			'max_more_days' => 'Max More Days',
+			'max_more_days' => 'حداکثر تعداد روزهای نمایش بیشتر',
 			'more_days' => 'تعداد روزهای اضافه تر از پیشفرض',
 			'state_id' => 'استان',
 			'state' => 'استان',
@@ -138,6 +191,7 @@ class Events extends CActiveRecord
 			'ceremony_poster' => 'پوستر مراسم',
 			'type1' => 'نوع مراسم',
 			'type2' => 'نوع مراسم',
+			'selectedCategories' => 'نوع مراسم',
 		);
 	}
 
@@ -212,7 +266,11 @@ class Events extends CActiveRecord
 	public function afterSave(){
 		if($this->type1)
 		{
-			$model = EventCategories::model()->findByAttributes(array('title'=>$this->type1));
+			if($this->dataSender=='server')
+				$model = EventCategories::model()->findByPk($this->type1);
+			else
+				$model = EventCategories::model()->findByAttributes(array('title'=>$this->type1));
+
 			if($model)
 			{
 				$rel = new EventCategoryRel();
@@ -223,7 +281,11 @@ class Events extends CActiveRecord
 		}
 		if($this->type2)
 		{
-			$model = EventCategories::model()->findAllByAttributes(array('title'=>$this->type2));
+			if($this->dataSender=='server')
+				$model = EventCategories::model()->findByPk($this->type2);
+			else
+				$model = EventCategories::model()->findAllByAttributes(array('title'=>$this->type2));
+
 			if($model)
 			{
 				$rel = new EventCategoryRel();
@@ -233,5 +295,19 @@ class Events extends CActiveRecord
 			}
 		}
 		parent::afterSave();
+	}
+
+	public function implodeInvitees($glue=' - ')
+	{
+		$invitees = CJSON::decode($this->invitees);
+		$translated = array();
+		foreach ($invitees as $key => $value)
+			$translated[$this->inviteesLabels[$key]] = implode(', ', $value);
+
+		$string='';
+		foreach($translated as $key=>$value)
+			$string.=$key.': '.$value.$glue;
+
+		return $string;
 	}
 }

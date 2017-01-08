@@ -275,6 +275,8 @@ class Users extends iWebActiveRecord
         $criteria = new CDbCriteria;
         $criteria->alias = 'user';
 
+        $criteria->addCondition('app_token IS NOT NULL');
+
         $criteria->compare('user.id', $this->id);
         $criteria->compare('user.role_id', $this->role_id);
         $criteria->compare('user.agent_id', $this->agent_id);

@@ -121,9 +121,9 @@ class TicketsContent extends iWebActiveRecord
         if ($uploadedFile) {
             $newName= md5(microtime(true)) . '_' . $uploadedFile->name;
             $this->file = $newName;
-            if(!is_dir(Yii::getPathOfAlias('webroot').'/upload/files/'))
-                mkdir(Yii::getPathOfAlias('webroot').'/upload/files/');
-            $uploadedFile->saveAs('upload/files/'. $newName);
+            if(!is_dir(Yii::getPathOfAlias('webroot').'/uploads/files/'))
+                mkdir(Yii::getPathOfAlias('webroot').'/uploads/files/');
+            $uploadedFile->saveAs('uploads/files/'. $newName);
         }
         return parent::beforeSave();
     }

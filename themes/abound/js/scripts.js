@@ -1,27 +1,30 @@
-$(function(){
-    setInterval(function(){
+$(function() {
+    setInterval(function () {
         $(".alert").fadeOut(2000);
     }, 20000);
-    $('.nav-tabs > li').click(function(event){
+    $('.nav-tabs > li').click(function (event) {
         if ($(this).hasClass('disabled')) {
             return false;
         }
     });
 
-    $('body').on('click', '.add-multipliable-input', function(){
-        var input=document.createElement('input');
-        input.type='text';
-        input.name='Books[permissions]['+$('.multipliable-input').length+']';
-        input.placeholder='دسترسی';
-        input.className='form-control multipliable-input';
-        var container=document.getElementsByClassName('multipliable-input-container');
-        $(container).append(input);
+    $('body').on('click', '.add-dynamic-field', function () {
+        var parent = $(this).parents('.dynamic-field-container'),
+            input = document.createElement('input');
+        if (parent.find('.dynamic-field').length < parseInt(parent.data('max'))) {
+            input.type = 'text';
+            input.name = parent.data('name') + '[' + parent.find('.dynamic-field').length + ']';
+            input.placeholder = parent.find('.dynamic-field').attr('placeholder');
+            input.className = parent.find('.dynamic-field').attr('class');
+            $(parent).find('.input-container').append(input);
+        }
         return false;
     });
 
-    $('body').on('click', '.remove-multipliable-input', function(){
-        if($('.multipliable-input').length>1)
-            $('.multipliable-input-container .multipliable-input:last').remove();
+    $('body').on('click', '.remove-dynamic-field', function () {
+        var parent = $(this).parents('.dynamic-field-container');
+        if (parent.find('.dynamic-field').length > 1)
+            parent.find('.dynamic-field:last').remove();
         return false;
     });
 });

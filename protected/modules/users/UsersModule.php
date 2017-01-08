@@ -14,7 +14,7 @@ class UsersModule extends CWebModule
         'manage'=>'users.controllers.UsersManageController',
         'roles'=>'users.controllers.UsersRolesController',
         'account'=>'users.controllers.UsersAccountController',
-        //'documents' => 'users.controllers.UsersLegalDocumentsController',
+        'places' => 'users.controllers.UsersPlacesController',
     );
 	public function init(){
         if($this->enableLegalDocuments){

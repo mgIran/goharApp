@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2016-12-22 10:46:08
+Date: 2017-01-08 13:34:36
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -127,7 +127,7 @@ CREATE TABLE `iw_buys` (
 -- ----------------------------
 -- Records of iw_buys
 -- ----------------------------
-INSERT INTO `iw_buys` VALUES ('52', null, '1', '107', '1438160130', null, null, '2', '1', null, null, '[]');
+INSERT INTO `iw_buys` VALUES ('52', null, '5', '165', '1438160130', null, null, '2', '1', null, null, '[]');
 INSERT INTO `iw_buys` VALUES ('96', null, '1', '107', '1438519295', 'ملی', '317749', '2', '1', '{\"0\":{\"label\":\"\\u062a\\u0639\\u062f\\u0627\\u062f (\\u0645\\u0642\\u062f\\u0627\\u0631) \\u0645\\u062d\\u0635\\u0648\\u0644 :\",\"value\":\"1\",\"unit\":\"\\u0648\\u0627\\u062d\\u062f\"},\"1\":{\"label\":\"\\u0642\\u06cc\\u0645\\u062a \\u0648\\u0627\\u062d\\u062f\",\"value\":\"9,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"2\":{\"label\":\"+ \\u0642\\u06cc\\u0645\\u062a \\u06a9\\u0644\",\"value\":\"9,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"3\":\"border\",\"4\":{\"label\":\"\\u0645\\u0642\\u062f\\u0627\\u0631 \\u062f\\u0631\\u0635\\u062f \\u062a\\u062e\\u0641\\u06cc\\u0641\\u06cc \\u067e\\u0644\\u0646\",\"value\":0,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"5\":{\"label\":\"- \\u0645\\u0628\\u0644\\u063a \\u062a\\u062e\\u0641\\u06cc\\u0641 \\u067e\\u0644\\u0646\",\"value\":\"0\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"6\":\"border\",\"7\":{\"label\":\"\\u062f\\u0631\\u0635\\u062f \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":5,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"8\":{\"label\":\"+ \\u0645\\u0628\\u0644\\u063a \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":450,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"final\":{\"label\":\"\\u0645\\u0628\\u0644\\u063a \\u0635\\u0648\\u0631\\u062a \\u062d\\u0633\\u0627\\u0628\",\"value\":9450,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"}}', '9450', '[]');
 INSERT INTO `iw_buys` VALUES ('106', null, '1', '107', '1438528740', 'ملی', '766760', '2', '1', '{\"0\":{\"label\":\"\\u062a\\u0639\\u062f\\u0627\\u062f (\\u0645\\u0642\\u062f\\u0627\\u0631) \\u0645\\u062d\\u0635\\u0648\\u0644 :\",\"value\":\"1\",\"unit\":\"\\u0648\\u0627\\u062d\\u062f\"},\"1\":{\"label\":\"\\u0642\\u06cc\\u0645\\u062a \\u0648\\u0627\\u062d\\u062f\",\"value\":\"6,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"2\":{\"label\":\"+ \\u0642\\u06cc\\u0645\\u062a \\u06a9\\u0644\",\"value\":\"6,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"3\":\"border\",\"4\":{\"label\":\"\\u0645\\u0642\\u062f\\u0627\\u0631 \\u062f\\u0631\\u0635\\u062f \\u062a\\u062e\\u0641\\u06cc\\u0641\\u06cc \\u067e\\u0644\\u0646\",\"value\":10,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"5\":{\"label\":\"- \\u0645\\u0628\\u0644\\u063a \\u062a\\u062e\\u0641\\u06cc\\u0641 \\u067e\\u0644\\u0646\",\"value\":\"600\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"6\":\"border\",\"7\":{\"label\":\"\\u062f\\u0631\\u0635\\u062f \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":5,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"8\":{\"label\":\"+ \\u0645\\u0628\\u0644\\u063a \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":300,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"final\":{\"label\":\"\\u0645\\u0628\\u0644\\u063a \\u0635\\u0648\\u0631\\u062a \\u062d\\u0633\\u0627\\u0628\",\"value\":5700,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"}}', '5700', '[]');
 INSERT INTO `iw_buys` VALUES ('107', null, '1', '107', '1438528832', 'ملی', '384683', '2', '1', '{\"0\":{\"label\":\"\\u062a\\u0639\\u062f\\u0627\\u062f (\\u0645\\u0642\\u062f\\u0627\\u0631) \\u0645\\u062d\\u0635\\u0648\\u0644 :\",\"value\":\"1\",\"unit\":\"\\u0648\\u0627\\u062d\\u062f\"},\"1\":{\"label\":\"\\u0642\\u06cc\\u0645\\u062a \\u0648\\u0627\\u062d\\u062f\",\"value\":\"9,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"2\":{\"label\":\"+ \\u0642\\u06cc\\u0645\\u062a \\u06a9\\u0644\",\"value\":\"9,000\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"3\":\"border\",\"4\":{\"label\":\"\\u0645\\u0642\\u062f\\u0627\\u0631 \\u062f\\u0631\\u0635\\u062f \\u062a\\u062e\\u0641\\u06cc\\u0641\\u06cc \\u067e\\u0644\\u0646\",\"value\":5,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"5\":{\"label\":\"- \\u0645\\u0628\\u0644\\u063a \\u062a\\u062e\\u0641\\u06cc\\u0641 \\u067e\\u0644\\u0646\",\"value\":\"450\",\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"6\":\"border\",\"7\":{\"label\":\"\\u062f\\u0631\\u0635\\u062f \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":5,\"unit\":\"\\u062f\\u0631\\u0635\\u062f\"},\"8\":{\"label\":\"+ \\u0645\\u0628\\u0644\\u063a \\u0645\\u0627\\u0644\\u06cc\\u0627\\u062a \\u0628\\u0631 \\u0627\\u0631\\u0632\\u0634 \\u0627\\u0641\\u0632\\u0648\\u062f\\u0647\",\"value\":450,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"},\"final\":{\"label\":\"\\u0645\\u0628\\u0644\\u063a \\u0635\\u0648\\u0631\\u062a \\u062d\\u0633\\u0627\\u0628\",\"value\":9000,\"unit\":\"\\u062a\\u0648\\u0645\\u0627\\u0646\"}}', '9000', '[]');
@@ -456,11 +456,12 @@ CREATE TABLE `iw_events` (
   `activator_postal_code` tinyint(1) unsigned DEFAULT '0' COMMENT 'فعال شدن کدپستی',
   `ceremony_poster` varchar(256) CHARACTER SET latin1 DEFAULT NULL COMMENT 'پوستر مراسم',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- ----------------------------
 -- Records of iw_events
 -- ----------------------------
+INSERT INTO `iw_events` VALUES ('2', 'مراسم آزمایشی', 'مراسم آزمایشی 2', 'سازمان جوانان', 'هلال احمر', 'male', '18', '25', '1484290632', '2', '1483597800', '1483603200', '2', '2', '19', '316', 'فاطمیه', 'امامزاده ابراهیم', 'شهید شوندی', 'سوم خرداد', 'زند آباد', 'معصومیه', 'نیرو هوایی', 'زند آباد', '6', '3718895691', 'کوچه 12 پلاک 5', 'مراسم بی خودی...', 'کیک و آبمیوه', '{\"executer\":[\"\\u0639\\u0644\\u06cc \\u0636\\u06cc\\u0627\\u0621\"],\"reader\":[\"\\u067e\\u0631\\u0647\\u06cc\\u0632\\u06af\\u0627\\u0631\"],\"poet\":[\"\\u0635\\u0627\\u0628\\u0631 \\u062e\\u0631\\u0627\\u0633\\u0627\\u0646\\u06cc\"],\"speaker\":[\"\\u0645\\u0627\\u0646\\u062f\\u06af\\u0627\\u0631\\u06cc\",\"\\u0642\\u0631\\u0627\\u0626\\u062a\\u06cc\"],\"maddah\":[\"\\u0645\\u06cc\\u0631\\u062f\\u0627\\u0645\\u0627\\u062f\"],\"singer\":[\"\\u0628\\u0647\\u0646\\u0627\\u0645 \\u0635\\u0641\\u0648\\u06cc\"],\"team\":[\"\\u0631\\u0647\\u0628\\u062f\"],\"other\":[\"\\u0633\\u0627\\u06cc\\u0631 \\u0646\\u062f\\u0627\\u0631\\u062f\\u06cc\"]}', '1', '1', '3k0zX1483613341.jpg');
 
 -- ----------------------------
 -- Table structure for iw_event_categories
@@ -508,6 +509,8 @@ CREATE TABLE `iw_event_category_rel` (
 -- ----------------------------
 -- Records of iw_event_category_rel
 -- ----------------------------
+INSERT INTO `iw_event_category_rel` VALUES ('2', '15');
+INSERT INTO `iw_event_category_rel` VALUES ('2', '16');
 
 -- ----------------------------
 -- Table structure for iw_log
@@ -527,7 +530,7 @@ CREATE TABLE `iw_log` (
   KEY `user_id` (`user_id`),
   KEY `pk` (`pk`) USING BTREE,
   KEY `module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=2204 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2209 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_log
@@ -2716,6 +2719,11 @@ INSERT INTO `iw_log` VALUES ('2200', '1481480377', null, '2.179.145.69', 'UsersL
 INSERT INTO `iw_log` VALUES ('2201', '1481480460', null, '2.179.145.69', 'UsersLogins', 'insert', '', '987', null);
 INSERT INTO `iw_log` VALUES ('2202', '1481480537', null, '2.179.145.69', 'UsersLogins', 'insert', '', '988', null);
 INSERT INTO `iw_log` VALUES ('2203', '1481485260', null, '2.179.145.69', 'UsersLogins', 'insert', '', '989', null);
+INSERT INTO `iw_log` VALUES ('2204', '1482564527', '1', '::1', 'TicketsContent', 'insert', '', '2', 'admin');
+INSERT INTO `iw_log` VALUES ('2205', '1482565893', '1', '::1', 'TicketsContent', 'insert', '', '3', 'admin');
+INSERT INTO `iw_log` VALUES ('2206', '1482565906', '1', '::1', 'TicketsContent', 'insert', '', '4', 'admin');
+INSERT INTO `iw_log` VALUES ('2207', '1482566220', '1', '::1', 'TicketsContent', 'insert', '', '5', 'admin');
+INSERT INTO `iw_log` VALUES ('2208', '1482566467', '1', '::1', 'TicketsContent', 'insert', '', '6', 'admin');
 
 -- ----------------------------
 -- Table structure for iw_messages_emails_bank
@@ -3029,12 +3037,14 @@ CREATE TABLE `iw_notifications` (
   `poster` varchar(500) DEFAULT NULL,
   `visit` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of iw_notifications
 -- ----------------------------
 INSERT INTO `iw_notifications` VALUES ('1', 'Test Notification', '1480772577', '14810972577', 'This Notification is for Test.', 'waiting', null, '0');
+INSERT INTO `iw_notifications` VALUES ('2', 'اطلاعیه آزمایشی', '1', '2', 'سلام این اطلاعیه جهت تست سیستم ارسال شده است.', 'waiting', 'c5b771482399244.png', '0');
+INSERT INTO `iw_notifications` VALUES ('6', 'اطلاعیه آزمایشی دوم', '1482489292', '1483094092', 'test', 'waiting', null, '0');
 
 -- ----------------------------
 -- Table structure for iw_pages
@@ -3202,7 +3212,7 @@ CREATE TABLE `iw_site_options` (
   `value` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_site_options
@@ -3228,10 +3238,17 @@ INSERT INTO `iw_site_options` VALUES ('19', 'sms_sending_system', 'SMS');
 INSERT INTO `iw_site_options` VALUES ('20', 'sms_send_usage_1', 'تکی ، گروهی');
 INSERT INTO `iw_site_options` VALUES ('21', 'sms_send_usage_2', 'کارت ویزیت');
 INSERT INTO `iw_site_options` VALUES ('22', 'send_sms', '1');
-INSERT INTO `iw_site_options` VALUES ('23', 'app_version', '0.0.0');
+INSERT INTO `iw_site_options` VALUES ('23', 'app_version', '1.0.0');
 INSERT INTO `iw_site_options` VALUES ('24', 'base_line', '50005313110');
 INSERT INTO `iw_site_options` VALUES ('25', 'signup_status', '1');
-INSERT INTO `iw_site_options` VALUES ('26', 'show_event_message', null);
+INSERT INTO `iw_site_options` VALUES ('26', 'show_event_message', '[[\"1\",\"2\",\"24\"],[\"3\",\"5\",\"48\"],[\"6\",\"10\",\"72\"],[\"11\",\"20\",\"120\"],[\"21\",\"30\",\"150\"]]');
+INSERT INTO `iw_site_options` VALUES ('27', 'show_event', '[[\"1\",\"2\",\"1000\"],[\"3\",\"5\",\"2000\"],[\"6\",\"10\",\"3000\"],[\"11\",\"20\",\"4000\"],[\"21\",\"30\",\"5000\"]]');
+INSERT INTO `iw_site_options` VALUES ('28', 'show_event_more_than_default_price', '2000');
+INSERT INTO `iw_site_options` VALUES ('29', 'show_event_more_than_default', '3');
+INSERT INTO `iw_site_options` VALUES ('30', 'event_max_long_days', '30');
+INSERT INTO `iw_site_options` VALUES ('31', 'show_event_arrived_deadline', '0');
+INSERT INTO `iw_site_options` VALUES ('32', 'submit_general_events', '1');
+INSERT INTO `iw_site_options` VALUES ('33', 'gohar_yab_program', 'gohar-v1.0.0.apk');
 
 -- ----------------------------
 -- Table structure for iw_sms
@@ -3454,12 +3471,13 @@ CREATE TABLE `iw_tickets` (
   KEY `cat_id` (`cat_id`),
   CONSTRAINT `iw_tickets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `iw_users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `iw_tickets_ibfk_2` FOREIGN KEY (`cat_id`) REFERENCES `iw_tickets_categories` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_tickets
 -- ----------------------------
 INSERT INTO `iw_tickets` VALUES ('1', '107', 'asd', '1', '1', '1');
+INSERT INTO `iw_tickets` VALUES ('2', '107', 'آزمایشی', '8', '1', '1');
 
 -- ----------------------------
 -- Table structure for iw_tickets_categories
@@ -3494,11 +3512,17 @@ CREATE TABLE `iw_tickets_content` (
   KEY `admin_id` (`admin_id`),
   CONSTRAINT `iw_tickets_content_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `iw_tickets` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `iw_tickets_content_ibfk_2` FOREIGN KEY (`admin_id`) REFERENCES `iw_admins` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_tickets_content
 -- ----------------------------
+INSERT INTO `iw_tickets_content` VALUES ('1', '2', 'سلام', null, '1', '143234234');
+INSERT INTO `iw_tickets_content` VALUES ('2', '2', 'پاسخ سلام...', null, '1', '1482564526');
+INSERT INTO `iw_tickets_content` VALUES ('3', '2', 'دیر شد...', null, '1', '1482565893');
+INSERT INTO `iw_tickets_content` VALUES ('4', '2', 'چرا...؟؟؟؟', null, '1', '1482565905');
+INSERT INTO `iw_tickets_content` VALUES ('5', '2', 'همین طور', null, '1', '1482566220');
+INSERT INTO `iw_tickets_content` VALUES ('6', '2', 'test file', 'adcc76c19d063cb4712c5d96c7f067bb_logo.rar', '1', '1482566466');
 
 -- ----------------------------
 -- Table structure for iw_users
@@ -4437,7 +4461,7 @@ CREATE TABLE `iw_users_options` (
   UNIQUE KEY `user_id_2` (`user_id`,`options`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `iw_users_options_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `iw_users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_users_options

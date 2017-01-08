@@ -118,6 +118,7 @@ class Tickets extends iWebActiveRecord
 		$criteria->compare('cat_id',$this->cat_id);
 		$criteria->compare('status',$this->status);
         $criteria->compare('priority',$this->priority);
+        $criteria->addCondition('cat_id = 8');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

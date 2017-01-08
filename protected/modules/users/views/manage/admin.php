@@ -31,26 +31,6 @@ $this->menu=array(
         'national_id',
         'iban',
         array(
-            'name'=>'activePlan',
-            'value'=>'$data->activePlan->plansBuys->plan->name',
-            'filter'=>false
-        ),
-        array(
-            'header'=>'زمان مانده از پلن',
-            'value'=>'$data->activePlan->plansBuys->get_date_diff(time(), $data->activePlan->plansBuys->expire_date)',
-            'filter'=>false
-        ),
-        array(
-            'header'=>'وضعیت پنل',
-            'value'=>'($data->activePlan->plansBuys->active)?"فعال":"غیرفعال"',
-            'filter'=>false
-        ),
-        array(
-            'header'=>'وضعیت اطلاعات',
-            'value'=>'($data->userInfoStatus())?"کامل است":"ناقص است"',
-            'filter'=>false
-        ),
-        array(
             'class'=>'CButtonColumn',
             'template'=>'{update}{delete}',
             'buttons' => array(

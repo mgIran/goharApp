@@ -41,7 +41,7 @@
         ),
         array(
             'header'=>'آخرین پیام',
-            'value'=> 'Yii::app()->jdate->date("Y-m-d H:i", Tickets::lastTalkTime($data->id))',
+            'value'=> 'JalaliDate::date("Y-m-d H:i", Tickets::lastTalkTime($data->id))',
         ),
         array(
             'class'=>'CButtonColumn',

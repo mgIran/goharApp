@@ -128,26 +128,17 @@ class Controller extends ApiBaseController
                     'url' => array('/admins/login/dashboard')
                 ),
                 array(
-                    'label' => 'مدیران <span class="caret"></span>',
-                    'url' => '#',
-                    'itemOptions' => array('class' => 'dropdown', 'tabindex' => "-1"), 'linkOptions' => array('class' => 'dropdown-toggle', 'data-toggle' => "dropdown"),
-                    'items' => array(
-                        array('label' => 'نقش مدیران', 'url' => Yii::app()->createUrl('/admins/roles/admin')),
-                        array('label' => 'مدیریت', 'url' => Yii::app()->createUrl('/admins/manage')),
-                        array('label' => 'افزودن', 'url' => Yii::app()->createUrl('/admins/manage/create')),
-                    )
-                ),
-                array(
-                    'label' => 'کاربران <span class="caret"></span>',
+                    'label' => 'مراسمات <span class="caret"></span>',
                     'url' => '#',
                     'itemOptions' => array('class' => 'dropdown', 'tabindex' => "-1"),
                     'linkOptions' => array('class' => 'dropdown-toggle', 'data-toggle' => "dropdown"),
                     'items' => array(
-                        array('label' => 'مدیریت کاربران', 'url' => Yii::app()->createUrl('/users/manage')),
+                        array('label' => 'لیست مراسمات', 'url' => Yii::app()->createUrl('/events/manage/admin')),
+                        array('label' => 'ثبت مراسم', 'url' => Yii::app()->createUrl('/events/manage/create')),
                     )
                 ),
                 array(
-                    'label' => 'اطلاعیه<span class="caret"></span>',
+                    'label' => 'اطلاعیه <span class="caret"></span>',
                     'url' => '#',
                     'itemOptions' => array('class' => 'dropdown', 'tabindex' => "-1"),
                     'linkOptions' => array('class' => 'dropdown-toggle', 'data-toggle' => "dropdown"),
@@ -157,8 +148,12 @@ class Controller extends ApiBaseController
                     )
                 ),
                 array(
+                    'label' => 'پشتیبانی',
+                    'url' => Yii::app()->createUrl('/tickets/manage/admin')
+                ),
+                array(
                     'label' => 'تنظیمات',
-                    'url' => Yii::app()->createUrl('/setting/manage')
+                    'url' => Yii::app()->createUrl('/setting/manage/update')
                 ),
                 array(
                     'label' => 'خروج',
