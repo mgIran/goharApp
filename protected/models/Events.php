@@ -5,6 +5,8 @@
  *
  * The followings are the available columns in table '{{events}}':
  * @property string $id
+ * @property string $creator_type
+ * @property string $creator_id
  * @property string $type1
  * @property string $type2
  * @property string $subject1
@@ -70,14 +72,12 @@ class Events extends CActiveRecord
 
 	public $state;
 	public $city;
-	public $type1;
-	public $type2;
-	public $sexLabels=array(
-		'male'=>'آقایان',
-		'female'=>'بانوان',
-		'both'=>'هر دو'
-	);
-	public $dataSender='app';
+    public $sexLabels=array(
+        'male'=>'آقایان',
+        'female'=>'بانوان',
+        'both'=>'هر دو'
+    );
+    public $dataSender='app';
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -87,22 +87,25 @@ class Events extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
+			array('creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
 			array('activator_area_code, activator_postal_code', 'numerical', 'integerOnly'=>true),
 			array('subject1, subject2, conductor1, conductor2, reception, ceremony_poster', 'length', 'max'=>256),
+			array('type1, type2,', 'length', 'max'=>255),
 			array('sexed_guest', 'length', 'max'=>6),
 			array('min_age_guests, max_age_guests, long_days_run, max_more_days, more_days, area_code', 'length', 'max'=>2),
 			array('start_date_run, start_time_run, end_time_run', 'length', 'max'=>20),
 			array('state_id, city_id, postal_code', 'length', 'max'=>10),
+			array('creator_type', 'length', 'max'=>50),
+			array('creator_id', 'length', 'max'=>11),
 			array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max'=>25),
-			array('type1, type2, state, city, complete_details, invitees', 'safe'),
-			array('selectedCategories', 'safe'),
-			array('max_more_days', 'checkMoreDays'),
-			array('long_days_run', 'checkLongDays'),
+			array('state, city, complete_details, invitees', 'safe'),
+            array('selectedCategories', 'safe'),
+            array('max_more_days', 'checkMoreDays'),
+            array('long_days_run', 'checkLongDays'),
             array('end_time_run', 'checkEndTime', 'distance'=>15),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('type1, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, max_more_days, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster', 'safe', 'on'=>'search'),
+			array('creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, max_more_days, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -144,7 +147,6 @@ class Events extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'categories' => array(self::MANY_MANY, 'EventCategories', '{{event_category_rel}}(event_id, category_id)'),
 		);
 	}
 
@@ -155,10 +157,14 @@ class Events extends CActiveRecord
 	{
 		return array(
 			'id' => 'شناسه',
-			'subject1' => 'موضوع 1',
-			'subject2' => 'موضوع 2',
-			'conductor1' => 'میزبان 1',
-			'conductor2' => 'میزبان 2',
+			'creator_type' => 'نوع ایجاد کننده',
+			'creator_id' => 'شناسه ایجاد کننده',
+            'type1' => 'نوع مراسم',
+            'type2' => 'نوع مراسم',
+			'subject1' => 'موضوع',
+			'subject2' => 'موضوع',
+			'conductor1' => 'میزبان',
+			'conductor2' => 'میزبان',
 			'sexed_guest' => 'جنسیت',
 			'min_age_guests' => 'حداقل سن میهمان',
 			'max_age_guests' => 'حداکثر سن میهمان',
@@ -189,9 +195,7 @@ class Events extends CActiveRecord
 			'activator_area_code' => 'فعال شدن منطقه شهرداری',
 			'activator_postal_code' => 'فعال شدن کدپستی',
 			'ceremony_poster' => 'پوستر مراسم',
-			'type1' => 'نوع مراسم',
-			'type2' => 'نوع مراسم',
-			'selectedCategories' => 'نوع مراسم',
+            'selectedCategories' => 'نوع مراسم',
 		);
 	}
 
@@ -214,6 +218,10 @@ class Events extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
+		$criteria->compare('creator_type',$this->creator_type,true);
+		$criteria->compare('creator_id',$this->creator_id,true);
+		$criteria->compare('type1',$this->type1,true);
+		$criteria->compare('type2',$this->type2,true);
 		$criteria->compare('subject1',$this->subject1,true);
 		$criteria->compare('subject2',$this->subject2,true);
 		$criteria->compare('conductor1',$this->conductor1,true);
@@ -262,52 +270,18 @@ class Events extends CActiveRecord
 	{
 		return parent::model($className);
 	}
-	
-	public function afterSave(){
-		if($this->type1)
-		{
-			if($this->dataSender=='server')
-				$model = EventCategories::model()->findByPk($this->type1);
-			else
-				$model = EventCategories::model()->findByAttributes(array('title'=>$this->type1));
 
-			if($model)
-			{
-				$rel = new EventCategoryRel();
-				$rel->event_id = $this->id;
-				$rel->category_id = $model->id;
-				$rel->save(false);
-			}
-		}
-		if($this->type2)
-		{
-			if($this->dataSender=='server')
-				$model = EventCategories::model()->findByPk($this->type2);
-			else
-				$model = EventCategories::model()->findAllByAttributes(array('title'=>$this->type2));
+    public function implodeInvitees($glue=' - ')
+    {
+        $invitees = CJSON::decode($this->invitees);
+        $translated = array();
+        foreach ($invitees as $key => $value)
+            $translated[$this->inviteesLabels[$key]] = implode(', ', $value);
 
-			if($model)
-			{
-				$rel = new EventCategoryRel();
-				$rel->event_id = $this->id;
-				$rel->category_id = $model->id;
-				$rel->save(false);
-			}
-		}
-		parent::afterSave();
-	}
+        $string='';
+        foreach($translated as $key=>$value)
+            $string.=$key.': '.$value.$glue;
 
-	public function implodeInvitees($glue=' - ')
-	{
-		$invitees = CJSON::decode($this->invitees);
-		$translated = array();
-		foreach ($invitees as $key => $value)
-			$translated[$this->inviteesLabels[$key]] = implode(', ', $value);
-
-		$string='';
-		foreach($translated as $key=>$value)
-			$string.=$key.': '.$value.$glue;
-
-		return $string;
-	}
+        return $string;
+    }
 }

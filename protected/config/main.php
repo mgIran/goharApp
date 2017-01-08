@@ -1,6 +1,6 @@
 <?php
 return array(
-    'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
+    'onBeginRequest'=>create_function('$event', 'return ob_start();'),
     'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 	'basePath' => dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'پنل مدیریت اپلیکیشن گهر',
@@ -8,7 +8,7 @@ return array(
     'theme' => 'abound',
     'language' => 'fa_ir',
 	// preloading 'log' component
-	'preload'=>array('log'),
+	//	'preload'=>array('log'),
 
 	// autoloading model and component classes
 	'import'=>array(
