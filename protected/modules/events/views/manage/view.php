@@ -74,8 +74,20 @@ $this->menu=array(
 			'value'=>$model->implodeInvitees('<br>'),
             'type'=>'raw'
 		),
-		'activator_area_code',
-		'activator_postal_code',
-		'ceremony_poster',
+		array(
+            'name'=>'activator_area_code',
+            'value'=>$model->activator_area_code?'فعال':'غیرفعال'
+        ),
+        array(
+            'name'=>'activator_postal_code',
+            'value'=>$model->activator_postal_code?'فعال':'غیرفعال'
+        ),
+		array(
+			'name'=>'ceremony_poster',
+			'value'=>CHtml::image(Yii::app()->baseUrl.'/uploads/events/'.$model->ceremony_poster, '', array(
+				'style'=>'max-width:200px;'
+			)),
+			'type'=>'raw'
+		),
 	),
 ));?>
