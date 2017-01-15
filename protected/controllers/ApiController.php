@@ -130,8 +130,8 @@ class ApiController extends Controller
 					'errors' => $entityUploadClass->getError()]) ,'application/json');
 			switch($entity){
 				case 'poster':
-					$path = Yii::getPathOfAlias('webroot') . '/uploads/events/';
-					$link = Yii::app()->baseUrl . '/uploads/events/' . $entityUploadClass->getName();
+					$path = Yii::getPathOfAlias('webroot') . '/uploads/poster/';
+					$link = Yii::app()->baseUrl . '/uploads/poster/' . $entityUploadClass->getName();
 					break;
 				default:
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
