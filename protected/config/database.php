@@ -11,7 +11,7 @@ return array(
 	'username' => 'avayesha_gm',
 	'password' => '72k~l~y_9gEysp8zJI',
 	'charset' => 'utf8',*/
-	'connectionString' => 'mysql:host=localhost;dbname=gohar_app',
+	'connectionString' => 'mysql:host=localhost;dbname=gohar-app',
 	'tablePrefix'=>'iw_',
 	'emulatePrepare' => true,
 	'username' => 'root',
