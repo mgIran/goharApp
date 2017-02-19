@@ -154,11 +154,16 @@ class ApiController extends Controller
 	{
 		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
 			if(isset($_POST[$entity])){
+				if($entity!= "User" && !isset($_POST['entityId']))
+					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
+
 				if(!is_array($_POST[$entity]))
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
 				switch($entity){
 						case 'Ceremony':
 						$model = Events::model()->findByPk($_POST['entityId']);
+						if($model === null)
+							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مراسم مورد نظر وجود ندارد.']), 'application/json');
 						$currentPoster= $model->ceremony_poster;
 						$model->attributes = $_POST[$entity];
 						$model->creator_type = $this->loginArray['type'];
@@ -172,6 +177,8 @@ class ApiController extends Controller
 					case 'User':
 						Yii::app()->getModule('users');
 						$model = Users::model()->findByPk($this->loginArray['userID']);
+						if($model === null)
+							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'کاربر مورد نظر وجود ندارد.']), 'application/json');
 						$currentAvatar = $model->avatar;
 						$model->unsetInvalidAttributes($_POST[$entity]);
 						$model->attributes = $_POST[$entity];
@@ -184,9 +191,9 @@ class ApiController extends Controller
 						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
 						break;
 				}
-				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه در به روزرسانی اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
 			}
-			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات به روزرسانی ارسال نشده است.']), 'application/json');
 		}
 		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
