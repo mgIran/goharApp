@@ -36,29 +36,55 @@ class ApiController extends Controller
 			}
 			//
 			// Set Function
+			$validQueries = array(
+				'find',
+				'findAll',
+				'count',
+				'delete',
+				'deleteAll',
+			);
 			if(isset($_POST['query']) && !empty($_POST['query'])){
-				if($_POST['query'] == 'count')
-					$func = 'count';
+				$query = strtolower(trim($_POST['query']));
+				if(in_array($query,$validQueries))
+					$func = $query;
 				else
 					$func = 'findAll';
 			}else
 				$func = 'findAll';
 			//
+
+			// Set Pk
+			if(isset($_POST['pk']) && !empty($_POST['pk']) && $pk = (int)$_POST['pk'])
+			{
+				$criteria->params[':pk'] = $pk;
+				$func = 'find';
+				$criteria->limit = 1;
+				$criteria->offset = 0;
+			}
+			//
 			switch(trim($entity)){
 				case 'Place':
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
 					$list = UsersPlaces::model()->{$func}($criteria);
 					break;
 				case 'Ceremony':
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
 					$list = Events::model()->{$func}($criteria);
 					break;
 				case 'Ticket':
 					Yii::app()->getModule('tickets');
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
 					$criteria->addCondition('user_id = :user_id');
 					$criteria->params[':user_id'] = $this->loginArray['userID'];
 					$list = Tickets::model()->with('ticketsContents')->{$func}($criteria);
 					break;
 				case 'Notification':
 					Yii::app()->getModule('notifications');
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
 					$criteria->addCondition('send_date < :time AND  expire_date > :time');
 					$criteria->params[':time'] = time();
 					$list = Notifications::model()->{$func}($criteria);
@@ -131,7 +157,7 @@ class ApiController extends Controller
 				if(!is_array($_POST[$entity]))
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
 				switch($entity){
-					case 'Ceremony':
+						case 'Ceremony':
 						$model = Events::model()->findByPk($_POST['entityId']);
 						$currentPoster= $model->ceremony_poster;
 						$model->attributes = $_POST[$entity];
@@ -141,7 +167,7 @@ class ApiController extends Controller
 						if($model->ceremony_poster != $currentPoster)
 							$model->deletePoster($currentPoster);
 						if($model->save())
-							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'model' => $model, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.']), 'application/json');
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.','model' => $model]), 'application/json');
 						break;
 					case 'User':
 						Yii::app()->getModule('users');
@@ -152,7 +178,7 @@ class ApiController extends Controller
 						if($model->avatar != $currentAvatar)
 							$model->deleteFile('avatar', $currentAvatar);
 						if($model->save())
-							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'model' => $model, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.']), 'application/json');
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.', 'model' => $model]), 'application/json');
 						break;
 					default:
 						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
@@ -167,17 +193,17 @@ class ApiController extends Controller
 
 	public function actionUpload()
 	{
-		if(isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			$entityUploadClass = CUploadedFile::getInstanceByName($entity);
 			if($entityUploadClass->getHasError())
 				$this->_sendResponse(200 ,CJSON::encode(['status' => false ,'message' => 'درآپلود فایل خطایی رخ داده است.' ,
 					'errors' => $entityUploadClass->getError()]) ,'application/json');
 			switch($entity){
-				case 'poster':
+				case 'Poster':
 					$path = Yii::getPathOfAlias('webroot') . Events::$path;
 					$link = Yii::app()->baseUrl . Events::$path . $entityUploadClass->getName();
 					break;
-				case 'profile':
+				case 'Profile':
 					Yii::import('users.models.Users');
                     $path = realpath(dirname(Yii::app()->request->scriptFile). '/..'.Users::$avatarPath);
                     $link = Yii::app()->getBaseUrl(true) . Users::$avatarPath . $entityUploadClass->getName();
