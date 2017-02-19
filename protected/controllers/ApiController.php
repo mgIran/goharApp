@@ -14,7 +14,7 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + getList, create, upload' ,
+			'RestUserAccessControl + getList, create, update, upload' ,
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -121,9 +121,52 @@ class ApiController extends Controller
 		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
 
+	/**
+	 * Update Model from Entity
+	 */
+	public function actionUpdate()
+	{
+		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+			if(isset($_POST[$entity])){
+				if(!is_array($_POST[$entity]))
+					$_POST[$entity] = CJSON::decode($_POST[$entity]);
+				switch($entity){
+					case 'Ceremony':
+						$model = Events::model()->findByPk($_POST['entityId']);
+						$currentPoster= $model->ceremony_poster;
+						$model->attributes = $_POST[$entity];
+						$model->creator_type = $this->loginArray['type'];
+						$model->creator_id = $this->loginArray['userID'];
+						$model->unsetInvalidAttributes($_POST[$entity]);
+						if($model->ceremony_poster != $currentPoster)
+							$model->deletePoster($currentPoster);
+						if($model->save())
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'model' => $model, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.']), 'application/json');
+						break;
+					case 'User':
+						Yii::app()->getModule('users');
+						$model = Users::model()->findByPk($this->loginArray['userID']);
+						$currentAvatar = $model->avatar;
+						$model->unsetInvalidAttributes($_POST[$entity]);
+						$model->attributes = $_POST[$entity];
+						if($model->avatar != $currentAvatar)
+							$model->deleteFile('avatar', $currentAvatar);
+						if($model->save())
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'model' => $model, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.']), 'application/json');
+						break;
+					default:
+						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+						break;
+				}
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه در ثبت اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
+			}
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات ثبت ارسال نشده است.']), 'application/json');
+		}
+		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
+	}
+
 	public function actionUpload()
 	{
-        var_dump(Yii::app()->getBaseUrl(true));
 		if(isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))){
 			$entityUploadClass = CUploadedFile::getInstanceByName($entity);
 			if($entityUploadClass->getHasError())
@@ -131,12 +174,13 @@ class ApiController extends Controller
 					'errors' => $entityUploadClass->getError()]) ,'application/json');
 			switch($entity){
 				case 'poster':
-					$path = Yii::getPathOfAlias('webroot') . '/uploads/poster/';
-					$link = Yii::app()->baseUrl . '/uploads/poster/' . $entityUploadClass->getName();
+					$path = Yii::getPathOfAlias('webroot') . Events::$path;
+					$link = Yii::app()->baseUrl . Events::$path . $entityUploadClass->getName();
 					break;
 				case 'profile':
-                    $path = realpath(dirname(Yii::app()->request->scriptFile). '/../upload/users/avatars/');
-                    $link = Yii::app()->getBaseUrl(true) . '/upload/users/avatars/' . $entityUploadClass->getName();
+					Yii::import('users.models.Users');
+                    $path = realpath(dirname(Yii::app()->request->scriptFile). '/..'.Users::$avatarPath);
+                    $link = Yii::app()->getBaseUrl(true) . Users::$avatarPath . $entityUploadClass->getName();
 					break;
 				default:
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');

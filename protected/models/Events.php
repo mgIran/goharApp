@@ -68,6 +68,8 @@ class Events extends CActiveRecord
 		return '{{events}}';
 	}
 
+    public static $path = '/uploads/poster/';
+
 	public $state;
 	public $city;
     public $sexLabels=array(
@@ -283,4 +285,34 @@ class Events extends CActiveRecord
 
         return $string;
     }
+
+	/**
+	 * unset invalid attributes
+	 * @param $attributes
+	 */
+	public function unsetInvalidAttributes(&$attributes)
+	{
+		$invalidChangeAttributes = array(
+			'id',
+			'creator_type',
+			'creator_id',
+		);
+		foreach($attributes as $key => $item)
+			if(in_array($key, $invalidChangeAttributes))
+				unset($attributes[$key]);
+	}
+
+    /**
+     * Delete Event Poster
+     * 
+     * @param $currentPoster
+     * @return bool
+     */
+    public function deletePoster($currentPoster)
+	{
+        $path = Yii::getPathOfAlias('webroot') . self::$path;
+        if($currentPoster && file_exists($path.$currentPoster))
+            return @unlink($path.$currentPoster);
+        return true;
+	}
 }
