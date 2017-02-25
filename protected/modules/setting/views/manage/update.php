@@ -108,7 +108,11 @@ $this->breadcrumbs=array(
 
     <div class="row">
         <?php echo CHtml::label('آخرین نسخه برنامه',''); ?>
-        <a href="<?php echo Yii::app()->baseUrl . '/uploads/app/'.$program['name'];?>"><?php echo $program['name'];?></a>
+        <?php if(isset($program['name'])):?>
+            <a href="<?php echo Yii::app()->baseUrl . '/uploads/app/'.$program['name'];?>"><?php echo $program['name'];?></a>
+        <?php else:?>
+            <span class="errorMessage">فایل جدید برنامه آپلود نشده است!</span>
+        <?php endif;?>
     </div>
 
     <div class="row">
