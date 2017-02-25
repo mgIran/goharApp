@@ -123,6 +123,7 @@ class ApiController extends Controller
 
 	public function actionUpload()
 	{
+        var_dump(Yii::app()->getBaseUrl(true));
 		if(isset($_POST['entity']) && $entity = strtolower(trim($_POST['entity']))){
 			$entityUploadClass = CUploadedFile::getInstanceByName($entity);
 			if($entityUploadClass->getHasError())
@@ -130,8 +131,12 @@ class ApiController extends Controller
 					'errors' => $entityUploadClass->getError()]) ,'application/json');
 			switch($entity){
 				case 'poster':
-					$path = Yii::getPathOfAlias('webroot') . '/uploads/events/';
-					$link = Yii::app()->baseUrl . '/uploads/events/' . $entityUploadClass->getName();
+					$path = Yii::getPathOfAlias('webroot') . '/uploads/poster/';
+					$link = Yii::app()->baseUrl . '/uploads/poster/' . $entityUploadClass->getName();
+					break;
+				case 'profile':
+                    $path = realpath(dirname(Yii::app()->request->scriptFile). '/../upload/users/avatars/');
+                    $link = Yii::app()->getBaseUrl(true) . '/upload/users/avatars/' . $entityUploadClass->getName();
 					break;
 				default:
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
@@ -186,7 +191,9 @@ class ApiController extends Controller
 						@copy(Yii::getPathOfAlias('webroot') . '/uploads/app/' . $fileName, Yii::getPathOfAlias('webroot') . '/temp/' . $copyFileName);
 				}
 				$fileLink = Yii::app()->createAbsoluteUrl('/api/downloadApp/' . $downloadToken->token);
-				$this->_sendResponse(200, CJSON::encode(['status' => false, 'newVersionLink' => $fileLink, 'serverTime' => time(), 'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'newVersionLink' => $fileLink,
+                    'serverTime' => time(), 'versionName' => $lastVer->value,
+                    'baseLine' => $baseLine?$baseLine->value:false]), 'application/json');
 			}
 		}elseif(!isset($_POST['version']))
 			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار نسخه فعلی ارسال نشده است.']), 'application/json');
@@ -214,6 +221,7 @@ class ApiController extends Controller
 	public function actionCheckNumber()
 	{
 		if(isset($_POST['token']) && isset($_POST['sim']) && isset($_POST['activateCode'])){
+            $baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
 			Yii::import('users.models.*');
 			$_POST['sim'] = strpos($_POST['sim'], '0') === 0?$_POST['sim']:'0' . $_POST['sim'];
 			$sim = strpos($_POST['sim'], '0') === 0?substr($_POST['sim'], 1):$_POST['sim'];
@@ -227,6 +235,8 @@ class ApiController extends Controller
 			$criteria = new CDbCriteria();
 			$criteria->compare('text', 'GoharActivate', true);
 			$criteria->compare('sender', $sim);
+            if($baseLine)
+			    $criteria->compare('t.to', $baseLine->value);
 			$criteria->addCondition('date >= :date');
 			$criteria->params[':date'] = time() - 10 * 60;
 			$criteria->order = 'date DESC';
