@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-02-28 16:22:32
+Date: 2017-03-01 20:24:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -3323,7 +3323,7 @@ CREATE TABLE `iw_site_options` (
   `value` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_site_options
@@ -3364,6 +3364,7 @@ INSERT INTO `iw_site_options` VALUES ('34', 'event_tax_enabled', '0');
 INSERT INTO `iw_site_options` VALUES ('35', 'admin_groups_price', '1100');
 INSERT INTO `iw_site_options` VALUES ('36', 'general_filters_price', '1200');
 INSERT INTO `iw_site_options` VALUES ('37', 'favorite_filters_price', '1300');
+INSERT INTO `iw_site_options` VALUES ('38', 'weekly_unity_image', 'vyd0D1488353566.jpg');
 
 -- ----------------------------
 -- Table structure for iw_sms
@@ -3631,6 +3632,26 @@ INSERT INTO `iw_tickets_content` VALUES ('3', '2', 'دیر شد...', null, '1', 
 INSERT INTO `iw_tickets_content` VALUES ('4', '2', 'چرا...؟؟؟؟', null, '1', '1482565905');
 INSERT INTO `iw_tickets_content` VALUES ('5', '2', 'همین طور', null, '1', '1482566220');
 INSERT INTO `iw_tickets_content` VALUES ('6', '2', 'test file', 'adcc76c19d063cb4712c5d96c7f067bb_logo.rar', '1', '1482566466');
+
+-- ----------------------------
+-- Table structure for iw_unity
+-- ----------------------------
+DROP TABLE IF EXISTS `iw_unity`;
+CREATE TABLE `iw_unity` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'شناسه',
+  `subject` varchar(511) CHARACTER SET utf8 COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'موضوع',
+  `content` text CHARACTER SET utf8 COLLATE utf8_persian_ci COMMENT 'محتوا',
+  `date` varchar(20) CHARACTER SET utf8 DEFAULT NULL COMMENT 'زمان همصدایی',
+  `notices_date` varchar(20) CHARACTER SET utf8 DEFAULT NULL COMMENT 'تاریخ اطلاع رسانی',
+  `poster` varchar(500) CHARACTER SET utf8 DEFAULT NULL COMMENT 'پوستر',
+  `receiver_count` int(10) unsigned DEFAULT '0' COMMENT 'تعداد گیرندگان',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of iw_unity
+-- ----------------------------
+INSERT INTO `iw_unity` VALUES ('9', 'اولین همصدایی', 'محتوای اولین همصدایی...', '1489138200', '1488706200', 'foN121488361046.jpg', '0');
 
 -- ----------------------------
 -- Table structure for iw_users
