@@ -15,6 +15,7 @@
  */
 class Notifications extends CActiveRecord
 {
+    public $status;
 	public $statusLabels=array(
 		'waiting'=>'در صف انتظار',
 		'sending'=>'در حال ارسال',
@@ -40,12 +41,12 @@ class Notifications extends CActiveRecord
 			array('subject, send_date, expire_date, content', 'required'),
 			array('subject', 'length', 'max'=>511),
 			array('send_date, expire_date', 'length', 'max'=>20),
-			array('status', 'length', 'max'=>7),
 			array('poster', 'length', 'max'=>500),
 			array('visit', 'length', 'max'=>10),
+			array('status', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, subject, send_date, expire_date, content, status, poster, visit', 'safe', 'on'=>'search'),
+			array('id, subject, send_date, expire_date, content, poster, visit', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,9 +72,9 @@ class Notifications extends CActiveRecord
 			'send_date' => 'تاریخ شروع ارسال',
 			'expire_date' => 'تاریخ انقضاء',
 			'content' => 'محتوا',
-			'status' => 'وضعیت',
 			'poster' => 'پوستر',
 			'visit' => 'Visit',
+			'status' => 'وضعیت',
 		);
 	}
 
@@ -90,25 +91,35 @@ class Notifications extends CActiveRecord
 	 * based on the search/filter conditions.
 	 */
 	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
+    {
+        // @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria=new CDbCriteria;
+        $criteria = new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('subject',$this->subject,true);
-		$criteria->compare('send_date',$this->send_date,true);
-		$criteria->compare('expire_date',$this->expire_date,true);
-		$criteria->compare('content',$this->content,true);
-		$criteria->compare('status',$this->status,true);
-		$criteria->compare('poster',$this->poster,true);
-		$criteria->compare('visit',$this->visit,true);
-		$criteria->order='id DESC';
+        $criteria->compare('id', $this->id, true);
+        $criteria->compare('subject', $this->subject, true);
+        $criteria->compare('send_date', $this->send_date, true);
+        $criteria->compare('expire_date', $this->expire_date, true);
+        $criteria->compare('content', $this->content, true);
+        $criteria->compare('poster', $this->poster, true);
+        $criteria->compare('visit', $this->visit, true);
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
+        if ($this->status == "waiting")
+            $criteria->addCondition("send_date > :time");
+        elseif ($this->status == "sending")
+            $criteria->addCondition("send_date <= :time AND expire_date > :time");
+        elseif ($this->status == "end")
+            $criteria->addCondition("expire_date < :time");
+
+        if (!is_null($this->status) and !empty($this->status))
+            $criteria->params[":time"] = time();
+
+        $criteria->order = 'id DESC';
+
+        return new CActiveDataProvider($this, array(
+            'criteria' => $criteria,
+        ));
+    }
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -119,5 +130,19 @@ class Notifications extends CActiveRecord
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	public function getStatus()
+	{
+		if(is_null($this->send_date) or is_null($this->expire_date))
+			return "";
+		elseif(time() < $this->send_date)
+			return "waiting";
+		elseif(time() >= $this->send_date and time() < $this->expire_date)
+			return "sending";
+		elseif(time() >= $this->expire_date)
+			return "end";
+        else
+            return "";
 	}
 }

@@ -151,6 +151,16 @@ class Controller extends ApiBaseController
                     )
                 ),
                 array(
+                    'label' => 'همصدایی <span class="caret"></span>',
+                    'url' => '#',
+                    'itemOptions' => array('class' => 'dropdown', 'tabindex' => "-1"),
+                    'linkOptions' => array('class' => 'dropdown-toggle', 'data-toggle' => "dropdown"),
+                    'items' => array(
+                        array('label' => 'لیست همصدایی ها', 'url' => Yii::app()->createUrl('/unity/manage/admin')),
+                        array('label' => 'ثبت همصدایی', 'url' => Yii::app()->createUrl('/unity/manage/create')),
+                    )
+                ),
+                array(
                     'label' => 'پشتیبانی',
                     'url' => Yii::app()->createUrl('/tickets/manage/admin')
                 ),

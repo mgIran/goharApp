@@ -33,6 +33,8 @@ return array(
         'tickets',
 		'notifications',
 		'events',
+		'plans',
+		'unity',
 	),
 
 	// application components

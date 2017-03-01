@@ -1,6 +1,6 @@
 <?php
-/* @var $this NotificationsManageController */
-/* @var $model Notifications */
+/* @var $this UnityManageController */
+/* @var $model Unity */
 /* @var $form CActiveForm */
 /* @var $poster array */
 ?>
@@ -8,7 +8,7 @@
 <div class="form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
-	'id'=>'notifications-form',
+	'id'=>'unity-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
 	// controller action is handling ajax validation correctly.
 	// There is a call to performAjaxValidation() commented in generated controller code.
@@ -16,7 +16,9 @@
 	'enableAjaxValidation'=>true,
 )); ?>
 
-	<?php $this->renderPartial('//layouts/_flashMessage'); ?>
+	<p class="note">فیلد های <span class="required">*</span>دار اجباری هستند.</p>
+
+    <?php $this->renderPartial("//layouts/_flashMessage");?>
 
 	<?php echo $form->errorSummary($model); ?>
 
@@ -27,29 +29,32 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'send_date'); ?>
-		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-			'id'=>'send-date',
-			'model'=>$model,
-			'attribute'=>'send_date',
-			'options'=>array(
-				'format'=>'DD MMMM YYYY'
-			),
-		));?>
-		<?php echo $form->error($model,'send_date'); ?>
+		<?php echo $form->labelEx($model,'date'); ?>
+        <?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+            'id'=>'date',
+            'model'=>$model,
+            'attribute'=>'date',
+            'options'=>array(
+                'format'=>'DD MMMM YYYY - H:m',
+                'timePicker'=>array(
+                    'enabled'=>true
+                )
+            ),
+        ));?>
+		<?php echo $form->error($model,'date'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'expire_date'); ?>
-		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-			'id'=>'expire-date',
-			'model'=>$model,
-			'attribute'=>'expire_date',
-			'options'=>array(
-				'format'=>'DD MMMM YYYY'
-			),
-		));?>
-		<?php echo $form->error($model,'expire_date'); ?>
+    <div class="row">
+		<?php echo $form->labelEx($model,'notices_date'); ?>
+        <?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+            'id'=>'notices-date',
+            'model'=>$model,
+            'attribute'=>'notices_date',
+            'options'=>array(
+                'format'=>'DD MMMM YYYY'
+            ),
+        ));?>
+		<?php echo $form->error($model,'date'); ?>
 	</div>
 
 	<div class="row">
@@ -66,8 +71,8 @@
 			'name' => 'poster',
 			'maxFiles' => 1,
 			'maxFileSize' => 1, //MB
-			'url' => $this->createUrl('/notifications/manage/upload'),
-			'deleteUrl' => $this->createUrl('/notifications/manage/deleteUpload'),
+			'url' => $this->createUrl('/unity/manage/upload'),
+			'deleteUrl' => $this->createUrl('/unity/manage/deleteUpload'),
 			'acceptedFiles' => '.jpeg, .jpg, .png, .gif',
 			'serverFiles' => $poster,
 			'onSuccess' => '
