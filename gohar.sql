@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-03-01 20:24:05
+Date: 2017-03-05 12:18:45
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -646,7 +646,6 @@ CREATE TABLE `iw_events` (
   `long_days_run` int(2) unsigned NOT NULL COMMENT 'مدت مراسم',
   `start_time_run` varchar(20) COLLATE utf8_persian_ci NOT NULL COMMENT 'ساعت شروع',
   `end_time_run` varchar(20) COLLATE utf8_persian_ci NOT NULL COMMENT 'ساعت پایان',
-  `max_more_days` int(2) unsigned DEFAULT NULL,
   `more_days` int(2) unsigned DEFAULT NULL COMMENT 'تعداد روزهای اضافه تر از پیشفرض',
   `state_id` int(10) unsigned NOT NULL COMMENT 'استان',
   `city_id` int(10) unsigned NOT NULL COMMENT 'شهرستان',
@@ -667,13 +666,15 @@ CREATE TABLE `iw_events` (
   `activator_area_code` tinyint(1) unsigned DEFAULT '0' COMMENT 'فعال شدن منطقه شهرداری',
   `activator_postal_code` tinyint(1) unsigned DEFAULT '0' COMMENT 'فعال شدن کدپستی',
   `ceremony_poster` varchar(256) CHARACTER SET latin1 DEFAULT NULL COMMENT 'پوستر مراسم',
+  `status` decimal(1,0) DEFAULT '0' COMMENT 'وضعیت',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- ----------------------------
 -- Records of iw_events
 -- ----------------------------
-INSERT INTO `iw_events` VALUES ('2', 'admin', '1', 'مذهبی', 'فرهنگی', 'مراسم آزمایشی', 'مراسم آزمایشی 2', 'سازمان جوانان', 'هلال احمر', 'male', '18', '25', '1484290632', '2', '1483597800', '1483603200', '2', '2', '19', '316', 'فاطمیه', 'امامزاده ابراهیم', 'شهید شوندی', 'سوم خرداد', 'زند آباد', 'معصومیه', 'نیرو هوایی', 'زند آباد', '6', '3718895691', 'کوچه 12 پلاک 5', 'مراسم بی خودی...', 'کیک و آبمیوه', '{\"executer\":[\"\\u0639\\u0644\\u06cc \\u0636\\u06cc\\u0627\\u0621\"],\"reader\":[\"\\u067e\\u0631\\u0647\\u06cc\\u0632\\u06af\\u0627\\u0631\"],\"poet\":[\"\\u0635\\u0627\\u0628\\u0631 \\u062e\\u0631\\u0627\\u0633\\u0627\\u0646\\u06cc\"],\"speaker\":[\"\\u0645\\u0627\\u0646\\u062f\\u06af\\u0627\\u0631\\u06cc\",\"\\u0642\\u0631\\u0627\\u0626\\u062a\\u06cc\"],\"maddah\":[\"\\u0645\\u06cc\\u0631\\u062f\\u0627\\u0645\\u0627\\u062f\"],\"singer\":[\"\\u0628\\u0647\\u0646\\u0627\\u0645 \\u0635\\u0641\\u0648\\u06cc\"],\"team\":[\"\\u0631\\u0647\\u0628\\u062f\"],\"other\":[\"\\u0633\\u0627\\u06cc\\u0631 \\u0646\\u062f\\u0627\\u0631\\u062f\\u06cc\"]}', '1', '1', '3k0zX1483613341.jpg');
+INSERT INTO `iw_events` VALUES ('2', 'admin', '1', 'مذهبی', 'فرهنگی', 'اربعین', 'مراسم آزمایشی 2', 'سازمان جوانان', 'هلال احمر', 'male', '18', '25', '1484290632', '2', '1483597800', '1483603200', '2', '19', '316', 'فاطمیه', 'امامزاده ابراهیم', 'شهید شوندی', 'سوم خرداد', 'زند آباد', 'معصومیه', 'نیرو هوایی', 'زند آباد', '6', '3718895691', 'کوچه 12 پلاک 5', 'مراسم بی خودی...', 'کیک و آبمیوه', '{\"executer\":[\"\\u0639\\u0644\\u06cc \\u0636\\u06cc\\u0627\\u0621\"],\"reader\":[\"\\u067e\\u0631\\u0647\\u06cc\\u0632\\u06af\\u0627\\u0631\"],\"poet\":[\"\\u0635\\u0627\\u0628\\u0631 \\u062e\\u0631\\u0627\\u0633\\u0627\\u0646\\u06cc\"],\"speaker\":[\"\\u0645\\u0627\\u0646\\u062f\\u06af\\u0627\\u0631\\u06cc\",\"\\u0642\\u0631\\u0627\\u0626\\u062a\\u06cc\"],\"maddah\":[\"\\u0645\\u06cc\\u0631\\u062f\\u0627\\u0645\\u0627\\u062f\"],\"singer\":[\"\\u0628\\u0647\\u0646\\u0627\\u0645 \\u0635\\u0641\\u0648\\u06cc\"],\"team\":[\"\\u0631\\u0647\\u0628\\u062f\"],\"other\":[\"\\u0633\\u0627\\u06cc\\u0631 \\u0646\\u062f\\u0627\\u0631\\u062f\\u06cc\"]}', '1', '1', '3k0zX1483613341.jpg', '1');
+INSERT INTO `iw_events` VALUES ('3', 'admin', '1', 'مذهبی', 'فرهنگی', 'مراسم آزمایشی', 'مراسم آزمایشی 2', 'سازمان جوانان', 'هلال احمر', 'female', '18', '25', '1484290632', '2', '1483597800', '1483603200', '2', '19', '316', 'فاطمیه', 'امامزاده ابراهیم', 'شهید شوندی', 'سوم خرداد', 'زند آباد', 'معصومیه', 'نیرو هوایی', 'زند آباد', '6', '3718895691', 'کوچه 12 پلاک 5', 'مراسم بی خودی...', 'کیک و آبمیوه', '{\"executer\":[\"\\u0639\\u0644\\u06cc \\u0636\\u06cc\\u0627\\u0621\"],\"reader\":[\"\\u067e\\u0631\\u0647\\u06cc\\u0632\\u06af\\u0627\\u0631\"],\"poet\":[\"\\u0635\\u0627\\u0628\\u0631 \\u062e\\u0631\\u0627\\u0633\\u0627\\u0646\\u06cc\"],\"speaker\":[\"\\u0645\\u0627\\u0646\\u062f\\u06af\\u0627\\u0631\\u06cc\",\"\\u0642\\u0631\\u0627\\u0626\\u062a\\u06cc\"],\"maddah\":[\"\\u0645\\u06cc\\u0631\\u062f\\u0627\\u0645\\u0627\\u062f\"],\"singer\":[\"\\u0628\\u0647\\u0646\\u0627\\u0645 \\u0635\\u0641\\u0648\\u06cc\"],\"team\":[\"\\u0631\\u0647\\u0628\\u062f\"],\"other\":[\"\\u0633\\u0627\\u06cc\\u0631 \\u0646\\u062f\\u0627\\u0631\\u062f\\u06cc\"]}', '1', '1', '3k0zX1483613341.jpg', '0');
 
 -- ----------------------------
 -- Table structure for iw_log
