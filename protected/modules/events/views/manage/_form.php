@@ -5,6 +5,7 @@
 /* @var $states array */
 /* @var $categories array */
 /* @var $poster array */
+/* @var $maxMoreDays string */
 ?>
 
 <div class="form">
@@ -112,14 +113,9 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'max_more_days'); ?>
-		<?php echo $form->textField($model,'max_more_days',array('size'=>2,'maxlength'=>2)); ?>
-		<?php echo $form->error($model,'max_more_days'); ?>
-	</div>
-
-	<div class="row">
 		<?php echo $form->labelEx($model,'more_days'); ?>
 		<?php echo $form->textField($model,'more_days',array('size'=>2,'maxlength'=>2)); ?>
+        <small>حداکثر تعداد روزهای اضافه تر از پیشفرض: <?php echo $maxMoreDays;?></small>
 		<?php echo $form->error($model,'more_days'); ?>
 	</div>
 
@@ -340,8 +336,12 @@
 		<?php echo $form->error($model,'ceremony_poster'); ?>
 	</div>
 
+	<div class="row">
+		<?php echo $form->error($model,'scenarioError'); ?>
+	</div>
+
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'ثبت' : 'ذخیره', array('class'=>'btn btn-success')); ?>
+		<?php echo CHtml::submitButton($model->isNewRecord ? 'نمایش پیش فاکتور' : 'ذخیره', array('class'=>'btn btn-success')); ?>
 	</div>
 
 <?php $this->endWidget(); ?>
