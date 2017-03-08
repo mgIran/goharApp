@@ -3,7 +3,7 @@
 class UnityModule extends CWebModule
 {
 	public $controllerMap = array(
-		'manage'=>'unity.controllers.unityManageController',
+		'manage'=>'unity.controllers.UnityManageController',
 	);
 
 	public function init()

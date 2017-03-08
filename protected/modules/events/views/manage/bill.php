@@ -14,7 +14,9 @@ $this->menu=array(
 	array('label'=>'لیست مراسمات', 'url'=>array('admin')),
 );
 
-$billInfo=$model->calculatePrice();
+$eventSubmitPrice=$model->default_show_price+$model->more_than_default_show_price;
+$eventPriceWithOff=$eventSubmitPrice-($model->plan_off*$eventSubmitPrice/100);
+$price=$eventPriceWithOff+($model->tax*$eventPriceWithOff/100);
 ?>
 
 <?php $this->renderPartial("//layouts/_flashMessage");?>
@@ -26,32 +28,32 @@ $billInfo=$model->calculatePrice();
 	'data'=>$model,
 	'attributes'=>array(
 		array(
-            'name'=>'هزینه نمایش پیشفرض',
-            'value'=>number_format($billInfo["defaultPrice"])." تومان"
+            'name'=>'default_show_price',
+            'value'=>number_format($model->default_show_price)." تومان"
         ),
 		array(
-            'name'=>'هزینه نمایش بیشتر از پیشفرض',
-            'value'=>number_format($billInfo["showMoreThanDefaultPrice"])." تومان"
+            'name'=>'more_than_default_show_price',
+            'value'=>number_format($model->more_than_default_show_price)." تومان"
         ),
 		array(
             'name'=>'هزینه ثبت مراسم',
-            'value'=>number_format($billInfo["eventPrice"])." تومان"
+            'value'=>number_format($eventSubmitPrice)." تومان"
         ),
         array(
-            'name'=>$billInfo["planOff"].'% تخفیف پلنی',
-            'value'=>number_format($billInfo["planOffPrice"])." تومان"
+            'name'=>$model->plan_off.'% تخفیف پلنی',
+            'value'=>number_format($model->plan_off*$eventSubmitPrice/100)." تومان"
         ),
         array(
             'name'=>'هزینه ثبت مراسم با تخفیف',
-            'value'=>number_format($billInfo["eventPriceWithOff"])." تومان"
+            'value'=>number_format($eventPriceWithOff)." تومان"
         ),
         array(
-            'name'=>$billInfo['tax'].'% مالیات',
-            'value'=>number_format($billInfo["taxPrice"])." تومان"
+            'name'=>$model->tax.'% مالیات',
+            'value'=>number_format($model->tax*$eventPriceWithOff/100)." تومان"
         ),
         array(
             'name'=>'صورتحاسب قابل پرداخت',
-            'value'=>number_format($billInfo["price"])." تومان"
+            'value'=>number_format($price)." تومان"
         ),
 	),
 ));?>
@@ -64,6 +66,10 @@ $billInfo=$model->calculatePrice();
 		'subject2',
 		'conductor1',
 		'conductor2',
+		array(
+			'name'=>'ceremony_public',
+			'value'=>$model->ceremony_public?"بله":"خیر"
+		),
 		array(
 			'name'=>'sexed_guest',
 			'value'=>$model->sexLabels[$model->sexed_guest]
@@ -130,8 +136,3 @@ $billInfo=$model->calculatePrice();
 		),
 	),
 ));?>
-<?php echo CHtml::beginForm();?>
-    <div class="row">
-        <?php echo CHtml::submitButton('تایید نهایی', array('class'=>'btn btn-success pull-left', 'name'=>'confirm'));?>
-    </div>
-<?php echo CHtml::endForm();?>

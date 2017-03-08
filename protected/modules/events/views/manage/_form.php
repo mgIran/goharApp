@@ -48,6 +48,12 @@
 	</div>
 
 	<div class="row">
+		<?php echo $form->labelEx($model,'ceremony_public'); ?>
+		<?php echo $form->checkBox($model, 'ceremony_public'); ?>
+		<?php echo $form->error($model,'ceremony_public'); ?>
+	</div>
+
+	<div class="row">
 		<?php echo $form->labelEx($model,'sexed_guest'); ?>
 		<?php echo $form->dropDownList($model, 'sexed_guest', $model->sexLabels); ?>
 		<?php echo $form->error($model,'sexed_guest'); ?>

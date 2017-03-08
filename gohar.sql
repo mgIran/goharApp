@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-03-05 12:18:45
+Date: 2017-03-07 16:21:24
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -3207,7 +3207,7 @@ CREATE TABLE `iw_notifications` (
 -- ----------------------------
 INSERT INTO `iw_notifications` VALUES ('1', 'Test Notification', '1480772577', '14810972577', 'This Notification is for Test.', null, '0');
 INSERT INTO `iw_notifications` VALUES ('2', 'اطلاعیه آزمایشی', '1', '2', 'سلام این اطلاعیه جهت تست سیستم ارسال شده است.', 'c5b771482399244.png', '0');
-INSERT INTO `iw_notifications` VALUES ('6', 'اطلاعیه آزمایشی دوم', '1482489292', '1483094092', 'test', null, '0');
+INSERT INTO `iw_notifications` VALUES ('6', 'اطلاعیه آزمایشی دوم', '1490092492', '1490348092', 'test', null, '0');
 
 -- ----------------------------
 -- Table structure for iw_pages
@@ -3361,7 +3361,7 @@ INSERT INTO `iw_site_options` VALUES ('30', 'event_max_long_days', '30');
 INSERT INTO `iw_site_options` VALUES ('31', 'show_event_arrived_deadline', '0');
 INSERT INTO `iw_site_options` VALUES ('32', 'submit_general_events', '1');
 INSERT INTO `iw_site_options` VALUES ('33', 'gohar_yab_program', 'gohar-v1.0.0.apk');
-INSERT INTO `iw_site_options` VALUES ('34', 'event_tax_enabled', '0');
+INSERT INTO `iw_site_options` VALUES ('34', 'event_tax_enabled', '1');
 INSERT INTO `iw_site_options` VALUES ('35', 'admin_groups_price', '1100');
 INSERT INTO `iw_site_options` VALUES ('36', 'general_filters_price', '1200');
 INSERT INTO `iw_site_options` VALUES ('37', 'favorite_filters_price', '1300');
@@ -3699,9 +3699,27 @@ CREATE TABLE `iw_users` (
   `business_license` varchar(100) DEFAULT NULL,
   `activity_permission` varchar(100) DEFAULT NULL,
   `other_legal_documents` text,
-  `schooling_city_id` int(11) DEFAULT NULL,
-  `favorite_city_id` int(11) DEFAULT NULL,
   `app_token` varchar(100) DEFAULT NULL,
+  `schooling_city_id_1` int(11) DEFAULT NULL,
+  `schooling_postal_code_1` varchar(10) DEFAULT NULL,
+  `schooling_address_1` text,
+  `schooling_phone_prefix_1` varchar(6) DEFAULT NULL,
+  `schooling_phone_number_1` int(11) DEFAULT NULL,
+  `schooling_city_id_2` int(11) DEFAULT NULL,
+  `schooling_postal_code_2` varchar(10) DEFAULT NULL,
+  `schooling_address_2` text,
+  `schooling_phone_prefix_2` varchar(6) DEFAULT NULL,
+  `schooling_phone_number_2` int(11) DEFAULT NULL,
+  `favorite_city_id_1` int(11) DEFAULT NULL,
+  `favorite_postal_code_1` varchar(10) DEFAULT NULL,
+  `favorite_address_1` text,
+  `favorite_phone_prefix_1` varchar(6) DEFAULT NULL,
+  `favorite_phone_number_1` int(11) DEFAULT NULL,
+  `favorite_city_id_2` int(11) DEFAULT NULL,
+  `favorite_postal_code_2` varchar(10) DEFAULT NULL,
+  `favorite_address_2` text,
+  `favorite_phone_prefix_2` varchar(6) DEFAULT NULL,
+  `favorite_phone_number_2` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name` (`user_name`,`email`,`mobile`),
   KEY `role_id` (`role_id`),
@@ -3710,34 +3728,37 @@ CREATE TABLE `iw_users` (
   KEY `birth_city_id` (`birth_city_id`) USING BTREE,
   KEY `home_city_id` (`home_city_id`) USING BTREE,
   KEY `iw_users_ibfk_4` (`work_city_id`),
-  KEY `iw_users_ibfk_5` (`schooling_city_id`),
-  KEY `iw_users_ibfk_6` (`favorite_city_id`),
+  KEY `iw_users_ibfk_5` (`schooling_city_id_1`),
+  KEY `schooling_city_id_2` (`schooling_city_id_2`),
+  KEY `favorite_city_id_1` (`favorite_city_id_1`),
+  KEY `favorite_city_id_2` (`favorite_city_id_2`),
+  CONSTRAINT `iw_users_ibfk_11` FOREIGN KEY (`favorite_city_id_2`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `iw_users_ibfk_1` FOREIGN KEY (`agent_id`) REFERENCES `iw_users` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  CONSTRAINT `iw_users_ibfk_10` FOREIGN KEY (`favorite_city_id_1`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `iw_users_ibfk_2` FOREIGN KEY (`birth_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `iw_users_ibfk_3` FOREIGN KEY (`home_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `iw_users_ibfk_4` FOREIGN KEY (`work_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
-  CONSTRAINT `iw_users_ibfk_5` FOREIGN KEY (`schooling_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
-  CONSTRAINT `iw_users_ibfk_6` FOREIGN KEY (`favorite_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
   CONSTRAINT `iw_users_ibfk_7` FOREIGN KEY (`role_id`) REFERENCES `iw_users_roles` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `iw_users_ibfk_8` FOREIGN KEY (`schooling_city_id`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
+  CONSTRAINT `iw_users_ibfk_8` FOREIGN KEY (`schooling_city_id_1`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION,
+  CONSTRAINT `iw_users_ibfk_9` FOREIGN KEY (`schooling_city_id_2`) REFERENCES `iw_users_places` (`id`) ON DELETE SET NULL ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=171 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_users
 -- ----------------------------
-INSERT INTO `iw_users` VALUES ('107', '5', 'majid.seifi71@gmail.com', '$2a$12$L9gscefH6UjUHFJ7v1iLG.dPanqP906kgXN8VU0MD1rWyOlbYBnLS', '1', 'مجید', 'سیفی', 'majid.seifi71@gmail.com', '09127468554', '0', '', null, '2000', '0', '282674', '1234', '123456789876543212345678', '111', 'ملی', 'مجید سیفی', '1233333445', '43', '47', '3712222334', 'دانیال', '25', '32888510', 'علی', '316', '3716543333', 'عطاران', '25', '32904051', '1447694837.jpg', '1438525926.jpg', '1438525929.jpg', '1438525937.jpg', '1438525940.jpg', '1438525943.jpg', '[{\"id\":1438525949,\"title\":\"\\u0645\\u062f\\u0631\\u06a9 \\u062d\\u0642\\u0648\\u0642\\u06cc\",\"file\":\"7.jpg\",\"user_id\":\"107\"}]', null, null, '$2a$12$AK01s106Iqf7utPhANEf7uG5qup61kIPXoToAges5qo43Rm8mb28b');
-INSERT INTO `iw_users` VALUES ('154', '11', 'saeedsobhani.inbox@gmail.com', '$2a$12$1MKG/luJpG2ys0sDpi7TtOvFFb1KX4yE0ik/L/hOAAPauHknO68rW', '1', 'saeed', 'sobhi', 'saeedsobhani.inbox@gmail.com', '', '0', '', null, '9845', '0', '0', null, null, null, null, null, '', '43', '43', '', '', '', '', '', null, '', '', '', '', null, null, null, null, null, null, '[{\"id\":1451824201,\"title\":\"\\u0645\\u062f\\u0631\\u06a9 \\u062d\\u0642\\u0648\\u0642\\u06cc\",\"file\":\"6.png\",\"user_id\":\"154\"}]', null, null, null);
-INSERT INTO `iw_users` VALUES ('157', '11', 'abcd@gmail.com', '$2a$12$ENVHAG6AQM4typUCx9stwuyQrkNIyg2Fp/TyVMvMIH5qM5jDBOOJe', '1', 'کاش', 'ممد1', 'abcd@gmail.com', '09125478903', '0', '56b5eb6cda903.jpg', null, '0', '0', '994', '554654764', 'ssafdncncncnckdvsfdsdldl', '45456456456456', '555', '56546', '0385910465', '91', '159', '3714744374', '', '25', '37711092', '1', '316', '', '', '', 'الغف', '1454762193.jpg', '1454767498.jpg', '1454767539.jpg', null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('159', '10', 'user1@gmail.com', '$2a$12$yVRqTdF1xRE.6VUeRH2Zz.ETnHNY1txU3.ol5zB3zVduiQIqE4QP6', '1', 'user1', 'user1', 'user1@gmail.com', '09352968585', '0', '', '157', '0', '0', '180000', '56', 'ljjhyhyhyhyhyhyhyhyhyhyh', '1452789475jfgjfjfjfj', 'یلیس', 'سیلبیس', '0385000006', '316', '316', '', '', '', '', '', null, '', '', '', '', null, '1454855872.jpg', null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('160', '5', 'user2@gmail.com', '$2a$12$i7MLbp94IY9z5ySeKkouz.C9L6PkZhkvrIxVFFOHFP7x94vNs4mgC', '1', 'user2', 'user2', 'user2@gmail.com', '09352968575', '0', '', null, '0', '0', '181000', 'fhfghfh', 'gfrftgyhujikol,mnbvcxsdf', 'fdsafgbtgfdhnnjp', '989898', '68894989', '0385910460', '73', '72', '', '', '', '', 'محسن', null, '', '', '', '', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('161', '5', 'user3@gmail.com', '09352968585', '1', 'user3', 'user3', 'user3@gmail.com', '', '0', '', null, '0', '0', '180000', '879874798', '', '123456789456123456', 'یسنمتاهخیسبهخنبتیخب', '', '0646466666', '468', '159', '', '', '', '', 'kjh65456', '91', '', '', '', '', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('162', '5', 'user4@gmail.com', '$2a$12$0DEAHsnImHhnesyHtfRoBuE1B9N9bZR56znGWCUd9YclntBzXOY8e', '1', 'user4', 'user4', 'user4@gmail.com', '09124445555', '0', '56f93da7b2588.jpg', null, '0', '0', '0', '669', '123456789789542144444444', '1234567894561254', 'ملی ساپشس ', 'محمیایسا', '', '316', '316', '', '', '', '', '546646', null, '', '', '', '', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('165', '5', '', '', '1', '', '', '', '09358389265', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('166', '5', '', '', '1', '', '', '', '09198505631', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, '$2a$12$iisKM.1WtCwaoTZbz1ahYursFbloaUXV0pUjcQzAroB1qfNk7ByES');
-INSERT INTO `iw_users` VALUES ('167', '5', '', '', '1', '', '', '', '09210914751', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('168', '5', '', '', '1', '', '', '', '09198691890', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('169', '5', '', '', '1', '', '', '', '09128541584', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-INSERT INTO `iw_users` VALUES ('170', '5', '', '', '1', '', '', '', '09128531582', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('107', '5', 'majid.seifi71@gmail.com', '$2a$12$L9gscefH6UjUHFJ7v1iLG.dPanqP906kgXN8VU0MD1rWyOlbYBnLS', '1', 'مجید', 'سیفی', 'majid.seifi71@gmail.com', '09127468554', '0', '', null, '2000', '0', '282674', '1234', '123456789876543212345678', '111', 'ملی', 'مجید سیفی', '1233333445', '43', '47', '3712222334', 'دانیال', '25', '32888510', 'علی', '316', '3716543333', 'عطاران', '25', '32904051', '1447694837.jpg', '1438525926.jpg', '1438525929.jpg', '1438525937.jpg', '1438525940.jpg', '1438525943.jpg', '[{\"id\":1438525949,\"title\":\"\\u0645\\u062f\\u0631\\u06a9 \\u062d\\u0642\\u0648\\u0642\\u06cc\",\"file\":\"7.jpg\",\"user_id\":\"107\"}]', '$2a$12$AK01s106Iqf7utPhANEf7uG5qup61kIPXoToAges5qo43Rm8mb28b', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('154', '11', 'saeedsobhani.inbox@gmail.com', '$2a$12$1MKG/luJpG2ys0sDpi7TtOvFFb1KX4yE0ik/L/hOAAPauHknO68rW', '1', 'saeed', 'sobhi', 'saeedsobhani.inbox@gmail.com', '', '0', '', null, '9845', '0', '0', null, null, null, null, null, '', '43', '43', '', '', '', '', '', null, '', '', '', '', null, null, null, null, null, null, '[{\"id\":1451824201,\"title\":\"\\u0645\\u062f\\u0631\\u06a9 \\u062d\\u0642\\u0648\\u0642\\u06cc\",\"file\":\"6.png\",\"user_id\":\"154\"}]', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('157', '11', 'abcd@gmail.com', '$2a$12$ENVHAG6AQM4typUCx9stwuyQrkNIyg2Fp/TyVMvMIH5qM5jDBOOJe', '1', 'کاش', 'ممد1', 'abcd@gmail.com', '09125478903', '0', '56b5eb6cda903.jpg', null, '0', '0', '994', '554654764', 'ssafdncncncnckdvsfdsdldl', '45456456456456', '555', '56546', '0385910465', '91', '159', '3714744374', '', '25', '37711092', '1', '316', '', '', '', 'الغف', '1454762193.jpg', '1454767498.jpg', '1454767539.jpg', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('159', '10', 'user1@gmail.com', '$2a$12$yVRqTdF1xRE.6VUeRH2Zz.ETnHNY1txU3.ol5zB3zVduiQIqE4QP6', '1', 'user1', 'user1', 'user1@gmail.com', '09352968585', '0', '', '157', '0', '0', '180000', '56', 'ljjhyhyhyhyhyhyhyhyhyhyh', '1452789475jfgjfjfjfj', 'یلیس', 'سیلبیس', '0385000006', '316', '316', '', '', '', '', '', null, '', '', '', '', null, '1454855872.jpg', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('160', '5', 'user2@gmail.com', '$2a$12$i7MLbp94IY9z5ySeKkouz.C9L6PkZhkvrIxVFFOHFP7x94vNs4mgC', '1', 'user2', 'user2', 'user2@gmail.com', '09352968575', '0', '', null, '0', '0', '181000', 'fhfghfh', 'gfrftgyhujikol,mnbvcxsdf', 'fdsafgbtgfdhnnjp', '989898', '68894989', '0385910460', '73', '72', '', '', '', '', 'محسن', null, '', '', '', '', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('161', '5', 'user3@gmail.com', '09352968585', '1', 'user3', 'user3', 'user3@gmail.com', '', '0', '', null, '0', '0', '180000', '879874798', '', '123456789456123456', 'یسنمتاهخیسبهخنبتیخب', '', '0646466666', '468', '159', '', '', '', '', 'kjh65456', '91', '', '', '', '', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('162', '5', 'user4@gmail.com', '$2a$12$0DEAHsnImHhnesyHtfRoBuE1B9N9bZR56znGWCUd9YclntBzXOY8e', '1', 'user4', 'user4', 'user4@gmail.com', '09124445555', '0', '56f93da7b2588.jpg', null, '0', '0', '0', '669', '123456789789542144444444', '1234567894561254', 'ملی ساپشس ', 'محمیایسا', '', '316', '316', '', '', '', '', '546646', null, '', '', '', '', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('165', '5', '', '', '1', '', '', '', '09358389265', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('166', '5', '', '', '1', '', '', '', '09198505631', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, '$2a$12$iisKM.1WtCwaoTZbz1ahYursFbloaUXV0pUjcQzAroB1qfNk7ByES', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('167', '5', '', '', '1', '', '', '', '09210914751', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('168', '5', '', '', '1', '', '', '', '09198691890', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('169', '5', '', '', '1', '', '', '', '09128541584', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+INSERT INTO `iw_users` VALUES ('170', '5', '', '', '1', '', '', '', '09128531582', '0', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, null, null, null, null, '1', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for iw_users_logins

@@ -6,7 +6,7 @@
  * The followings are the available columns in table '{{events}}':
  * @property string $id
  * @property string $creator_type
- * @property string $creator_id
+ * @property integer $creator_id
  * @property string $type1
  * @property string $type2
  * @property string $subject1
@@ -44,6 +44,11 @@
  * @property string $city
  * @property string $selectedCategories
  * @property integer $status
+ * @property string $ceremony_public
+ * @property string $default_show_price
+ * @property string $more_than_default_show_price
+ * @property string $plan_off
+ * @property string $tax
  *
  */
 class Events extends CActiveRecord
@@ -52,6 +57,7 @@ class Events extends CActiveRecord
     public $selectedCategories;
     public $state;
     public $city;
+    public $creator_mobile;
     public $inviteesLabels = array(
         'executer' => 'مجری',
         'reader' => 'قاری',
@@ -96,9 +102,10 @@ class Events extends CActiveRecord
             array('status', 'length', 'max' => 1),
             array('min_age_guests, max_age_guests, long_days_run, more_days, area_code', 'length', 'max' => 2),
             array('start_date_run, start_time_run, end_time_run', 'length', 'max' => 20),
-            array('state_id, city_id, postal_code', 'length', 'max' => 10),
+            array('state_id, city_id, postal_code, default_show_price, more_than_default_show_price, plan_off, tax', 'length', 'max' => 10),
             array('creator_type', 'length', 'max' => 50),
             array('creator_id', 'length', 'max' => 11),
+            array('ceremony_public', 'length', 'max' => 1),
             array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max' => 25),
             array('state, city, complete_details, invitees', 'safe'),
             array('selectedCategories', 'safe'),
@@ -108,11 +115,10 @@ class Events extends CActiveRecord
             array('end_time_run', 'checkEndTime', 'distance' => 15),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster, status', 'safe', 'on' => 'search'),
+            array('creator_mobile, ceremony_public, creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster, status, default_show_price, more_than_default_show_price, plan_off, tax', 'safe', 'on' => 'search'),
         );
     }
 
-    /**/
     public function calculatePrice($planOff = 0)
     {
         $a = $this->long_days_run;
@@ -122,14 +128,25 @@ class Events extends CActiveRecord
         foreach ($defaultShowTimes as $item)
             if ($a >= $item[0] and $a <= $item[1])
                 $b = $item[2];
-        $c = (float)$a + ($b / 24);
+        $b = $b / 24;
+        // Reducing time lost from default show time
+        $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $b . "days");
+        $diff = (time() - $showTime < 0) ? 0 : time() - $showTime;
+        $diff = floor($diff / (60 * 60 * 24));
+        $b = ($b - $diff < 0) ? 0 : $b - $diff;
+        $c = (float)$a + $b;
         $defaultShowPrice = CJSON::decode(SiteOptions::model()->getOption('show_event'));
         $d = 0;
         foreach ($defaultShowPrice as $item)
             if ($c >= $item[0] and $c <= $item[1])
                 $d = $item[2];
         $showEventMoreThanDefaultPrice = (int)SiteOptions::model()->getOption('show_event_more_than_default_price');
-        $e = $showEventMoreThanDefaultPrice * $this->more_days;
+        // Reducing time lost from more_days
+        $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $c . "days");
+        $diff = (time() - $showTime < 0) ? 0 : time() - $showTime;
+        $diff = floor($diff / (60 * 60 * 24));
+        $moreDays = ($this->more_days - $diff < 0) ? 0 : $this->more_days - $diff;
+        $e = $showEventMoreThanDefaultPrice * $moreDays;
         $eventTaxEnabled = SiteOptions::model()->getOption('event_tax_enabled');
         $tax = 0;
         if ($eventTaxEnabled == 1)
@@ -142,8 +159,9 @@ class Events extends CActiveRecord
             'planOff' => $planOff,
             'planOffPrice' => (($e + $d) * $planOff) / 100,
             'eventPriceWithOff' => ($e + $d) - ((($e + $d) * $planOff) / 100),
-            'tax' => $tax,
-            'taxPrice' => (($e + $d) * $tax) / 100,
+            'tax' => SiteOptions::model()->getOption('tax'),
+            'thisEventTax' => $tax,
+            'taxPrice' => ((($e + $d) - ((($e + $d) * $planOff) / 100)) * $tax) / 100,
             'price' => $f
         );
         return $returns;
@@ -242,8 +260,14 @@ class Events extends CActiveRecord
             'activator_area_code' => 'فعال شدن منطقه شهرداری',
             'activator_postal_code' => 'فعال شدن کدپستی',
             'ceremony_poster' => 'پوستر مراسم',
+            'ceremony_public' => 'مراسم عمومی است',
             'selectedCategories' => 'نوع مراسم',
             'status' => 'وضعیت',
+            'creator_mobile' => 'شماره موبایل ثبت کننده',
+            'default_show_price' => 'هزینه نمایش پیشفرض',
+            'more_than_default_show_price' => 'هزینه نمایش بیشتر از پیشفرض',
+            'plan_off' => 'تخفیف پلنی',
+            'tax' => 'مالیات ثبت مراسم',
         );
     }
 
@@ -283,7 +307,6 @@ class Events extends CActiveRecord
         $criteria->compare('start_time_run', $this->start_time_run, true);
         $criteria->compare('end_time_run', $this->end_time_run, true);
         $criteria->compare('more_days', $this->more_days, true);
-        $criteria->compare('state_id', $this->state_id, true);
         $criteria->compare('city_id', $this->city_id, true);
         $criteria->compare('town', $this->town, true);
         $criteria->compare('main_street', $this->main_street, true);
@@ -304,7 +327,15 @@ class Events extends CActiveRecord
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
         $criteria->compare('status', $this->status, true);
 
-        if(!is_null($condition))
+        if (!empty($_GET['Events']['state_id']))
+            $criteria->compare('state_id', $this->state_id);
+
+        if (!empty($_GET['Events']['creator_mobile'])) {
+            $criteria->addCondition("creator_id IN (SELECT id FROM iw_users WHERE mobile LIKE :mobile)");
+            $criteria->params[':mobile'] = '%' . $this->creator_mobile . '%';
+        }
+
+        if (!is_null($condition))
             $criteria->addCondition($condition);
 
         $criteria->order = 'id DESC';

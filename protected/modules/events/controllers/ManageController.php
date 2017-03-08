@@ -28,7 +28,7 @@ class ManageController extends Controller
     {
         return array(
             array('allow',
-                'actions' => array('admin', 'delete', 'create', 'update', 'view', 'upload', 'deleteUpload', 'bill'),
+                'actions' => array('admin', 'delete', 'create', 'update', 'view', 'upload', 'deleteUpload', 'confirmBill', 'bill'),
                 'users' => array('admin'),
             ),
             array('deny',  // deny all users
@@ -134,16 +134,32 @@ class ManageController extends Controller
         ));
     }
 
-    public function actionBill($id)
+    public function actionConfirmBill($id)
     {
         if (isset($_POST['confirm'])) {
-            if (Events::model()->updateByPk($id, array('status' => '1'))) {
+            $model=$this->loadModel($id);
+            $calculatedPrices=$model->calculatePrice();
+            $update=Events::model()->updateByPk($id, array(
+                'status' => '1',
+                'default_show_price'=>$calculatedPrices['defaultPrice'],
+                'more_than_default_show_price'=>$calculatedPrices['showMoreThanDefaultPrice'],
+                'plan_off'=>0,
+                'tax'=>$calculatedPrices['thisEventTax'],
+            ));
+            if ($update) {
                 Yii::app()->user->setFlash('success', "اطلاعات با موفقیت ثبت شد.");
                 $this->redirect(array("view", "id" => $id));
             } else
                 Yii::app()->user->setFlash('failed', "در ثبت اطلاعات خطایی رخ داده است.");
         }
 
+        $this->render('confirm-bill', array(
+            'model' => $this->loadModel($id),
+        ));
+    }
+
+    public function actionBill($id)
+    {
         $this->render('bill', array(
             'model' => $this->loadModel($id),
         ));
@@ -211,7 +227,7 @@ class ManageController extends Controller
                     rename($tmpDIR . $model->ceremony_poster, $posterDIR . $model->ceremony_poster);
 
                 Yii::app()->user->setFlash('success', 'اطلاعات با موفقیت ذخیره شد.');
-                $this->refresh();
+                $this->redirect(array("confirmBill", "id" => $model->id));
             } else
                 Yii::app()->user->setFlash('failed', 'در ثبت اطلاعات خطایی رخ داده است!');
         }
@@ -258,8 +274,11 @@ class ManageController extends Controller
         if (isset($_GET['Events']))
             $model->attributes = $_GET['Events'];
 
+        $states = CHtml::listData(UsersPlaces::model()->findAll('parent_id IS NULL'), 'id', 'title');
+
         $this->render('admin', array(
             'model' => $model,
+            'states' => $states,
         ));
     }
 

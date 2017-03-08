@@ -11,7 +11,6 @@
 /* @var $program array */
 /* @var $baseLine SiteOptions */
 /* @var $appVersion SiteOptions */
-/* @var $tax SiteOptions */
 /* @var $eventTaxEnabled SiteOptions */
 /* @var $signupStatus SiteOptions */
 /* @var $adminGroupsPrice SiteOptions */
@@ -147,11 +146,6 @@ $this->breadcrumbs=array(
             </div>
         </div>
         <div id="finance" class="tab-pane fade">
-            <div class="row">
-                <?php echo CHtml::label('مالیات بر ارزش افزوده','tax'); ?>
-                <?php echo CHtml::textField('tax', $tax->value); ?>
-            </div>
-
             <div class="row">
                 <?php echo CHtml::label('مالیات برای هر ثبت مراسم اعمال شود؟','tax'); ?>
                 <div><?php echo CHtml::radioButtonList('eventTaxEnabled', $eventTaxEnabled->value, array(1=>'بله', 0=>'خیر'));?></div>

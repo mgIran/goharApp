@@ -3,7 +3,7 @@
 class NotificationsModule extends CWebModule
 {
 	public $controllerMap = array(
-		'manage'=>'notifications.controllers.notificationsManageController',
+		'manage'=>'notifications.controllers.NotificationsManageController',
 	);
 
 	public function init()

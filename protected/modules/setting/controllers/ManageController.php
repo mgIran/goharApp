@@ -88,7 +88,6 @@ class ManageController extends Controller
         $goharYabProgram =
         $baseLine =
         $appVersion =
-        $tax =
         $eventTaxEnabled =
         $signupStatus =
         $adminGroupsPrice =
@@ -118,8 +117,6 @@ class ManageController extends Controller
                 $baseLine = $setting;
             elseif ($setting->name == 'app_version')
                 $appVersion = $setting;
-            elseif ($setting->name == 'tax')
-                $tax = $setting;
             elseif ($setting->name == 'event_tax_enabled')
                 $eventTaxEnabled = $setting;
             elseif ($setting->name == 'signup_status')
@@ -218,15 +215,6 @@ class ManageController extends Controller
 
                 if (!$appVersion->save())
                     foreach ($appVersion->errors as $error)
-                        foreach ($error as $item)
-                            $errors[] = $item;
-            }
-
-            if (isset($_POST['tax'])) {
-                $tax->value = $_POST['tax'];
-
-                if (!$tax->save())
-                    foreach ($tax->errors as $error)
                         foreach ($error as $item)
                             $errors[] = $item;
             }
@@ -359,7 +347,6 @@ class ManageController extends Controller
             'program' => $program,
             'baseLine' => $baseLine,
             'appVersion' => $appVersion,
-            'tax' => $tax,
             'eventTaxEnabled' => $eventTaxEnabled,
             'signupStatus' => $signupStatus,
             'adminGroupsPrice' => $adminGroupsPrice,

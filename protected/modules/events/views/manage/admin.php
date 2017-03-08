@@ -1,6 +1,7 @@
 <?php
 /* @var $this ManageController */
 /* @var $model Events */
+/* @var $states array */
 
 $this->breadcrumbs=array(
 	'مراسمات'=>array('admin'),
@@ -22,9 +23,13 @@ $this->menu=array(
 		'subject1',
 		'conductor1',
 		array(
-			'name'=>'sexed_guest',
-			'value'=>'$data->sexLabels[$data->sexed_guest]',
-			'filter'=>CHtml::activeDropDownList($model, 'sexed_guest', $model->sexLabels, array('prompt'=>'همه'))
+			'name'=>'state_id',
+			'value'=>'UsersPlaces::model()->findByPk($data->state_id)->title',
+			'filter'=>CHtml::activeDropDownList($model, 'state_id', $states, array('prompt'=>'همه'))
+		),
+		array(
+			'name'=>'creator_mobile',
+			'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:"-"',
 		),
 		array(
 			'class'=>'CButtonColumn',
@@ -49,11 +54,15 @@ $this->menu=array(
 	'columns'=>array(
 		'subject1',
 		'conductor1',
-		array(
-			'name'=>'sexed_guest',
-			'value'=>'$data->sexLabels[$data->sexed_guest]',
-			'filter'=>CHtml::activeDropDownList($model, 'sexed_guest', $model->sexLabels, array('prompt'=>'همه'))
-		),
+        array(
+            'name'=>'state_id',
+            'value'=>'UsersPlaces::model()->findByPk($data->state_id)->title',
+            'filter'=>CHtml::activeDropDownList($model, 'state_id', $states, array('prompt'=>'همه'))
+        ),
+        array(
+            'name'=>'creator_mobile',
+            'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:"-"',
+        ),
 		array(
 			'class'=>'CButtonColumn',
 			'template'=>'{bill} {view} {update} {delete}',
