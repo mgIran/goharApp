@@ -37,7 +37,8 @@ $this->menu=array(
 			'buttons'=>array(
 				'bill'=>array(
 					'imageUrl'=>Yii::app()->theme->baseUrl."/img/bill.png",
-					'url'=>'Yii::app()->createUrl("/events/manage/bill/".$data->id)'
+					'url'=>'Yii::app()->createUrl("/events/manage/bill/".$data->id)',
+					'label'=>'فاکتور'
 				)
 			)
 		),
@@ -69,7 +70,8 @@ $this->menu=array(
 			'buttons'=>array(
 				'bill'=>array(
 					'imageUrl'=>Yii::app()->theme->baseUrl."/img/bill.png",
-					'url'=>'Yii::app()->createUrl("/events/manage/bill/".$data->id)'
+					'url'=>'Yii::app()->createUrl("/events/manage/confirmBill/".$data->id)',
+					'label'=>'پیش فاکتور'
 				)
 			)
 		),

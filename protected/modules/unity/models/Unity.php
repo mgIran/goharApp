@@ -45,11 +45,28 @@ class Unity extends CActiveRecord
 			array('poster', 'length', 'max'=>500),
 			array('receiver_count', 'length', 'max'=>10),
 			array('content, status', 'safe'),
+			array('date', 'unique'),
+			array('date','compare'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, date, notices_date, subject, content, poster, receiver_count', 'safe', 'on'=>'search'),
 		);
 	}
+
+    public function unique($attribute, $params)
+    {
+        $models = self::model()->findAll();
+        foreach ($models as $model)
+            if (date("Y/m/d", $model->date) == date("Y/m/d", $this->$attribute))
+                $this->addError($attribute, "قبلا در این تاریخ یک همصدایی ثبت شده است.");
+    }
+
+    public function compare($attribute, $params)
+    {
+        $noticesDate=strtotime(date("Y/m/d 00:00",$this->notices_date));
+        if($this->$attribute < $noticesDate)
+            $this->addError($attribute, "زمان همصدایی نمی تواند قبل از تاریخ اطلاع رسانی باشد.");
+    }
 
 	/**
 	 * @return array relational rules.

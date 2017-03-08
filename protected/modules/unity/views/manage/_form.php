@@ -54,7 +54,7 @@
                 'format'=>'DD MMMM YYYY'
             ),
         ));?>
-		<?php echo $form->error($model,'date'); ?>
+		<?php echo $form->error($model,'notices_date'); ?>
 	</div>
 
 	<div class="row">
