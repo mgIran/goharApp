@@ -1,5 +1,5 @@
 <?php
-/* @var $this EventsController */
+/* @var $this ManageController */
 /* @var $model Events */
 
 $this->breadcrumbs=array(
@@ -13,12 +13,52 @@ $this->menu=array(
 	array('label'=>'حذف این مراسم', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'آیا از حذف این مراسم مطمئن هستید؟')),
 	array('label'=>'لیست مراسمات', 'url'=>array('admin')),
 );
+
+$eventSubmitPrice=$model->default_show_price+$model->more_than_default_show_price;
+$eventPriceWithOff=$eventSubmitPrice-($model->plan_off*$eventSubmitPrice/100);
+$price=$eventPriceWithOff+($model->tax*$eventPriceWithOff/100);
 ?>
 
 <?php $this->renderPartial("//layouts/_flashMessage");?>
 
 <h1><?php echo $model->subject1; ?></h1>
 
+<h3>پیش فاکتور</h3>
+<?php $this->widget('zii.widgets.CDetailView', array(
+	'data'=>$model,
+	'attributes'=>array(
+		array(
+            'name'=>'default_show_price',
+            'value'=>number_format($model->default_show_price)." تومان"
+        ),
+		array(
+            'name'=>'more_than_default_show_price',
+            'value'=>number_format($model->more_than_default_show_price)." تومان"
+        ),
+		array(
+            'name'=>'هزینه ثبت مراسم',
+            'value'=>number_format($eventSubmitPrice)." تومان"
+        ),
+        array(
+            'name'=>$model->plan_off.'% تخفیف پلنی',
+            'value'=>number_format($model->plan_off*$eventSubmitPrice/100)." تومان"
+        ),
+        array(
+            'name'=>'هزینه ثبت مراسم با تخفیف',
+            'value'=>number_format($eventPriceWithOff)." تومان"
+        ),
+        array(
+            'name'=>$model->tax.'% مالیات',
+            'value'=>number_format($model->tax*$eventPriceWithOff/100)." تومان"
+        ),
+        array(
+            'name'=>'صورتحاسب قابل پرداخت',
+            'value'=>number_format($price)." تومان"
+        ),
+	),
+));?>
+<hr>
+<h3>اطلاعات مراسم</h3>
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(

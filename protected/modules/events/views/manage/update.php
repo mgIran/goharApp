@@ -4,6 +4,7 @@
 /* @var $states array */
 /* @var $categories array */
 /* @var $poster array */
+/* @var $maxMoreDays string */
 
 $this->breadcrumbs=array(
 	'مراسمات'=>array('admin'),
@@ -20,4 +21,4 @@ $this->menu=array(
 
 <h1>ویرایش <?php echo $model->subject1; ?></h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model, 'states'=>$states, 'categories'=>$categories, 'poster'=>$poster)); ?>
+<?php $this->renderPartial('_form', array('model'=>$model, 'states'=>$states, 'categories'=>$categories, 'poster'=>$poster, 'maxMoreDays'=>$maxMoreDays)); ?>

@@ -27,7 +27,7 @@ class ManageController extends Controller
     {
         return array(
             array('allow',
-                'actions' => array('update', 'upload', 'deleteUpload'),
+                'actions' => array('update', 'upload', 'deleteUpload', 'uploadPoster', 'deleteUploadPoster'),
                 'users' => array('admin'),
             ),
             array('deny',  // deny all users
@@ -54,6 +54,21 @@ class ManageController extends Controller
                 'uploadDir' => '/uploads/app',
                 'storedMode' => 'field'
             ),
+            'uploadPoster' => array(
+                'class' => 'ext.dropZoneUploader.actions.AjaxUploadAction',
+                'attribute' => 'weekly_unity_poster',
+                'rename' => 'random',
+                'validateOptions' => array(
+                    'acceptedTypes' => array('jpg','png','gif')
+                )
+            ),
+            'deleteUploadPoster' => array(
+                'class' => 'ext.dropZoneUploader.actions.AjaxDeleteUploadedAction',
+                'modelName' => 'SiteOptions',
+                'attribute' => 'value',
+                'uploadDir' => '/uploads/unity',
+                'storedMode' => 'field'
+            ),
         );
     }
 
@@ -63,16 +78,22 @@ class ManageController extends Controller
 
         $errors=array();
 
-        $showEventMessage = null;
-        $showEvent = null;
-        $showEventMoreThanDefaultPrice = null;
-        $showEventMoreThanDefault = null;
-        $eventMaxLongDays = null;
-        $showEventArrivedDeadline = null;
-        $submitGeneralEvents = null;
-        $goharYabProgram = null;
-        $baseLine = null;
-        $appVersion = null;
+        $showEventMessage =
+        $showEvent =
+        $showEventMoreThanDefaultPrice =
+        $showEventMoreThanDefault =
+        $eventMaxLongDays =
+        $showEventArrivedDeadline =
+        $submitGeneralEvents =
+        $goharYabProgram =
+        $baseLine =
+        $appVersion =
+        $eventTaxEnabled =
+        $signupStatus =
+        $adminGroupsPrice =
+        $generalFiltersPrice =
+        $favoriteFiltersPrice =
+        $weeklyUnityRecord = null;
 
         foreach ($settings as $setting) {
             /* @var $setting SiteOptions */
@@ -96,6 +117,18 @@ class ManageController extends Controller
                 $baseLine = $setting;
             elseif ($setting->name == 'app_version')
                 $appVersion = $setting;
+            elseif ($setting->name == 'event_tax_enabled')
+                $eventTaxEnabled = $setting;
+            elseif ($setting->name == 'signup_status')
+                $signupStatus = $setting;
+            elseif ($setting->name == 'admin_groups_price')
+                $adminGroupsPrice = $setting;
+            elseif ($setting->name == 'general_filters_price')
+                $generalFiltersPrice = $setting;
+            elseif ($setting->name == 'favorite_filters_price')
+                $favoriteFiltersPrice = $setting;
+            elseif ($setting->name == 'weekly_unity_image')
+                $weeklyUnityRecord = $setting;
         }
 
         $tmpDIR = Yii::getPathOfAlias("webroot") . '/uploads/temp/';
@@ -106,8 +139,12 @@ class ManageController extends Controller
         if (!is_dir($programDIR))
             mkdir($programDIR);
         $programUrl = Yii::app()->baseUrl . '/uploads/app/';
+        $weeklyUnityPosterDIR = Yii::getPathOfAlias("webroot") . "/uploads/unity/";
+        if (!is_dir($weeklyUnityPosterDIR))
+            mkdir($weeklyUnityPosterDIR);
+        $weeklyUnityPosterUrl = Yii::app()->baseUrl . '/uploads/unity/';
 
-        $program = array();
+        $program = $weeklyUnityPoster = array();
 
         if (isset($_POST['submit'])) {
             if (isset($_POST['showEventMessage'])) {
@@ -182,6 +219,51 @@ class ManageController extends Controller
                             $errors[] = $item;
             }
 
+            if (isset($_POST['eventTaxEnabled'])) {
+                $eventTaxEnabled->value = $_POST['eventTaxEnabled'];
+
+                if (!$eventTaxEnabled->save())
+                    foreach ($eventTaxEnabled->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['signupStatus'])) {
+                $signupStatus->value = $_POST['signupStatus'];
+
+                if (!$signupStatus->save())
+                    foreach ($signupStatus->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['adminGroupsPrice'])) {
+                $adminGroupsPrice->value = $_POST['adminGroupsPrice'];
+
+                if (!$adminGroupsPrice->save())
+                    foreach ($adminGroupsPrice->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['generalFiltersPrice'])) {
+                $generalFiltersPrice->value = $_POST['generalFiltersPrice'];
+
+                if (!$generalFiltersPrice->save())
+                    foreach ($generalFiltersPrice->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['favoriteFiltersPrice'])) {
+                $favoriteFiltersPrice->value = $_POST['favoriteFiltersPrice'];
+
+                if (!$favoriteFiltersPrice->save())
+                    foreach ($favoriteFiltersPrice->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
             if (isset($_POST['gohar_yab_program'])) {
                 $goharYabProgram->value = 'gohar-v'.$appVersion->value.'.apk';
 
@@ -204,6 +286,34 @@ class ManageController extends Controller
                             $errors[] = $item;
                 }
             }
+
+            if (isset($_POST['weekly_unity_poster'])) {
+                $weeklyUnityRecord->value = $_POST['weekly_unity_poster'];
+
+                if (isset($_POST['weekly_unity_poster']) and file_exists($tmpDIR . $_POST['weekly_unity_poster'])) {
+                    $file = $_POST['weekly_unity_poster'];
+                    $weeklyUnityPoster = array(
+                        'name' => $file,
+                        'src' => $tmpUrl . '/' . $file,
+                        'size' => filesize($tmpDIR . $file),
+                        'serverName' => $file,
+                    );
+                }
+
+                if ($weeklyUnityRecord->save()) {
+                    if ($weeklyUnityRecord->value and file_exists($tmpDIR . $_POST['weekly_unity_poster']))
+                        rename($tmpDIR . $_POST['weekly_unity_poster'], $weeklyUnityPosterDIR . $weeklyUnityRecord->value);
+                } else {
+                    foreach ($weeklyUnityRecord->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+                }
+            }
+
+            if(empty($errors))
+                Yii::app()->user->setFlash("success", "اطلاعات با موفقیت ثبت شد.");
+            else
+                Yii::app()->user->setFlash("failed", "در ثبت اطلاعات خطایی رخ داده است!");
         }
 
         if ($goharYabProgram->value and file_exists($programDIR . $goharYabProgram->value)) {
@@ -212,6 +322,16 @@ class ManageController extends Controller
                 'name' => $file,
                 'src' => $programUrl . '/' . $file,
                 'size' => filesize($programDIR . $file),
+                'serverName' => $file,
+            );
+        }
+
+        if ($weeklyUnityRecord->value and file_exists($weeklyUnityPosterDIR . $weeklyUnityRecord->value)) {
+            $file = $weeklyUnityRecord->value;
+            $weeklyUnityPoster = array(
+                'name' => $file,
+                'src' => $weeklyUnityPosterUrl . '/' . $file,
+                'size' => filesize($weeklyUnityPosterDIR . $file),
                 'serverName' => $file,
             );
         }
@@ -227,6 +347,12 @@ class ManageController extends Controller
             'program' => $program,
             'baseLine' => $baseLine,
             'appVersion' => $appVersion,
+            'eventTaxEnabled' => $eventTaxEnabled,
+            'signupStatus' => $signupStatus,
+            'adminGroupsPrice' => $adminGroupsPrice,
+            'generalFiltersPrice' => $generalFiltersPrice,
+            'favoriteFiltersPrice' => $favoriteFiltersPrice,
+            'weeklyUnityPoster' => $weeklyUnityPoster,
         ));
     }
 }

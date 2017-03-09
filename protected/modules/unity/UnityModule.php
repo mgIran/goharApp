@@ -1,9 +1,9 @@
 <?php
 
-class NotificationsModule extends CWebModule
+class UnityModule extends CWebModule
 {
 	public $controllerMap = array(
-		'manage'=>'notifications.controllers.NotificationsManageController',
+		'manage'=>'unity.controllers.UnityManageController',
 	);
 
 	public function init()
@@ -13,8 +13,8 @@ class NotificationsModule extends CWebModule
 
 		// import the module-level models and components
 		$this->setImport(array(
-			'notifications.models.*',
-			'notifications.components.*',
+			'unity.models.*',
+			'unity.components.*',
 		));
 	}
 

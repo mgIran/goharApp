@@ -257,12 +257,69 @@ $labels=$model->attributeLabels();
                 <?php echo $form->error($model,'agency_profit_sections'); ?>
             </div>
 
+            <hr/>
+
+            <div class="row">
+                <h6 class="pull-right">اپ موبایل</h6>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->labelEx($model,'max_events_daily',array('style'=>'float:right')); ?>
+                </div>
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->textField($model,'max_events_daily',array('class'=>'form-control')); ?>
+                    <?php echo $form->error($model,'max_events_daily'); ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->labelEx($model,'max_general_filters',array('style'=>'float:right')); ?>
+                </div>
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->textField($model,'max_general_filters',array('class'=>'form-control')); ?>
+                    <?php echo $form->error($model,'max_general_filters'); ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->labelEx($model,'max_favorite_filters',array('style'=>'float:right')); ?>
+                </div>
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->textField($model,'max_favorite_filters',array('class'=>'form-control')); ?>
+                    <?php echo $form->error($model,'max_favorite_filters'); ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->labelEx($model,'max_groups_membership',array('style'=>'float:right')); ?>
+                </div>
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->textField($model,'max_groups_membership',array('class'=>'form-control')); ?>
+                    <?php echo $form->error($model,'max_groups_membership'); ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->labelEx($model,'max_groups_admin_membership',array('style'=>'float:right')); ?>
+                </div>
+                <div class="col-md-6 pull-right">
+                    <?php echo $form->textField($model,'max_groups_admin_membership',array('class'=>'form-control')); ?>
+                    <?php echo $form->error($model,'max_groups_admin_membership'); ?>
+                </div>
+            </div>
+
             <br/>
             <div class="row">
                 <div class="col-md-4 pull-left">
                     <?php echo CHtml::submitButton('ثبت', array('class'=>'form-control btn btn-default submit')); ?>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="col-md-5 pull-left">
@@ -273,11 +330,11 @@ $labels=$model->attributeLabels();
                 </h6>
             </div>
             <?
-            $this->widget('application.modules.users.extensions.RolesJsTree.RolesJsTree', array(
-                'name' => 'UsersRoles[permissions]',
-                'classes' => $this->getArrayOfControllers(),
-                'currentPermissions' => $rolesModel->permissions
-            ));
+//            $this->widget('application.modules.users.extensions.RolesJsTree.RolesJsTree', array(
+//                'name' => 'UsersRoles[permissions]',
+//                'classes' => $this->getArrayOfControllers(),
+//                'currentPermissions' => $rolesModel->permissions
+//            ));
             ?>
         </div>
         <div class="col-md-12 pull-left">

@@ -217,7 +217,7 @@ class Plans extends iWebActiveRecord
 			array('expire_time,active,disable_login', 'numerical', 'integerOnly'=>true),
             array('active', 'default', 'value'=>0),
             array('disable_login', 'default', 'value'=>1),
-			array('speed_time_discount, extension_discount', 'numerical'),
+			array('speed_time_discount, extension_discount, max_events_daily, max_general_filters, max_favorite_filters, max_groups_membership, max_groups_admin_membership', 'numerical'),
             array('extension_discount', 'CCompareValidator', 'allowEmpty'=>TRUE, 'compareValue' => $maxDiscount, 'operator'=>'<='),
 			array('name', 'length', 'max'=>255),
 			array('real_price, approved_price', 'length', 'max'=>10),
@@ -227,7 +227,7 @@ class Plans extends iWebActiveRecord
             //array('pages, ratio, emails, free_special_services, agency', 'jsonEncoding'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, name, real_price, approved_price, pages, ratio, speed_time_discount, emails, free_special_services, agency, extension_discount, expire_time', 'safe', 'on'=>'search'),
+			array('id, name, real_price, approved_price, pages, ratio, speed_time_discount, emails, free_special_services, agency, extension_discount, expire_time, max_events_daily, max_general_filters, max_favorite_filters, max_groups_membership, max_groups_admin_membership', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -283,6 +283,12 @@ class Plans extends iWebActiveRecord
             'disable_login' => 'امکان لاگین',
 
             'required_fields' => 'ملزومات ستاره دار کاربران این پلن',
+
+            'max_events_daily'=>'حداکثر تعداد مراسمات قابل ثبت روزانه هر کاربر',
+            'max_general_filters'=>'حداکثر تعداد فیلترهای عمومی رایگان قابل ثبت برای هر کاربر',
+            'max_favorite_filters'=>'حداکثر تعداد فیلترهای علاقه مندی رایگان قابل ثبت برای هر کاربر',
+            'max_groups_membership'=>'حداکثر تعداد گروهایی که کاربر در آن عضو عادی است',
+            'max_groups_admin_membership'=>'حداکثر تعداد گروهایی که کاربر در آن مدیر است',
 		);
 	}
 
