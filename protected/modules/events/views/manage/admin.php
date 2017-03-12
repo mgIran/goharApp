@@ -20,8 +20,14 @@ $this->menu=array(
 	'dataProvider'=>$model->search('status = 1'),
 	'filter'=>$model,
 	'columns'=>array(
-		'subject1',
-		'conductor1',
+		array(
+			'name'=>'subject1',
+			'value'=>'$data->subject1." - ".$data->subject2'
+		),
+		array(
+			'name'=>'conductor1',
+			'value'=>'$data->conductor1." - ".$data->conductor2'
+		),
 		array(
 			'name'=>'state_id',
 			'value'=>'UsersPlaces::model()->findByPk($data->state_id)->title',
@@ -53,7 +59,10 @@ $this->menu=array(
 	'dataProvider'=>$model->search('status = 0'),
 	'filter'=>$model,
 	'columns'=>array(
-		'subject1',
+		array(
+			'name'=>'subject1',
+			'value'=>'$data->subject1." - ".$data->subject2'
+		),
 		'conductor1',
         array(
             'name'=>'state_id',

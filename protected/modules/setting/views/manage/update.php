@@ -17,6 +17,9 @@
 /* @var $generalFiltersPrice SiteOptions */
 /* @var $favoriteFiltersPrice SiteOptions */
 /* @var $weeklyUnityPoster array */
+/* @var $adminGroupsTaxEnabled SiteOptions */
+/* @var $generalFiltersTaxEnabled SiteOptions */
+/* @var $favoriteFiltersTaxEnabled SiteOptions */
 
 $this->breadcrumbs=array(
 	'تنظیمات',
@@ -149,6 +152,21 @@ $this->breadcrumbs=array(
             <div class="row">
                 <?php echo CHtml::label('مالیات برای هر ثبت مراسم اعمال شود؟','tax'); ?>
                 <div><?php echo CHtml::radioButtonList('eventTaxEnabled', $eventTaxEnabled->value, array(1=>'بله', 0=>'خیر'));?></div>
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::label('مالیات برای ایجاد گروه مدیریتی اضافی اعمال شود؟','adminGroupsTaxEnabled'); ?>
+                <div><?php echo CHtml::radioButtonList('adminGroupsTaxEnabled', $adminGroupsTaxEnabled->value, array(1=>'بله', 0=>'خیر'));?></div>
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::label('مالیات برای ایجاد فیلتر عمومی اضافی اعمال شود؟','generalFiltersTaxEnabled'); ?>
+                <div><?php echo CHtml::radioButtonList('generalFiltersTaxEnabled', $generalFiltersTaxEnabled->value, array(1=>'بله', 0=>'خیر'));?></div>
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::label('مالیات برای ایجاد فیلتر علاقه مندی اضافی اعمال شود؟','favoriteFiltersTaxEnabled'); ?>
+                <div><?php echo CHtml::radioButtonList('favoriteFiltersTaxEnabled', $favoriteFiltersTaxEnabled->value, array(1=>'بله', 0=>'خیر'));?></div>
             </div>
 
             <hr>

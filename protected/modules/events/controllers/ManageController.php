@@ -97,6 +97,7 @@ class ManageController extends Controller
             $model->creator_type = 'admin';
             $model->creator_id = Yii::app()->user->userID;
             $model->invitees = CJSON::encode($model->invitees);
+            $model->ceremony_public = 1;
             if (!empty($model->selectedCategories)) {
                 $model->type1 = $categories[$model->selectedCategories[0]];
                 $model->type2 = $categories[$model->selectedCategories[1]];
