@@ -401,4 +401,34 @@ class Events extends CActiveRecord
         $startTime=strtotime(date("Y/m/d",$this->start_date_run)." ".date("H:i", $this->start_time_run));
         return $startTime + ($this->long_days_run * 24 * 60 * 60);
     }
+
+    /**
+     * unset invalid attributes
+     * @param $attributes
+     */
+    public function unsetInvalidAttributes(&$attributes)
+    {
+        $invalidChangeAttributes = array(
+            'id',
+            'creator_type',
+            'creator_id',
+        );
+        foreach($attributes as $key => $item)
+            if(in_array($key, $invalidChangeAttributes))
+                unset($attributes[$key]);
+    }
+
+    /**
+     * Delete Event Poster
+     *
+     * @param $currentPoster
+     * @return bool
+     */
+    public function deletePoster($currentPoster)
+    {
+        $path = Yii::getPathOfAlias('webroot') . self::$path;
+        if($currentPoster && file_exists($path.$currentPoster))
+            return @unlink($path.$currentPoster);
+        return true;
+    }
 }
