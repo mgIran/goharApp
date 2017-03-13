@@ -325,7 +325,6 @@ class Events extends CActiveRecord
         $criteria->compare('activator_area_code', $this->activator_area_code);
         $criteria->compare('activator_postal_code', $this->activator_postal_code);
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
-        $criteria->compare('status', $this->status, true);
 
         if (!empty($_GET['Events']['subject1'])) {
             $criteria->addCondition("subject1 LIKE :subject OR subject2 LIKE :subject");
