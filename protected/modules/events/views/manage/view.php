@@ -54,6 +54,14 @@ $this->menu=array(
 		),
 		'more_days',
 		array(
+			'name'=>'showStartTime',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->showStartTime)
+		),
+		array(
+			'name'=>'showEndTime',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->showEndTime)
+		),
+		array(
 			'name'=>'state_id',
 			'value'=>UsersPlaces::model()->findByPk($model->state_id)->title
 		),

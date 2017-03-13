@@ -49,6 +49,8 @@
  * @property string $more_than_default_show_price
  * @property string $plan_off
  * @property string $tax
+ * @property string $showStartTime
+ * @property string $showEndTime
  *
  * The followings are the available model relations:
  * @property Users $user
@@ -99,7 +101,7 @@ class Events extends iWebActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
+            array('main_street, creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
             array('activator_area_code, activator_postal_code', 'numerical', 'integerOnly' => true),
             array('subject1, subject2, conductor1, conductor2, reception, ceremony_poster', 'length', 'max' => 256),
             array('status', 'default', 'value' => self::STATUS_PENDING),
@@ -316,6 +318,8 @@ class Events extends iWebActiveRecord
             'more_than_default_show_price' => 'هزینه نمایش بیشتر از پیشفرض',
             'plan_off' => 'تخفیف پلنی',
             'tax' => 'مالیات ثبت مراسم',
+            'showStartTime' => 'شروع نمایش',
+            'showEndTime' => 'پایان نمایش',
         );
     }
 
@@ -338,61 +342,76 @@ class Events extends iWebActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('creator_type',$this->creator_type,true);
-		$criteria->compare('creator_id',$this->creator_id,true);
-		$criteria->compare('type1',$this->type1,true);
-		$criteria->compare('type2',$this->type2,true);
-		$criteria->compare('subject1',$this->subject1,true);
-		$criteria->compare('subject2',$this->subject2,true);
-		$criteria->compare('conductor1',$this->conductor1,true);
-		$criteria->compare('conductor2',$this->conductor2,true);
-		$criteria->compare('sexed_guest',$this->sexed_guest,true);
-		$criteria->compare('min_age_guests',$this->min_age_guests,true);
-		$criteria->compare('max_age_guests',$this->max_age_guests,true);
-		$criteria->compare('start_date_run',$this->start_date_run,true);
-		$criteria->compare('long_days_run',$this->long_days_run,true);
-		$criteria->compare('start_time_run',$this->start_time_run,true);
-		$criteria->compare('end_time_run',$this->end_time_run,true);
-		$criteria->compare('max_more_days',$this->max_more_days,true);
-		$criteria->compare('more_days',$this->more_days,true);
-		$criteria->compare('state_id',$this->state_id,true);
-		$criteria->compare('city_id',$this->city_id,true);
-		$criteria->compare('town',$this->town,true);
-		$criteria->compare('main_street',$this->main_street,true);
-		$criteria->compare('by_street',$this->by_street,true);
-		$criteria->compare('boulevard',$this->boulevard,true);
-		$criteria->compare('afew_ways',$this->afew_ways,true);
-		$criteria->compare('squary',$this->squary,true);
-		$criteria->compare('bridge',$this->bridge,true);
-		$criteria->compare('quarter',$this->quarter,true);
-		$criteria->compare('area_code',$this->area_code,true);
-		$criteria->compare('postal_code',$this->postal_code,true);
-		$criteria->compare('complete_address',$this->complete_address,true);
-		$criteria->compare('complete_details',$this->complete_details,true);
-		$criteria->compare('reception',$this->reception,true);
-		$criteria->compare('invitees',$this->invitees,true);
-		$criteria->compare('activator_area_code',$this->activator_area_code);
-		$criteria->compare('activator_postal_code',$this->activator_postal_code);
-		$criteria->compare('ceremony_poster',$this->ceremony_poster,true);
+        $criteria->compare('id', $this->id, true);
+        $criteria->compare('creator_type', $this->creator_type, true);
+        $criteria->compare('creator_id', $this->creator_id, true);
+        $criteria->compare('type1', $this->type1, true);
+        $criteria->compare('type2', $this->type2, true);
+        $criteria->compare('sexed_guest', $this->sexed_guest, true);
+        $criteria->compare('min_age_guests', $this->min_age_guests, true);
+        $criteria->compare('max_age_guests', $this->max_age_guests, true);
+        $criteria->compare('start_date_run', $this->start_date_run, true);
+        $criteria->compare('long_days_run', $this->long_days_run, true);
+        $criteria->compare('start_time_run', $this->start_time_run, true);
+        $criteria->compare('end_time_run', $this->end_time_run, true);
+        $criteria->compare('more_days', $this->more_days, true);
+        $criteria->compare('city_id', $this->city_id, true);
+        $criteria->compare('town', $this->town, true);
+        $criteria->compare('main_street', $this->main_street, true);
+        $criteria->compare('by_street', $this->by_street, true);
+        $criteria->compare('boulevard', $this->boulevard, true);
+        $criteria->compare('afew_ways', $this->afew_ways, true);
+        $criteria->compare('squary', $this->squary, true);
+        $criteria->compare('bridge', $this->bridge, true);
+        $criteria->compare('quarter', $this->quarter, true);
+        $criteria->compare('area_code', $this->area_code, true);
+        $criteria->compare('postal_code', $this->postal_code, true);
+        $criteria->compare('complete_address', $this->complete_address, true);
+        $criteria->compare('complete_details', $this->complete_details, true);
+        $criteria->compare('reception', $this->reception, true);
+        $criteria->compare('invitees', $this->invitees, true);
+        $criteria->compare('activator_area_code', $this->activator_area_code);
+        $criteria->compare('activator_postal_code', $this->activator_postal_code);
+        $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
 
-        $criteria->order='id DESC';
+        if (!empty($_GET['Events']['subject1'])) {
+            $criteria->addCondition("subject1 LIKE :subject OR subject2 LIKE :subject");
+            $criteria->params[':subject'] = '%' . $this->subject1 . '%';
+        }
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
+        if (!empty($_GET['Events']['conductor1'])) {
+            $criteria->addCondition("conductor1 LIKE :conductor OR conductor2 LIKE :conductor");
+            $criteria->params[':conductor'] = '%' . $this->conductor1 . '%';
+        }
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * Please note that you should have this exact method in all your CActiveRecord descendants!
-	 * @param string $className active record class name.
-	 * @return Events the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+        if (!empty($_GET['Events']['state_id']))
+            $criteria->compare('state_id', $this->state_id);
+
+        if (!empty($_GET['Events']['creator_mobile'])) {
+            $criteria->addCondition("creator_id IN (SELECT id FROM iw_users WHERE mobile LIKE :mobile)");
+            $criteria->params[':mobile'] = '%' . $this->creator_mobile . '%';
+        }
+
+        if (!is_null($condition))
+            $criteria->addCondition($condition);
+
+        $criteria->order = 'id DESC';
+
+        return new CActiveDataProvider($this, array(
+            'criteria' => $criteria,
+        ));
+    }
+
+    /**
+     * Returns the static model of the specified AR class.
+     * Please note that you should have this exact method in all your CActiveRecord descendants!
+     * @param string $className active record class name.
+     * @return Events the static model class
+     */
+    public static function model($className = __CLASS__)
+    {
+        return parent::model($className);
+    }
 
     public function implodeInvitees($glue=' - ')
     {
@@ -406,5 +425,57 @@ class Events extends iWebActiveRecord
             $string.=$key.': '.$value.$glue;
 
         return $string;
+    }
+
+    public function getShowStartTime()
+    {
+        $a = $this->long_days_run;
+        Yii::app()->getModule('setting');
+        $defaultShowTimes = CJSON::decode(SiteOptions::model()->getOption('show_event_message'));
+        $b = 0;
+        foreach ($defaultShowTimes as $item)
+            if ($a >= $item[0] and $a <= $item[1])
+                $b = $item[2];
+        $b = $b / 24;
+        $b = (float)$b + (float)$this->more_days;
+        $showTime=strtotime(date("Y/m/d",$this->start_date_run)." ".date("H:i", $this->start_time_run));
+        return $showTime - ($b * 24 * 60 * 60);
+    }
+
+    public function getShowEndTime()
+    {
+        Yii::app()->getModule('setting');
+        $startTime=strtotime(date("Y/m/d",$this->start_date_run)." ".date("H:i", $this->start_time_run));
+        return $startTime + ($this->long_days_run * 24 * 60 * 60);
+    }
+
+    /**
+     * unset invalid attributes
+     * @param $attributes
+     */
+    public function unsetInvalidAttributes(&$attributes)
+    {
+        $invalidChangeAttributes = array(
+            'id',
+            'creator_type',
+            'creator_id',
+        );
+        foreach($attributes as $key => $item)
+            if(in_array($key, $invalidChangeAttributes))
+                unset($attributes[$key]);
+    }
+
+    /**
+     * Delete Event Poster
+     *
+     * @param $currentPoster
+     * @return bool
+     */
+    public function deletePoster($currentPoster)
+    {
+        $path = Yii::getPathOfAlias('webroot') . self::$path;
+        if($currentPoster && file_exists($path.$currentPoster))
+            return @unlink($path.$currentPoster);
+        return true;
     }
 }

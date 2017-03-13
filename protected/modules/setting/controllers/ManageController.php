@@ -93,7 +93,10 @@ class ManageController extends Controller
         $adminGroupsPrice =
         $generalFiltersPrice =
         $favoriteFiltersPrice =
-        $weeklyUnityRecord = null;
+        $weeklyUnityRecord =
+        $adminGroupsTaxEnabled =
+        $generalFiltersTaxEnabled=
+        $favoriteFiltersTaxEnabled= null;
 
         foreach ($settings as $setting) {
             /* @var $setting SiteOptions */
@@ -129,6 +132,12 @@ class ManageController extends Controller
                 $favoriteFiltersPrice = $setting;
             elseif ($setting->name == 'weekly_unity_image')
                 $weeklyUnityRecord = $setting;
+            elseif ($setting->name == 'admin_groups_tax_enabled')
+                $adminGroupsTaxEnabled = $setting;
+            elseif ($setting->name == 'general_filters_tax_enabled')
+                $generalFiltersTaxEnabled = $setting;
+            elseif ($setting->name == 'favorite_filters_tax_enabled')
+                $favoriteFiltersTaxEnabled = $setting;
         }
 
         $tmpDIR = Yii::getPathOfAlias("webroot") . '/uploads/temp/';
@@ -264,6 +273,33 @@ class ManageController extends Controller
                             $errors[] = $item;
             }
 
+            if (isset($_POST['adminGroupsTaxEnabled'])) {
+                $adminGroupsTaxEnabled->value = $_POST['adminGroupsTaxEnabled'];
+
+                if (!$adminGroupsTaxEnabled->save())
+                    foreach ($adminGroupsTaxEnabled->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['generalFiltersTaxEnabled'])) {
+                $generalFiltersTaxEnabled->value = $_POST['generalFiltersTaxEnabled'];
+
+                if (!$generalFiltersTaxEnabled->save())
+                    foreach ($generalFiltersTaxEnabled->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['favoriteFiltersTaxEnabled'])) {
+                $favoriteFiltersTaxEnabled->value = $_POST['favoriteFiltersTaxEnabled'];
+
+                if (!$favoriteFiltersTaxEnabled->save())
+                    foreach ($favoriteFiltersTaxEnabled->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
             if (isset($_POST['gohar_yab_program'])) {
                 $goharYabProgram->value = 'gohar-v'.$appVersion->value.'.apk';
 
@@ -353,6 +389,9 @@ class ManageController extends Controller
             'generalFiltersPrice' => $generalFiltersPrice,
             'favoriteFiltersPrice' => $favoriteFiltersPrice,
             'weeklyUnityPoster' => $weeklyUnityPoster,
+            'adminGroupsTaxEnabled' => $adminGroupsTaxEnabled,
+            'generalFiltersTaxEnabled' => $generalFiltersTaxEnabled,
+            'favoriteFiltersTaxEnabled' => $favoriteFiltersTaxEnabled,
         ));
     }
 }

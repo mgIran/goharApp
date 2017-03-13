@@ -49,7 +49,7 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'ceremony_public'); ?>
-		<?php echo $form->checkBox($model, 'ceremony_public'); ?>
+		<?php echo $form->checkBox($model, 'ceremony_public', array('disabled'=>true, 'checked'=>true)); ?>
 		<?php echo $form->error($model,'ceremony_public'); ?>
 	</div>
 

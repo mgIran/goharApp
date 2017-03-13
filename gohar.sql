@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-03-09 13:27:04
+Date: 2017-03-12 11:47:01
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -3332,7 +3332,7 @@ CREATE TABLE `iw_site_options` (
   `value` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_site_options
@@ -3374,6 +3374,9 @@ INSERT INTO `iw_site_options` VALUES ('35', 'admin_groups_price', '1100');
 INSERT INTO `iw_site_options` VALUES ('36', 'general_filters_price', '1200');
 INSERT INTO `iw_site_options` VALUES ('37', 'favorite_filters_price', '1300');
 INSERT INTO `iw_site_options` VALUES ('38', 'weekly_unity_image', 'vyd0D1488353566.jpg');
+INSERT INTO `iw_site_options` VALUES ('39', 'admin_groups_tax_enabled', '1');
+INSERT INTO `iw_site_options` VALUES ('40', 'general_filters_tax_enabled', '1');
+INSERT INTO `iw_site_options` VALUES ('41', 'favorite_filters_tax_enabled', '1');
 
 -- ----------------------------
 -- Table structure for iw_sms
