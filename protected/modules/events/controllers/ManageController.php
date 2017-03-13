@@ -274,12 +274,14 @@ class ManageController extends Controller
         $model->unsetAttributes();  // clear any default values
 
         /* @var $event Events */
-        foreach($model->search('status = 1')->getData() as $event) {
+        foreach ($model->search('status = 1')->getData() as $event) {
             if (time() >= $event->showEndTime) {
                 $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
                 @unlink($posterDIR . $event->ceremony_poster);
                 $event->delete();
             }
+            if ($event and time() >= ((float)$event->create_date + (15 * 60)))
+                $event->delete();
         }
 
         if (isset($_GET['Events']))

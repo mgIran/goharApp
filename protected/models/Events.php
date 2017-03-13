@@ -51,6 +51,7 @@
  * @property string $tax
  * @property string $showStartTime
  * @property string $showEndTime
+ * @property string $create_date
  *
  */
 class Events extends CActiveRecord
@@ -103,11 +104,12 @@ class Events extends CActiveRecord
             array('sexed_guest', 'length', 'max' => 6),
             array('status', 'length', 'max' => 1),
             array('min_age_guests, max_age_guests, long_days_run, more_days, area_code', 'length', 'max' => 2),
-            array('start_date_run, start_time_run, end_time_run', 'length', 'max' => 20),
+            array('start_date_run, start_time_run, end_time_run, create_date', 'length', 'max' => 20),
             array('state_id, city_id, postal_code, default_show_price, more_than_default_show_price, plan_off, tax', 'length', 'max' => 10),
             array('creator_type', 'length', 'max' => 50),
             array('creator_id', 'length', 'max' => 11),
             array('ceremony_public', 'length', 'max' => 1),
+            array('create_date', 'default', 'value'=>time(), 'on'=>'insert'),
             array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max' => 25),
             array('state, city, complete_details, invitees', 'safe'),
             array('selectedCategories', 'safe'),
@@ -272,6 +274,7 @@ class Events extends CActiveRecord
             'tax' => 'مالیات ثبت مراسم',
             'showStartTime' => 'شروع نمایش',
             'showEndTime' => 'پایان نمایش',
+            'create_date' => 'تاریخ ثبت',
         );
     }
 
