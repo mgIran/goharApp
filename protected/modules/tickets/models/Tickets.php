@@ -142,9 +142,8 @@ class Tickets extends iWebActiveRecord
             if(!is_dir(Yii::getPathOfAlias('webroot').'/upload/files/'))
                 mkdir(Yii::getPathOfAlias('webroot').'/upload/files/');
             $uploadedFile->saveAs('upload/files/'. $newName);
-            return true;
         }
-        return true;
+        return parent::beforeSave();
     }
 
     public function beforeDelete(){

@@ -106,46 +106,25 @@ class UsersAccountController extends Controller
                 $model->status = 0;
             }
             if($model->save()) {
-                $buy = new Buys;
-                $buy->scenario = 'user_register';
-                $buy->user_id = $model->id;
-                $buy->status = Buys::STATUS_DONE;
-                $buy->type = Buys::TYPE_PLAN;
-                if ($buy->save()) {
-                    $registerFlag = 1;
-                    Yii::import('application.modules.plans.models.*');
-                    $selectFreePlan = new PlansBuys;
-                    $selectFreePlan->attributes = array(
-                        'buy_id' => $buy->id,
-                        'plan_id' => 3,
-                        'active' => 1,
-                    );
-                    if ($selectFreePlan->save()){
-                        $registerFlag = 2;
+                if ($model->setDefaultPlan()) {
+                    unset($_COOKIE['agentId']);
+                    if (is_null($this->getModule()->verification)) {
+
+                        $loginModel = new UsersLogin;
+                        $loginModel->scenario = 'register';
+                        $loginModel->username = $model->user_name;
+                        $loginModel->password = $_POST['Users']['password'];
+
+                        if ($loginModel->validate() && $loginModel->login())
+                            $this->redirect(Yii::app()->user->loginUrl);
+
+                    } elseif ($this->getModule()->verification == 'email') {
+                        $this->sendVerificationEmail($model);
                     }
-
-                    if ($registerFlag == 2) {
-                        unset($_COOKIE['agentId']);
-                        if (is_null($this->getModule()->verification)) {
-
-                            $loginModel = new UsersLogin;
-                            $loginModel->scenario = 'register';
-                            $loginModel->username = $model->user_name;
-                            $loginModel->password = $_POST['Users']['password'];
-
-                            if ($loginModel->validate() && $loginModel->login())
-                                $this->redirect(Yii::app()->user->loginUrl);
-
-                        } elseif ($this->getModule()->verification == 'email') {
-                            $this->sendVerificationEmail($model);
-                        }
-                    } else {
-                        $model = Users::model()->findByPk($model->id);
-                        $model->delete();
-                        Yii::app()->user->setFlash('danger', 'خطا در هنگام ثبت!');
-                    }
+                } else {
+                    $model->delete();
+                    Yii::app()->user->setFlash('danger', 'خطا در هنگام ثبت!');
                 }
-
             }
         }
         $page = Pages::model()->findByPk(5);

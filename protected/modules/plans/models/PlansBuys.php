@@ -1,4 +1,18 @@
 <?php
+/**
+ * This is the model class for table "{{plans_buys}}".
+ *
+ * The followings are the available columns in table '{{plans_buys}}':
+ * @property string $buy_id
+ * @property integer $plan_id
+ * @property integer $charge_kind
+ * @property integer $active
+ * @property integer $expire_date
+ *
+ * The followings are the available model relations:
+ * @property Plans $plan
+ * @property Buys $buy
+ */
 class PlansBuys extends iWebActiveRecord
 {
     const KIND_ONLINE = 1;
