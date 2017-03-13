@@ -13,7 +13,7 @@
  * @property string $poster
  * @property string $visit
  */
-class Notifications extends CActiveRecord
+class Notifications extends iWebActiveRecord
 {
     public $status;
 	public $statusLabels=array(

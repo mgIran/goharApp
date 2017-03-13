@@ -1,4 +1,39 @@
 <?php
+/**
+ * This is the model class for table "{{plans}}".
+ *
+ * The followings are the available columns in table '{{plans}}':
+ * @property integer $id
+ * @property string $name
+ * @property string $real_price
+ * @property string $approved_price
+ * @property string $pages
+ * @property string $ratio
+ * @property double $speed_time_discount
+ * @property string $emails
+ * @property string $free_special_services
+ * @property string $agency
+ * @property double $extension_discount
+ * @property integer $expire_time
+ * @property string $color
+ * @property integer $active
+ * @property integer $role_id
+ * @property integer $deleted
+ * @property string $factor_name
+ * @property string $agency_profit_sections
+ * @property string $extension_discount_sections
+ * @property string $required_fields
+ * @property integer $disable_login
+ * @property integer $max_events_daily
+ * @property integer $max_general_filters
+ * @property integer $max_favorite_filters
+ * @property integer $max_groups_membership
+ * @property integer $max_groups_admin_membership
+ *
+ * The followings are the available model relations:
+ * @property UsersRoles $role
+ * @property PlansBuys[] $plansBuys
+ */
 class Plans extends iWebActiveRecord
 {
     const

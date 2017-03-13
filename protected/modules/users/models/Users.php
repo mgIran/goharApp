@@ -1,5 +1,100 @@
 <?php
 Yii::import('application.modules.plans.models.*');
+/**
+ * This is the model class for table "{{users}}".
+ *
+ * The followings are the available columns in table '{{users}}':
+ * @property integer $id
+ * @property integer $role_id
+ * @property string $user_name
+ * @property string $password
+ * @property integer $status
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $email
+ * @property string $mobile
+ * @property integer $deleted
+ * @property string $avatar
+ * @property integer $agent_id
+ * @property double $sms_charge
+ * @property double $email_charge
+ * @property string $credit_charge
+ * @property string $account_number
+ * @property string $iban
+ * @property string $card_number
+ * @property string $bank_name
+ * @property string $holder_name
+ * @property string $national_id
+ * @property integer $birth_city_id
+ * @property integer $home_city_id
+ * @property string $home_postal_code
+ * @property string $home_address
+ * @property string $home_phone_prefix
+ * @property string $home_phone_number
+ * @property string $father_name
+ * @property integer $work_city_id
+ * @property string $work_postal_code
+ * @property string $work_address
+ * @property string $work_phone_prefix
+ * @property string $work_phone_number
+ * @property string $personal_image
+ * @property string $national_card_front
+ * @property string $national_card_rear
+ * @property string $birth_certificate_first
+ * @property string $business_license
+ * @property string $activity_permission
+ * @property string $other_legal_documents
+ * @property string $app_token
+ * @property integer $schooling_city_id_1
+ * @property string $schooling_postal_code_1
+ * @property string $schooling_address_1
+ * @property string $schooling_phone_prefix_1
+ * @property integer $schooling_phone_number_1
+ * @property integer $schooling_city_id_2
+ * @property string $schooling_postal_code_2
+ * @property string $schooling_address_2
+ * @property string $schooling_phone_prefix_2
+ * @property integer $schooling_phone_number_2
+ * @property integer $favorite_city_id_1
+ * @property string $favorite_postal_code_1
+ * @property string $favorite_address_1
+ * @property string $favorite_phone_prefix_1
+ * @property integer $favorite_phone_number_1
+ * @property integer $favorite_city_id_2
+ * @property string $favorite_postal_code_2
+ * @property string $favorite_address_2
+ * @property string $favorite_phone_prefix_2
+ * @property integer $favorite_phone_number_2
+ *
+ * The followings are the available model relations:
+ * @property AgentsCommissions[] $agentsCommissions
+ * @property Buys[] $buys
+ * @property Checkouts[] $checkouts
+ * @property ContactsCategories[] $contactsCategories
+ * @property Buys[] $iwBuys
+ * @property MessagesEmailsDrafts[] $messagesEmailsDrafts
+ * @property MessagesEmailsSend[] $messagesEmailsSends
+ * @property MessagesTextsDrafts[] $messagesTextsDrafts
+ * @property MessagesTextsInbox[] $messagesTextsInboxes
+ * @property MessagesTextsSend[] $messagesTextsSends
+ * @property MessagesTextsUsersNumbers[] $messagesTextsUsersNumbers
+ * @property Sms[] $sms
+ * @property SpecialServices[] $specialServices
+ * @property Tickets[] $tickets
+ * @property UsersPlaces $favoriteCityId2
+ * @property Users $agent
+ * @property Users[] $users
+ * @property UsersPlaces $favoriteCityId1
+ * @property UsersPlaces $birthCity
+ * @property UsersPlaces $homeCity
+ * @property UsersPlaces $workCity
+ * @property UsersRoles $role
+ * @property UsersPlaces $schoolingCityId1
+ * @property UsersPlaces $schoolingCityId2
+ * @property UsersLogins[] $usersLogins
+ * @property UsersOptions[] $usersOptions
+ * @property Buys $activePlan
+ */
 class Users extends iWebActiveRecord
 {
     public static $avatarPath = '/upload/users/avatars/';
@@ -589,7 +684,7 @@ class Users extends iWebActiveRecord
 
     /**
      * Delete Users File function
-     * 
+     *
      * @param $type
      * @param $filename
      * @return bool
@@ -602,5 +697,28 @@ class Users extends iWebActiveRecord
                 return @unlink($path . $filename);
         }
         return true;
+    }
+
+
+    public function setDefaultPlan($plan_id = 3)
+    {
+        $buy = new Buys();
+        $buy->scenario = 'user_register';
+        $buy->user_id = $this->id;
+        $buy->status = Buys::STATUS_DONE;
+        $buy->type = Buys::TYPE_PLAN;
+        if($buy->save()){
+            Yii::import('application.modules.plans.models.*');
+            $selectFreePlan = new PlansBuys;
+            $selectFreePlan->attributes = array(
+                'buy_id' => $buy->id,
+                'plan_id' => $plan_id,
+                'active' => 1,
+            );
+            if($selectFreePlan->save()){
+                return true;
+            }
+        }
+        return false;
     }
 }

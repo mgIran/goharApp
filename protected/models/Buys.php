@@ -1,7 +1,28 @@
 <?php
 Yii::import('application.modules.plans.model.*');
 Yii::import('application.modules.messages.model.*');
-
+/**
+ * This is the model class for table "{{buys}}".
+ *
+ * The followings are the available columns in table '{{buys}}':
+ * @property string $id
+ * @property string $title
+ * @property integer $type
+ * @property integer $user_id
+ * @property integer $date
+ * @property string $gateway
+ * @property integer $tracking_no
+ * @property integer $status
+ * @property integer $qty
+ * @property string $details
+ * @property string $sum_price
+ * @property string $current_agents_plan
+ *
+ * The followings are the available model relations:
+ * @property Users $user
+ * @property Users[] $iwUsers
+ * @property PlansBuys $plansBuys
+ */
 /*$A = $this->sum_price;
 $B = SiteOptions::getOption(SiteOptions::B);
 $C = SiteOptions::getOption(SiteOptions::C);*/

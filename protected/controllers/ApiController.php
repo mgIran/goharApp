@@ -14,9 +14,52 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + getList, create, update, upload' ,
+			'RestUserAccessControl + test, changes, getList, create, update, upload' ,
 //			'RestAdminAccessControl +'
 		);
+	}
+
+	public function actionChanges()
+	{
+		$allModules = [
+			'Ceremony',
+			'Notification',
+			'Ticket'
+		];
+
+		$criteria = new CDbCriteria();
+		$criteria->distinct = true;
+		// Set Last ID
+		if(isset($_POST['lastId']) && !empty($_POST['lastId']) && $lastId = (int)$_POST['lastId']){
+			$criteria->addCondition('t.id > :last_id');
+			$criteria->params[':last_id'] = $lastId;
+		}
+		//
+		// Set Function
+		$validQueries = array(
+			'findAll',
+			'count',
+		);
+		if(isset($_POST['query']) && !empty($_POST['query'])){
+			$query = strtolower(trim($_POST['query']));
+			if(in_array($query, $validQueries))
+				$func = $query;
+			else
+				$func = 'findAll';
+		}else
+			$func = 'findAll';
+		//
+		$entity = isset($_POST['entity'])?$_POST['entity']:false;
+		if($entity && trim($entity))
+			$criteria->compare("module",$entity);
+		else
+			$criteria->addInCondition('module',$allModules);
+
+		$list = Log::model()->{$func}($criteria);
+		if($list){
+			$this->_sendResponse(200, CJSON::encode(['status' => true, 'list' => $list]), 'application/json');
+		}else
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
 	}
 
 	public function actionGetList()
@@ -71,6 +114,7 @@ class ApiController extends Controller
 				case 'Ceremony':
 					if(isset($pk) && !empty($pk))
 						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
+					$criteria->addCondition('ceremony_public = 1');
 					$list = Events::model()->{$func}($criteria);
 					break;
 				case 'Ticket':
@@ -111,12 +155,21 @@ class ApiController extends Controller
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
 				switch($entity){
 					case 'Ceremony':
-						$model = new Events;
+						$model = new Events();
 						$model->attributes = $_POST[$entity];
 						$model->creator_type = $this->loginArray['type'];
 						$model->creator_id = $this->loginArray['userID'];
-						if($model->save())
+						if($model->save()){
+							$results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
+
+							$results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
+							$results['moreDays'] = $model->show;
+							$results['moreDays'] = $model->more_days;
+
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
+								'invoice' => $results, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'مراسم با موفقیت ثبت شد.']), 'application/json');
+						}
 						break;
 					case 'Ticket':
 						Yii::app()->getModule('tickets');
@@ -344,10 +397,16 @@ class ApiController extends Controller
 				if($signUpStatus->value == 1){
 					$model = new Users('app_insert');
 					$model->mobile = $_POST['sim'];
-					if($model->createAppToken()->save())
-						$this->_sendResponse(200, CJSON::encode(['status' => true,
-							'isUser' => 1, 'newUser' => 1, 'userToken' => $model->app_token,
-							'user' => $model]), 'application/json');
+					if($model->createAppToken()->save()){
+						if ($model->setDefaultPlan()) {
+							$this->_sendResponse(200, CJSON::encode(['status' => true,
+								'isUser' => 1, 'newUser' => 1, 'userToken' => $model->app_token,
+								'user' => $model]), 'application/json');
+						} else {
+							$model->delete();
+							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'خطا در هنگام ثبت!']), 'application/json');
+						}
+					}
 					else
 						$this->_sendResponse(200, CJSON::encode(['status' => false, 'isUser' => 0, 'message' => 'در ثبت نام مشکلی ایجاد شده است، لطفا مجددا تلاش کنید.', 'errors' => $model->errors]), 'application/json');
 				}else
@@ -359,8 +418,6 @@ class ApiController extends Controller
 
 	public function actionTest()
 	{
-		var_dump($_POST);
-		exit;
 		var_dump($this->loginArray);
 		exit;
 	}

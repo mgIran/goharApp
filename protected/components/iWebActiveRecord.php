@@ -1,42 +1,53 @@
 <?php
 class iWebActiveRecord extends CActiveRecord
 {
-    protected function afterSave(){
+    public $otherClassNames = [
+        'Events' => 'Ceremony',
+        'Tickets' => 'Ticket',
+        'Notifications' => 'Notification',
+    ];
 
-
-        if(get_called_class()!="Log")
-        {
-            $logAttribute=array();
+    protected function afterSave()
+    {
+        $module = get_called_class();
+        if(key_exists($module, $this->otherClassNames))
+            $module = $this->otherClassNames[$module];
+        if($module != "Log"){
+            $logAttribute = array();
             $logAttribute["user_id"] = (isset(Yii::app()->user->userID)?Yii::app()->user->userID:NULL); // get user ID
             $logAttribute["type"] = (isset(Yii::app()->user->type)?Yii::app()->user->type:NULL);
-            $logAttribute["module"] = get_called_class(); // get module ID
+            $logAttribute["module"] = $module; // get module ID
             $logAttribute["action"] = $this->scenario;
             if(isset($this->id))
-                $logAttribute["pk"]=$this->id;
-            $log=new Log;
-            $log->attributes=$logAttribute;
+                $logAttribute["pk"] = $this->id;
+            $log = new Log;
+            $log->attributes = $logAttribute;
             $log->save();
         }
         return parent::afterSave();
     }
-    protected function afterDelete(){
-        if(get_called_class()!="Log")
-        {
-            $logAttribute=array();
+
+    protected function afterDelete()
+    {
+        $module = get_called_class();
+        if(key_exists($module, $this->otherClassNames))
+            $module = $this->otherClassNames[$module];
+        if($module != "Log"){
+            $logAttribute = array();
             $logAttribute["user_id"] = (isset(Yii::app()->user->userID)?Yii::app()->user->userID:NULL); // get user ID
             $logAttribute["type"] = (isset(Yii::app()->user->type)?Yii::app()->user->type:NULL);
-            $logAttribute["module"] = get_called_class(); // get module ID
+            $logAttribute["module"] = $module; // get module ID
             $logAttribute["action"] = "delete";
-            $log=new Log;
-            $log->attributes=$logAttribute;
+            $log = new Log;
+            $log->attributes = $logAttribute;
             $log->save();
         }
         return parent::afterDelete();
     }
 
-    public function multipleRowInsert($array=array())
+    public function multipleRowInsert($array = array())
     {
-        if($array==array())
+        if($array == array())
             return false;
         $builder = Yii::app()->db->schema->commandBuilder;
 
@@ -46,7 +57,7 @@ class iWebActiveRecord extends CActiveRecord
 
     }
 
-    public function sortRow($oldPos,$newPos,$inStart = false)
+    public function sortRow($oldPos, $newPos, $inStart = false)
     {
         // set table table
         $table = $this->tableName();
@@ -55,7 +66,7 @@ class iWebActiveRecord extends CActiveRecord
         $oldPos = intval($oldPos);
         $newPos = intval($newPos);
 
-        $this::model()->updateAll(array("in_stack"=>0),"sort = $oldPos");
+        $this::model()->updateAll(array("in_stack" => 0), "sort = $oldPos");
 
         if($inStart)    // when drag to start of rows
             $newPos++;
@@ -65,8 +76,7 @@ class iWebActiveRecord extends CActiveRecord
             $tempStart = $newPos;
             $j = $oldPos;
             $sign = 1;
-        }
-        else    // when drag from bottom to top
+        }else    // when drag from bottom to top
         {
             $tempStart = $oldPos;
             $newPos--;
@@ -76,21 +86,19 @@ class iWebActiveRecord extends CActiveRecord
 
         // make where clause for select ids
         $where = array();
-        for($i = $tempStart;$i <= $j;$i++)
-        {
+        for($i = $tempStart;$i <= $j;$i++){
             $where[] = $i;
         }
-        $where = implode(',',$where);
+        $where = implode(',', $where);
         $sql = "SELECT GROUP_CONCAT(id ORDER BY sort SEPARATOR ',') AS ids FROM $table WHERE sort IN($where)";
         $ids = Yii::app()->db->createCommand($sql)->queryRow();
         $ids = $ids['ids'];
 
         // make where clause for change position
-        $sql="";
+        $sql = "";
         $i = $tempStart;
         $where = array();
-        foreach(explode(",",$ids) as $id)
-        {
+        foreach(explode(",", $ids) as $id){
             if($i == $oldPos)
                 $temp = $newPos;
             else
@@ -99,12 +107,11 @@ class iWebActiveRecord extends CActiveRecord
             $where[] = $id;
             $i++;
         }
-        $where = implode(',',$where);
+        $where = implode(',', $where);
 
-        if($sql!="")
-        {
+        if($sql != ""){
             // update sort fields query
-            $sql="UPDATE $table
+            $sql = "UPDATE $table
                       SET sort = CASE id
                       $sql
                       END
@@ -119,7 +126,7 @@ class iWebActiveRecord extends CActiveRecord
 
     }
 
-    public function updateSortInList($parentId,$sql,$where)
+    public function updateSortInList($parentId, $sql, $where)
     {
         // set table table
         $table = $this->tableName();
@@ -133,5 +140,4 @@ class iWebActiveRecord extends CActiveRecord
             ->execute();
 
     }
-
 }
