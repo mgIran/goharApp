@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-03-13 13:45:46
+Date: 2017-03-14 17:21:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -673,14 +673,13 @@ CREATE TABLE `iw_events` (
   `plan_off` int(10) unsigned DEFAULT '0' COMMENT 'تخفیف پلنی',
   `tax` int(10) unsigned DEFAULT '0' COMMENT 'مالیات ثبت مراسم',
   `create_date` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'تاریخ ثبت',
+  `deleted` decimal(1,0) DEFAULT '0' COMMENT 'حذف شده',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- ----------------------------
 -- Records of iw_events
 -- ----------------------------
-INSERT INTO `iw_events` VALUES ('7', 'user', '159', 'سلامت', 'آموزشی', 'فاطمیه اول', '', 'هییت یازهرا س', '', 'both', '10', '60', '1490054400', '31', '75600', '84600', '0', '19', '316', null, 'باجک', 'نونزده دی', 'عماریاسر', 'بازار', 'جهاد', 'غدیر', 'باغ پنبه', '1', '3714744374', 'خیابان باجک ک 25پلاک 30', 'تازنعلثترتنلنع ررن مت رم م متذحرنت مرنترمترحت\nن ن مترمت تم مت م\nتررتثرمترم\nاثرادزنازدازدازدازدازدازدازدتزدتزدتزنزنرتثرنث', 'شام', '{\"speaker\":[\"حجت الاسلام جمشیدی\",\"صادقی واعظ\"],\"maddah\":[\"حمید محمدی\",\"مهدی حیدرزاده\"]}', '1', '1', '', '1', '1', '0', '0', '0', '0', null);
-INSERT INTO `iw_events` VALUES ('8', 'admin', '1', 'مذهبی', null, 'فاطمیه دوم', '', 'هیئت خادم الحسین ع', '', 'both', '00', '99', '1489588196', '2', '1488781800', '1488745800', '2', '14', '249', '', '', '', '', '', '', '', '', '0', '', 'تبلتلبتبلت', '', '', '{\"executer\":[\"\"],\"reader\":[\"\"],\"poet\":[\"\"],\"speaker\":[\"\"],\"maddah\":[\"\"],\"singer\":[\"\"],\"team\":[\"\"],\"other\":[\"\"]}', '1', '1', null, '0', '1', '2000', '4000', '0', '5', null);
 
 -- ----------------------------
 -- Table structure for iw_log
@@ -700,7 +699,7 @@ CREATE TABLE `iw_log` (
   KEY `user_id` (`user_id`),
   KEY `pk` (`pk`) USING BTREE,
   KEY `module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=2209 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2211 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_log
@@ -2894,6 +2893,8 @@ INSERT INTO `iw_log` VALUES ('2205', '1482565893', '1', '::1', 'TicketsContent',
 INSERT INTO `iw_log` VALUES ('2206', '1482565906', '1', '::1', 'TicketsContent', 'insert', '', '4', 'admin');
 INSERT INTO `iw_log` VALUES ('2207', '1482566220', '1', '::1', 'TicketsContent', 'insert', '', '5', 'admin');
 INSERT INTO `iw_log` VALUES ('2208', '1482566467', '1', '::1', 'TicketsContent', 'insert', '', '6', 'admin');
+INSERT INTO `iw_log` VALUES ('2209', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
+INSERT INTO `iw_log` VALUES ('2210', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
 
 -- ----------------------------
 -- Table structure for iw_messages_emails_bank
