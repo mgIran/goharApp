@@ -119,6 +119,12 @@ return array(
             'coreScriptPosition' => CClientScript::POS_HEAD,
             'defaultScriptFilePosition' => CClientScript::POS_END,
         ),
+		'Payment' => array(
+			'class'=> 'ext.MellatPayment.MellatPayment',
+			'terminalId' => '',
+			'userName' => '',
+			'userPassword' => '',
+		),
     ),
     'controllerMap' => array(
         'min' => array(

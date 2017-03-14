@@ -46,6 +46,7 @@ class Buys extends iWebActiveRecord{
     const TYPE_CREDIT_CHARGE = 4;
     const TYPE_EMAIL = 5;
     const TYPE_SETTLEMENT = 6;
+    const TYPE_EVENT = 7;
 
     public static $typeList = array(
         1 => 'خرید پلن',
@@ -54,6 +55,7 @@ class Buys extends iWebActiveRecord{
         4 => 'شارژ اعتبار نقدی',
         5 => "خرید ایمیل",
         6 => "تسویه حساب",
+        7 => "پرداخت فاکتور مراسم",
     );
 
     public static $typeAssoc = array(
@@ -62,7 +64,8 @@ class Buys extends iWebActiveRecord{
         3 => "texts_buy",
         4 => "credits_buy",
         5 => "emails_buy",
-        6 => "settlement_buy"
+        6 => "settlement_buy",
+        7 => "event_buy"
     );
 
     public static $typeInvestment = array(
@@ -71,7 +74,8 @@ class Buys extends iWebActiveRecord{
         3 => "sms_investment",
         4 => "credits_investment",
         5 => "emails_investment",
-        6 => "settlement_investment"
+        6 => "settlement_investment",
+        7 => "event_investment"
     );
 
     public $subset_level,$currentPlan,$days,$success_price,$failed_price,$success_count,$failed_count;

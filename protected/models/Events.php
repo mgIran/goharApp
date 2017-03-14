@@ -139,37 +139,37 @@ class Events extends iWebActiveRecord
         Yii::app()->getModule('setting');
         $defaultShowTimes = CJSON::decode(SiteOptions::getOption('show_event_message'));
         $b = 0;
-        foreach ($defaultShowTimes as $item)
-            if ($a >= $item[0] and $a <= $item[1])
+        foreach($defaultShowTimes as $item)
+            if($a >= $item[0] and $a <= $item[1])
                 $b = $item[2];
         $b = $b / 24;
         // Reducing time lost from default show time
         $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $b . "days");
-        $diff = (time() - $showTime < 0) ? 0 : time() - $showTime;
+        $diff = (time() - $showTime < 0)?0:time() - $showTime;
         $diff = floor($diff / (60 * 60 * 24));
-        $constStartShowTime = strtotime(date('Y/m/d',$showTime).' '.date('H:i', $this->start_time_run));
-        $b = ($b - $diff < 0) ? 0 : $b - $diff;
+        $constStartShowTime = strtotime(date('Y/m/d', $showTime) . ' ' . date('H:i', $this->start_time_run));
+        $b = ($b - $diff < 0)?0:$b - $diff;
         $c = (float)$a + $b;
         $defaultShowPrice = CJSON::decode(SiteOptions::getOption('show_event'));
         $d = 0;
-        foreach ($defaultShowPrice as $item)
-            if ($c >= $item[0] and $c <= $item[1])
+        foreach($defaultShowPrice as $item)
+            if($c >= $item[0] and $c <= $item[1])
                 $d = $item[2];
         $showEventMoreThanDefaultPrice = (int)SiteOptions::getOption('show_event_more_than_default_price');
         // Reducing time lost from more_days
         $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $c . "days");
-        $diff = (time() - $showTime < 0) ? 0 : time() - $showTime;
+        $diff = (time() - $showTime < 0)?0:time() - $showTime;
         $diff = floor($diff / (60 * 60 * 24));
-        $moreDays = ($this->more_days - $diff < 0) ? 0 : $this->more_days - $diff;
+        $moreDays = ($this->more_days - $diff < 0)?0:$this->more_days - $diff;
         $e = $showEventMoreThanDefaultPrice * $moreDays;
         $eventTaxEnabled = SiteOptions::getOption('event_tax_enabled');
         $tax = 0;
-        if ($eventTaxEnabled == 1)
+        if($eventTaxEnabled == 1)
             $tax = (float)SiteOptions::getOption('tax');
         $f = (($d + $e) * (100 - $planOff) / 100) + (($tax / 100) * (($d + $e) * (100 - $planOff) / 100));
         $returns = array(
             'defaultPrice' => $d,
-            'showDefault' => $constStartShowTime,
+            'showStartDefault' => $constStartShowTime,
             'moreDaysPrice' => $showEventMoreThanDefaultPrice,
             'showMoreThanDefaultPrice' => $e,
             'eventPrice' => $e + $d,
@@ -188,9 +188,9 @@ class Events extends iWebActiveRecord
     {
         Yii::app()->getModule('users');
 
-        $place= UsersPlaces::model()->findByPk($this->{$attribute});
+        $place = UsersPlaces::model()->findByPk($this->{$attribute});
 
-        if ($place === NULL)
+        if($place === NULL)
             $this->addError($attribute, 'استان یا شهرستان موردنظر وجود ندارد.');
     }
 
@@ -198,11 +198,9 @@ class Events extends iWebActiveRecord
     {
         if($this->creator_type && $this->creator_type == 'user'){
             $user = Users::model()->findByPk($this->creator_id);
-            if($user->activePlan->plansBuys->plan)
-            {
+            if($user->activePlan->plansBuys->plan){
                 $max = $user->activePlan->plansBuys->plan->max_events_daily;
-                if($max)
-                {
+                if($max){
                     $criteria = new CDbCriteria();
                     $criteria->compare('creator_type', $this->creator_type);
                     $criteria->compare('creator_id', $this->creator_id);
@@ -218,9 +216,9 @@ class Events extends iWebActiveRecord
     public function checkSubmitEvents($attribute, $params)
     {
         Yii::app()->getModule('setting');
-        $submitGeneralEvents = SiteOptions::model()->getOption('submit_general_events');
+        $submitGeneralEvents = SiteOptions::getOption('submit_general_events');
 
-        if ($submitGeneralEvents == 0)
+        if($submitGeneralEvents == 0)
             $this->addError($attribute, 'در حال حاضر امکان ثبت مراسم وجود ندارد.');
     }
 
@@ -228,29 +226,29 @@ class Events extends iWebActiveRecord
     {
         $lastDay = $this->start_date_run + ($this->long_days_run * (3600 * 24));
         $lastDateTime = strtotime(date('Y/m/d', $lastDay) . date(' H:i', $this->end_time_run));
-        if ($lastDateTime < time())
+        if($lastDateTime < time())
             $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
-        elseif ($lastDateTime < (time() + ($params['distance'] * 60)))
+        elseif($lastDateTime < (time() + ($params['distance'] * 60)))
             $this->addError($attribute, 'تاریخ و زمان آخرین جلسه از مراسم باید حداقل ' . $params['distance'] . ' دقیقه بعد باشد.');
     }
 
     public function checkMoreDays()
     {
         Yii::app()->getModule('setting');
-        $showEventMoreThanDefault = SiteOptions::model()->getOption('show_event_more_than_default');
+        $showEventMoreThanDefault = SiteOptions::getOption('show_event_more_than_default');
 
-        if ($this->more_days > $showEventMoreThanDefault)
+        if($this->more_days > $showEventMoreThanDefault)
             $this->addError('more_days', $this->getAttributeLabel('more_days') . ' نمی تواند بیشتر از ' . $showEventMoreThanDefault . ' باشد.');
     }
 
     public function checkLongDays()
     {
         Yii::app()->getModule('setting');
-        $eventMaxLongDays = SiteOptions::model()->getOption('event_max_long_days');
+        $eventMaxLongDays = SiteOptions::getOption('event_max_long_days');
 
-        if ($this->long_days_run < 1)
+        if($this->long_days_run < 1)
             $this->addError('long_days_run', $this->getAttributeLabel('long_days_run') . ' نمی تواند کمتر از 1 باشد.');
-        elseif ($this->long_days_run > $eventMaxLongDays)
+        elseif($this->long_days_run > $eventMaxLongDays)
             $this->addError('long_days_run', $this->getAttributeLabel('long_days_run') . ' نمی تواند بیشتر از ' . $eventMaxLongDays . ' باشد.');
     }
 
@@ -340,7 +338,7 @@ class Events extends iWebActiveRecord
     {
         // @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria=new CDbCriteria;
+        $criteria = new CDbCriteria;
 
         $criteria->compare('id', $this->id, true);
         $criteria->compare('creator_type', $this->creator_type, true);
@@ -374,25 +372,25 @@ class Events extends iWebActiveRecord
         $criteria->compare('activator_postal_code', $this->activator_postal_code);
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
 
-        if (!empty($_GET['Events']['subject1'])) {
+        if(!empty($_GET['Events']['subject1'])){
             $criteria->addCondition("subject1 LIKE :subject OR subject2 LIKE :subject");
             $criteria->params[':subject'] = '%' . $this->subject1 . '%';
         }
 
-        if (!empty($_GET['Events']['conductor1'])) {
+        if(!empty($_GET['Events']['conductor1'])){
             $criteria->addCondition("conductor1 LIKE :conductor OR conductor2 LIKE :conductor");
             $criteria->params[':conductor'] = '%' . $this->conductor1 . '%';
         }
 
-        if (!empty($_GET['Events']['state_id']))
+        if(!empty($_GET['Events']['state_id']))
             $criteria->compare('state_id', $this->state_id);
 
-        if (!empty($_GET['Events']['creator_mobile'])) {
+        if(!empty($_GET['Events']['creator_mobile'])){
             $criteria->addCondition("creator_id IN (SELECT id FROM iw_users WHERE mobile LIKE :mobile)");
             $criteria->params[':mobile'] = '%' . $this->creator_mobile . '%';
         }
 
-        if (!is_null($condition))
+        if(!is_null($condition))
             $criteria->addCondition($condition);
 
         $criteria->order = 'id DESC';
@@ -413,16 +411,16 @@ class Events extends iWebActiveRecord
         return parent::model($className);
     }
 
-    public function implodeInvitees($glue=' - ')
+    public function implodeInvitees($glue = ' - ')
     {
         $invitees = CJSON::decode($this->invitees);
         $translated = array();
-        foreach ($invitees as $key => $value)
+        foreach($invitees as $key => $value)
             $translated[$this->inviteesLabels[$key]] = implode(', ', $value);
 
-        $string='';
-        foreach($translated as $key=>$value)
-            $string.=$key.': '.$value.$glue;
+        $string = '';
+        foreach($translated as $key => $value)
+            $string .= $key . ': ' . $value . $glue;
 
         return $string;
     }
@@ -431,21 +429,21 @@ class Events extends iWebActiveRecord
     {
         $a = $this->long_days_run;
         Yii::app()->getModule('setting');
-        $defaultShowTimes = CJSON::decode(SiteOptions::model()->getOption('show_event_message'));
+        $defaultShowTimes = CJSON::decode(SiteOptions::getOption('show_event_message'));
         $b = 0;
-        foreach ($defaultShowTimes as $item)
-            if ($a >= $item[0] and $a <= $item[1])
+        foreach($defaultShowTimes as $item)
+            if($a >= $item[0] and $a <= $item[1])
                 $b = $item[2];
         $b = $b / 24;
         $b = (float)$b + (float)$this->more_days;
-        $showTime=strtotime(date("Y/m/d",$this->start_date_run)." ".date("H:i", $this->start_time_run));
+        $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " " . date("H:i", $this->start_time_run));
         return $showTime - ($b * 24 * 60 * 60);
     }
 
     public function getShowEndTime()
     {
         Yii::app()->getModule('setting');
-        $startTime=strtotime(date("Y/m/d",$this->start_date_run)." ".date("H:i", $this->start_time_run));
+        $startTime = strtotime(date("Y/m/d", $this->start_date_run) . " " . date("H:i", $this->start_time_run));
         return $startTime + ($this->long_days_run * 24 * 60 * 60);
     }
 
@@ -474,8 +472,15 @@ class Events extends iWebActiveRecord
     public function deletePoster($currentPoster)
     {
         $path = Yii::getPathOfAlias('webroot') . self::$path;
-        if($currentPoster && file_exists($path.$currentPoster))
-            return @unlink($path.$currentPoster);
+        if($currentPoster && file_exists($path . $currentPoster))
+            return @unlink($path . $currentPoster);
         return true;
+    }
+
+    public function getPrice()
+    {
+        $eventSubmitPrice = (float)$this->default_show_price + (float)$this->more_than_default_show_price;
+        $eventPriceWithOff = $eventSubmitPrice - (float)($this->plan_off * $eventSubmitPrice / 100);
+        return (float)$eventPriceWithOff + (float)($this->tax * $eventPriceWithOff / 100);
     }
 }

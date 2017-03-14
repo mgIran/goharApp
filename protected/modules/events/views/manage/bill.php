@@ -13,10 +13,6 @@ $this->menu=array(
 	array('label'=>'حذف این مراسم', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'آیا از حذف این مراسم مطمئن هستید؟')),
 	array('label'=>'لیست مراسمات', 'url'=>array('admin')),
 );
-
-$eventSubmitPrice=$model->default_show_price+$model->more_than_default_show_price;
-$eventPriceWithOff=$eventSubmitPrice-($model->plan_off*$eventSubmitPrice/100);
-$price=$eventPriceWithOff+($model->tax*$eventPriceWithOff/100);
 ?>
 
 <?php $this->renderPartial("//layouts/_flashMessage");?>
@@ -53,7 +49,7 @@ $price=$eventPriceWithOff+($model->tax*$eventPriceWithOff/100);
         ),
         array(
             'name'=>'صورتحاسب قابل پرداخت',
-            'value'=>number_format($price)." تومان"
+            'value'=>number_format($model->getPrice())." تومان"
         ),
 	),
 ));?>
