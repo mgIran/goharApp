@@ -280,8 +280,11 @@ class ManageController extends Controller
                 @unlink($posterDIR . $event->ceremony_poster);
                 $event->delete();
             }
-            if ($event and time() >= ((float)$event->create_date + (15 * 60)))
+            if ($event and time() >= ((float)$event->create_date + (15 * 60))) {
+                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
+                @unlink($posterDIR . $event->ceremony_poster);
                 $event->delete();
+            }
         }
 
         if (isset($_GET['Events']))
