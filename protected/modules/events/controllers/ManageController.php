@@ -118,7 +118,7 @@ class ManageController extends Controller
                     rename($tmpDIR . $model->ceremony_poster, $posterDIR . $model->ceremony_poster);
 
                 Yii::app()->user->setFlash('success', 'اطلاعات با موفقیت ذخیره شد.');
-                $this->redirect(array("bill", "id" => $model->id));
+                $this->redirect(array("confirmBill", "id" => $model->id));
             } else
                 Yii::app()->user->setFlash('failed', 'در ثبت اطلاعات خطایی رخ داده است!');
         }

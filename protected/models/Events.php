@@ -159,7 +159,7 @@ class Events extends iWebActiveRecord
                 $d = $item[2];
         $showEventMoreThanDefaultPrice = (int)SiteOptions::getOption('show_event_more_than_default_price');
         // Reducing time lost from more_days
-        $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $c . "days");
+        $showTime = strtotime(date("Y/m/d", $showTime) . " 00:00 - " . $this->more_days . "days");
         $diff = (time() - $showTime < 0)?0:time() - $showTime;
         $diff = floor($diff / (60 * 60 * 24));
         $moreDays = ($this->more_days - $diff < 0)?0:$this->more_days - $diff;
