@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50617
 File Encoding         : 65001
 
-Date: 2017-03-12 11:47:01
+Date: 2017-03-14 17:21:51
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -672,17 +672,14 @@ CREATE TABLE `iw_events` (
   `more_than_default_show_price` int(10) unsigned DEFAULT '0' COMMENT 'هزینه نمایش بیشتر از پیشفرض',
   `plan_off` int(10) unsigned DEFAULT '0' COMMENT 'تخفیف پلنی',
   `tax` int(10) unsigned DEFAULT '0' COMMENT 'مالیات ثبت مراسم',
+  `create_date` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'تاریخ ثبت',
+  `deleted` decimal(1,0) DEFAULT '0' COMMENT 'حذف شده',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- ----------------------------
 -- Records of iw_events
 -- ----------------------------
-INSERT INTO `iw_events` VALUES ('3', 'admin', '1', 'مذهبی', 'فرهنگی', 'مراسم آزمایشی', 'مراسم آزمایشی 2', 'سازمان جوانان', 'هلال احمر', 'male', '18', '25', '1484836520', '1', '1483885820', '1483891220', '2', '19', '316', 'فاطمیه', 'امامزاده ابراهیم', 'شهید شوندی', 'سوم خرداد', 'زند آباد', 'معصومیه', 'نیرو هوایی', 'زند آباد', '6', '3718895691', 'qom', 'no...', 'کیک و آبمیوه', '{\"executer\":[\"\\u0639\\u0644\\u06cc \\u0636\\u06cc\\u0627\\u0621\"],\"reader\":[\"\\u067e\\u0631\\u0647\\u06cc\\u0632\\u06af\\u0627\\u0631\"],\"poet\":[\"\\u0635\\u0627\\u0628\\u0631 \\u062e\\u0631\\u0627\\u0633\\u0627\\u0646\\u06cc\"],\"speaker\":[\"\\u0645\\u0627\\u0646\\u062f\\u06af\\u0627\\u0631\\u06cc\"],\"maddah\":[\"\\u0645\\u06cc\\u0631\\u062f\\u0627\\u0645\\u0627\\u062f\"],\"singer\":[\"\\u0628\\u0647\\u0646\\u0627\\u0645 \\u0635\\u0641\\u0648\\u06cc\"],\"team\":[\"\\u0631\\u0647\\u0628\\u062f\"],\"other\":[\"\\u0633\\u0627\\u06cc\\u0631 \\u0646\\u062f\\u0627\\u0631\\u062f\"]}', '1', '0', 'eAND41483886270.jpg', '1', '1', '0', '0', '0', '0');
-INSERT INTO `iw_events` VALUES ('5', 'user', '168', 'مذهبی', 'اجتماعی', 'زن در اسلام', '', 'مرکز مدیریت حوزه های علمیه', '', 'female', '18', '90', '1487289600', '3', '26400', '37080', '0', '19', '316', '', 'بلوار امین', '', '', '', '', '', '', '0', '', 'بلوار امین.نبش کوی ۵۱', '', 'به صرف شام', '{\"executer\":[\"\\u062c\\u0644\\u0627\\u0644\\u06cc\"],\"reader\":[\"\\u0639\\u0644\\u06cc\\u0632\\u0627\\u062f\\u0647\"],\"poet\":[\"\\u0639\\u0644\\u06cc\\u0632\\u0627\\u062f\\u0647\"],\"speaker\":[\"\\u062c\\u0645\\u0634\\u06cc\\u062f\\u06cc\"],\"maddah\":[\"\\u0639\\u0644\\u06cc\\u0632\\u0627\\u062f\\u0647\"]}', '0', '0', 'http://www.gohar.org/app/uploads/poster/IMG_POSTER_1.jpg', '1', '1', '0', '0', '0', '0');
-INSERT INTO `iw_events` VALUES ('6', 'user', '159', 'مذهبی', 'فرهنگی', 'فاطمیه', 'عزاداری', 'خادم الحسین ع', 'هیئت الزهرا', 'female', '10', '60', '1486857600', '5', '47940', '83940', '0', '19', '316', null, 'باجک', '', '', '', '', '', '', '1', '3714744374', 'خ باجک ک ۲۵ پ۳۰', 'بویو\nوزوز\nللل\nل۴۵', 'شام', '{\"executer\":[\"محمد استادی\"],\"reader\":[\"سرکارآقای\",\"علی علیزاده جنابی\"],\"maddah\":[\"حیدرزاده\"]}', '1', '1', '', '1', '1', '0', '0', '0', '0');
-INSERT INTO `iw_events` VALUES ('7', 'user', '159', 'سلامت', 'آموزشی', 'فاطمیه اول', '', 'هییت یازهرا س', '', 'both', '10', '60', '1490054400', '31', '75600', '84600', '0', '19', '316', null, 'باجک', 'نونزده دی', 'عماریاسر', 'بازار', 'جهاد', 'غدیر', 'باغ پنبه', '1', '3714744374', 'خیابان باجک ک 25پلاک 30', 'تازنعلثترتنلنع ررن مت رم م متذحرنت مرنترمترحت\nن ن مترمت تم مت م\nتررتثرمترم\nاثرادزنازدازدازدازدازدازدازدتزدتزدتزنزنرتثرنث', 'شام', '{\"speaker\":[\"حجت الاسلام جمشیدی\",\"صادقی واعظ\"],\"maddah\":[\"حمید محمدی\",\"مهدی حیدرزاده\"]}', '1', '1', '', '1', '1', '0', '0', '0', '0');
-INSERT INTO `iw_events` VALUES ('8', 'admin', '1', 'مذهبی', null, 'فاطمیه دوم', '', 'هیئت خادم الحسین ع', '', 'both', '00', '99', '1489588196', '2', '1488781800', '1488745800', '2', '14', '249', '', '', '', '', '', '', '', '', '0', '', 'تبلتلبتبلت', '', '', '{\"executer\":[\"\"],\"reader\":[\"\"],\"poet\":[\"\"],\"speaker\":[\"\"],\"maddah\":[\"\"],\"singer\":[\"\"],\"team\":[\"\"],\"other\":[\"\"]}', '1', '1', null, '0', '1', '2000', '4000', '0', '5');
 
 -- ----------------------------
 -- Table structure for iw_log
@@ -702,7 +699,7 @@ CREATE TABLE `iw_log` (
   KEY `user_id` (`user_id`),
   KEY `pk` (`pk`) USING BTREE,
   KEY `module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=2209 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2211 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_log
@@ -2896,6 +2893,8 @@ INSERT INTO `iw_log` VALUES ('2205', '1482565893', '1', '::1', 'TicketsContent',
 INSERT INTO `iw_log` VALUES ('2206', '1482565906', '1', '::1', 'TicketsContent', 'insert', '', '4', 'admin');
 INSERT INTO `iw_log` VALUES ('2207', '1482566220', '1', '::1', 'TicketsContent', 'insert', '', '5', 'admin');
 INSERT INTO `iw_log` VALUES ('2208', '1482566467', '1', '::1', 'TicketsContent', 'insert', '', '6', 'admin');
+INSERT INTO `iw_log` VALUES ('2209', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
+INSERT INTO `iw_log` VALUES ('2210', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
 
 -- ----------------------------
 -- Table structure for iw_messages_emails_bank

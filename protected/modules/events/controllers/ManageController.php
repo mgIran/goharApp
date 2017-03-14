@@ -258,7 +258,8 @@ class ManageController extends Controller
         $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
         @unlink($posterDIR . $model->ceremony_poster);
 
-        $model->delete();
+        $model->deleted = 1;
+        $model->update();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax']))
@@ -274,11 +275,18 @@ class ManageController extends Controller
         $model->unsetAttributes();  // clear any default values
 
         /* @var $event Events */
-        foreach($model->search('status = 1')->getData() as $event) {
+        foreach ($model->search('status = 1')->getData() as $event) {
             if (time() >= $event->showEndTime) {
                 $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
                 @unlink($posterDIR . $event->ceremony_poster);
-                $event->delete();
+                $event->deleted = 1;
+                $event->update();
+            }
+            if ($event and time() >= ((float)$event->create_date + (15 * 60))) {
+                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
+                @unlink($posterDIR . $event->ceremony_poster);
+                $event->deleted = 1;
+                $event->update();
             }
         }
 

@@ -51,6 +51,8 @@
  * @property string $tax
  * @property string $showStartTime
  * @property string $showEndTime
+ * @property string $create_date
+ * @property integer $deleted
  *
  * The followings are the available model relations:
  * @property Users $user
@@ -102,19 +104,19 @@ class Events extends iWebActiveRecord
         // will receive user inputs.
         return array(
             array('main_street, creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
-            array('activator_area_code, activator_postal_code', 'numerical', 'integerOnly' => true),
+            array('activator_area_code, activator_postal_code, deleted', 'numerical', 'integerOnly' => true),
             array('subject1, subject2, conductor1, conductor2, reception, ceremony_poster', 'length', 'max' => 256),
             array('status', 'default', 'value' => self::STATUS_PENDING),
             array('type1, type2', 'length', 'max' => 255),
             array('sexed_guest', 'length', 'max' => 6),
-            array('status', 'length', 'max' => 1),
+            array('status, ceremony_public, deleted', 'length', 'max' => 1),
             array('min_age_guests, max_age_guests, long_days_run, more_days, area_code', 'length', 'max' => 2),
-            array('start_date_run, start_time_run, end_time_run', 'length', 'max' => 20),
+            array('start_date_run, start_time_run, end_time_run, create_date', 'length', 'max' => 20),
             array('state_id, city_id, postal_code, default_show_price, more_than_default_show_price, plan_off, tax', 'length', 'max' => 10),
             array('state_id, city_id', 'checkPlaces'),
             array('creator_type', 'length', 'max' => 50),
             array('creator_id', 'length', 'max' => 11),
-            array('ceremony_public', 'length', 'max' => 1),
+            array('create_date', 'default', 'value'=>time(), 'on'=>'insert'),
             array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max' => 25),
             array('state, city, complete_details, invitees', 'safe'),
             array('selectedCategories', 'safe'),
@@ -125,7 +127,7 @@ class Events extends iWebActiveRecord
             array('creator_id', 'checkPlanCountEventsDaily'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('creator_mobile, ceremony_public, creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster, status, default_show_price, more_than_default_show_price, plan_off, tax', 'safe', 'on' => 'search'),
+            array('creator_mobile, ceremony_public, creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster, status, default_show_price, more_than_default_show_price, plan_off, tax, deleted', 'safe', 'on' => 'search'),
         );
     }
 
@@ -318,6 +320,7 @@ class Events extends iWebActiveRecord
             'tax' => 'مالیات ثبت مراسم',
             'showStartTime' => 'شروع نمایش',
             'showEndTime' => 'پایان نمایش',
+            'create_date' => 'تاریخ ثبت',
         );
     }
 
@@ -372,7 +375,9 @@ class Events extends iWebActiveRecord
         $criteria->compare('activator_postal_code', $this->activator_postal_code);
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
 
-        if(!empty($_GET['Events']['subject1'])){
+        $criteria->addCondition('deleted = 0');
+
+        if (!empty($_GET['Events']['subject1'])) {
             $criteria->addCondition("subject1 LIKE :subject OR subject2 LIKE :subject");
             $criteria->params[':subject'] = '%' . $this->subject1 . '%';
         }
