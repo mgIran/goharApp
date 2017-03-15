@@ -226,8 +226,12 @@ class Events extends iWebActiveRecord
 
     public function checkEndTime($attribute, $params)
     {
-        $lastDay = $this->start_date_run + ($this->long_days_run * (3600 * 24));
+        $lastDay = (float)$this->start_date_run + (float)($this->long_days_run * (3600 * 24));
         $lastDateTime = strtotime(date('Y/m/d', $lastDay) . date(' H:i', $this->end_time_run));
+
+        if($this->start_date_run < time())
+            $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
+
         if($lastDateTime < time())
             $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
         elseif($lastDateTime < (time() + ($params['distance'] * 60)))
@@ -449,7 +453,7 @@ class Events extends iWebActiveRecord
     {
         Yii::app()->getModule('setting');
         $startTime = strtotime(date("Y/m/d", $this->start_date_run) . " " . date("H:i", $this->start_time_run));
-        return $startTime + ($this->long_days_run * 24 * 60 * 60);
+        return (float)$startTime + (float)(($this->long_days_run - 1) * 24 * 60 * 60);
     }
 
     /**
