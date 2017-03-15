@@ -73,55 +73,75 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'start_date_run'); ?>
-		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-			'id'=>'start-date-run',
-			'model'=>$model,
-			'attribute'=>'start_date_run',
-			'options'=>array(
-				'format'=>'DD MMMM YYYY',
-			),
-		));?>
+		<?php if($model->status==1):?>
+			<span><?php echo JalaliDate::date("d F Y", $model->start_date_run);?></span>
+		<?php else:?>
+			<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+				'id'=>'start-date-run',
+				'model'=>$model,
+				'attribute'=>'start_date_run',
+				'options'=>array(
+					'format'=>'DD MMMM YYYY',
+				),
+			));?>
+		<?php endif;?>
 		<?php echo $form->error($model,'start_date_run'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'long_days_run'); ?>
-		<?php echo $form->textField($model,'long_days_run',array('size'=>2,'maxlength'=>2)); ?>شبانه روز
+		<?php if($model->status==1):?>
+			<span><?php echo $model->long_days_run;?> شبانه روز</span>
+		<?php else:?>
+			<?php echo $form->textField($model,'long_days_run',array('size'=>2,'maxlength'=>2)); ?>شبانه روز
+		<?php endif;?>
 		<?php echo $form->error($model,'long_days_run'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'start_time_run'); ?>
-		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-			'id'=>'start-time-run',
-			'model'=>$model,
-			'attribute'=>'start_time_run',
-			'options'=>array(
-				'format'=>'HH:mm',
-				'onlyTimePicker'=>true,
-			),
-		));?>
+		<?php if($model->status==1):?>
+			<span><?php echo date("H:i", $model->start_time_run);?></span>
+		<?php else:?>
+			<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+				'id'=>'start-time-run',
+				'model'=>$model,
+				'attribute'=>'start_time_run',
+				'options'=>array(
+					'format'=>'HH:mm',
+					'onlyTimePicker'=>true,
+				),
+			));?>
+		<?php endif;?>
 		<?php echo $form->error($model,'start_time_run'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'end_time_run'); ?>
-		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-			'id'=>'end-time-run',
-			'model'=>$model,
-			'attribute'=>'end_time_run',
-			'options'=>array(
-				'format'=>'HH:mm',
-				'onlyTimePicker'=>true,
-			),
-		));?>
+		<?php if($model->status==1):?>
+			<span><?php echo date("H:i", $model->end_time_run);?></span>
+		<?php else:?>
+			<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+				'id'=>'end-time-run',
+				'model'=>$model,
+				'attribute'=>'end_time_run',
+				'options'=>array(
+					'format'=>'HH:mm',
+					'onlyTimePicker'=>true,
+				),
+			));?>
+		<?php endif;?>
 		<?php echo $form->error($model,'end_time_run'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'more_days'); ?>
-		<?php echo $form->textField($model,'more_days',array('size'=>2,'maxlength'=>2)); ?>
-        <small>حداکثر تعداد روزهای اضافه تر از پیشفرض: <?php echo $maxMoreDays;?></small>
+		<?php if($model->status==1):?>
+			<span><?php echo $model->more_days;?> روز</span>
+		<?php else:?>
+			<?php echo $form->textField($model,'more_days',array('size'=>2,'maxlength'=>2)); ?>
+			<small>حداکثر تعداد روزهای اضافه تر از پیشفرض: <?php echo $maxMoreDays;?></small>
+		<?php endif;?>
 		<?php echo $form->error($model,'more_days'); ?>
 	</div>
 

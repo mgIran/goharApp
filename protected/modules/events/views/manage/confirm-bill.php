@@ -65,16 +65,6 @@ $billInfo=$model->calculatePrice();
 		'conductor1',
 		'conductor2',
 		array(
-			'name'=>'ceremony_public',
-			'value'=>$model->ceremony_public?"بله":"خیر"
-		),
-		array(
-			'name'=>'sexed_guest',
-			'value'=>$model->sexLabels[$model->sexed_guest]
-		),
-		'min_age_guests',
-		'max_age_guests',
-		array(
 			'name'=>'start_date_run',
 			'value'=>JalaliDate::date('d F Y', $model->start_date_run)
 		),
@@ -100,45 +90,8 @@ $billInfo=$model->calculatePrice();
 			'value'=>JalaliDate::date('d F Y - H:i', $model->showEndTime)
 		),
 		array(
-			'name'=>'state_id',
-			'value'=>UsersPlaces::model()->findByPk($model->state_id)->title
-		),
-		array(
-			'name'=>'city_id',
-			'value'=>UsersPlaces::model()->findByPk($model->city_id)->title
-		),
-		'town',
-		'main_street',
-		'by_street',
-		'boulevard',
-		'afew_ways',
-		'squary',
-		'bridge',
-		'quarter',
-		'area_code',
-		'postal_code',
-		'complete_address',
-		'complete_details',
-		'reception',
-		array(
-			'name'=>'invitees',
-			'value'=>$model->implodeInvitees('<br>'),
-            'type'=>'raw'
-		),
-		array(
-            'name'=>'activator_area_code',
-            'value'=>$model->activator_area_code?'فعال':'غیرفعال'
-        ),
-        array(
-            'name'=>'activator_postal_code',
-            'value'=>$model->activator_postal_code?'فعال':'غیرفعال'
-        ),
-		array(
-			'name'=>'ceremony_poster',
-			'value'=>CHtml::image(Yii::app()->baseUrl.'/uploads/events/'.$model->ceremony_poster, '', array(
-				'style'=>'max-width:200px;'
-			)),
-			'type'=>'raw'
+			'name'=>'creator_mobile',
+			'value'=>($model->creator_type != "admin")?Users::model()->findByPk($model->creator_id)->mobile:"-",
 		),
 	),
 ));?>

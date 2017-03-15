@@ -38,6 +38,10 @@ $this->menu=array(
 			'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:"-"',
 		),
 		array(
+			'header'=>'کد رهگیری',
+			'value'=>'',
+		),
+		array(
 			'class'=>'CButtonColumn',
 			'template'=>'{bill} {view} {update} {delete}',
 			'buttons'=>array(
@@ -63,7 +67,10 @@ $this->menu=array(
 			'name'=>'subject1',
 			'value'=>'$data->subject1." - ".$data->subject2'
 		),
-		'conductor1',
+        array(
+            'name'=>'conductor1',
+            'value'=>'$data->conductor1." - ".$data->conductor2'
+        ),
         array(
             'name'=>'state_id',
             'value'=>'UsersPlaces::model()->findByPk($data->state_id)->title',

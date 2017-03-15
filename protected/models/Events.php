@@ -159,7 +159,7 @@ class Events extends iWebActiveRecord
                 $d = $item[2];
         $showEventMoreThanDefaultPrice = (int)SiteOptions::getOption('show_event_more_than_default_price');
         // Reducing time lost from more_days
-        $showTime = strtotime(date("Y/m/d", $this->start_date_run) . " 00:00 - " . $c . "days");
+        $showTime = strtotime(date("Y/m/d", $showTime) . " 00:00 - " . $this->more_days . "days");
         $diff = (time() - $showTime < 0)?0:time() - $showTime;
         $diff = floor($diff / (60 * 60 * 24));
         $moreDays = ($this->more_days - $diff < 0)?0:$this->more_days - $diff;
@@ -226,8 +226,12 @@ class Events extends iWebActiveRecord
 
     public function checkEndTime($attribute, $params)
     {
-        $lastDay = $this->start_date_run + ($this->long_days_run * (3600 * 24));
+        $lastDay = (float)$this->start_date_run + (float)($this->long_days_run * (3600 * 24));
         $lastDateTime = strtotime(date('Y/m/d', $lastDay) . date(' H:i', $this->end_time_run));
+
+        if($this->start_date_run < time())
+            $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
+
         if($lastDateTime < time())
             $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
         elseif($lastDateTime < (time() + ($params['distance'] * 60)))
@@ -449,7 +453,7 @@ class Events extends iWebActiveRecord
     {
         Yii::app()->getModule('setting');
         $startTime = strtotime(date("Y/m/d", $this->start_date_run) . " " . date("H:i", $this->start_time_run));
-        return $startTime + ($this->long_days_run * 24 * 60 * 60);
+        return (float)$startTime + (float)(($this->long_days_run - 1) * 24 * 60 * 60);
     }
 
     /**
