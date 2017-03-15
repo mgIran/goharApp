@@ -168,7 +168,8 @@ class ApiController extends Controller
 							$results['showEndTime'] = $model->showEndTime;
 							$results['moreDays'] = $model->more_days;
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
-								'invoice' => $results, 'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
+								'invoice' => $results,
+								'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
 						}
 						break;
 					case 'Ticket':
@@ -318,7 +319,7 @@ class ApiController extends Controller
 						if($transaction->save())
 						{
 							$Amount = doubleval($transaction->amount) * 10;
-							$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment';
+							$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?id='.$model->id;
 							$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
 							if (!$result['error']) {
 								$transaction->ref_id = $result['responseCode'];
@@ -349,29 +350,34 @@ class ApiController extends Controller
 
 	public function actionVerifyPayment()
 	{
-		$model = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
-		$result = NULL;
-		if($_POST['ResCode'] == 0){
-			$result = Yii::app()->Payment->VerifyRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
-		}
-		if($result != NULL){
-			$RecourceCode = (!is_array($result)?$result:$result['responseCode']);
-			if($RecourceCode == 0){
-				$model->status = 'paid';
-				// Settle Payment
-				$settle = Yii::app()->Payment->SettleRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
-				if($settle)
-					$model->settle = 1;
+		if(isset($_GET['id'])){
+			$model = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
+			$event = Events::model()->findByPk((int)$_GET['id']);
+			$result = NULL;
+			if($_POST['ResCode'] == 0){
+				$result = Yii::app()->Payment->VerifyRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
 			}
-		}else{
-			$RecourceCode = $_POST['ResCode'];
+			if($result != NULL){
+				$RecourceCode = (!is_array($result)?$result:$result['responseCode']);
+				if($RecourceCode == 0){
+					$model->status = 'paid';
+					// Settle Payment
+					$settle = Yii::app()->Payment->SettleRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
+					if($settle)
+						$model->settle = 1;
+				}
+			}else{
+				$RecourceCode = $_POST['ResCode'];
+			}
+			$model->res_code = $RecourceCode;
+			$model->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
+			if($model->update())
+				echo 'پرداخت با موفقیت انجام شد.';
+			else
+				echo 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
 		}
-		$model->res_code = $RecourceCode;
-		$model->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
-		if($model->update())
-			$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'پرداخت با موفقیت انجام شد.']), 'application/json');
 		else
-			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.']), 'application/json');
+			echo 'شناسه مراسم ارسال نشده است.';
 	}
 
 	/**************************************************** Base Actions ***********************************************************/
