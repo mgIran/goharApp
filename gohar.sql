@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50617
+Source Server         : local
+Source Server Version : 50616
 Source Host           : localhost:3306
 Source Database       : gohar-app
 
 Target Server Type    : MYSQL
-Target Server Version : 50617
+Target Server Version : 50616
 File Encoding         : 65001
 
-Date: 2017-03-14 17:40:59
+Date: 2017-04-08 13:40:38
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -709,6 +709,42 @@ CREATE TABLE `iw_events` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for iw_event_filters
+-- ----------------------------
+DROP TABLE IF EXISTS `iw_event_filters`;
+CREATE TABLE `iw_event_filters` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `title` varchar(100) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'عنوان فیلترینگ',
+  `type` text COLLATE utf8_persian_ci,
+  `subject` text COLLATE utf8_persian_ci,
+  `conductor` text COLLATE utf8_persian_ci,
+  `sexed_guest` varchar(255) COLLATE utf8_persian_ci DEFAULT NULL,
+  `min_age_guest` decimal(3,0) DEFAULT NULL,
+  `max_age_guest` decimal(3,0) DEFAULT NULL,
+  `town` text COLLATE utf8_persian_ci,
+  `main_street` text COLLATE utf8_persian_ci,
+  `by_street` text COLLATE utf8_persian_ci,
+  `boulevard` text COLLATE utf8_persian_ci,
+  `afew_ways` text COLLATE utf8_persian_ci,
+  `squary` text COLLATE utf8_persian_ci,
+  `bridge` text COLLATE utf8_persian_ci,
+  `quarter` text COLLATE utf8_persian_ci,
+  `area_code` text COLLATE utf8_persian_ci,
+  `postal_code` text COLLATE utf8_persian_ci,
+  `complete_address` text COLLATE utf8_persian_ci,
+  `invitees` text COLLATE utf8_persian_ci,
+  `filter_type` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `iw_event_filters_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `iw_users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+
+-- ----------------------------
+-- Records of iw_event_filters
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for iw_log
 -- ----------------------------
 DROP TABLE IF EXISTS `iw_log`;
@@ -726,7 +762,7 @@ CREATE TABLE `iw_log` (
   KEY `user_id` (`user_id`),
   KEY `pk` (`pk`) USING BTREE,
   KEY `module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=2211 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2212 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_log
@@ -2922,6 +2958,7 @@ INSERT INTO `iw_log` VALUES ('2207', '1482566220', '1', '::1', 'TicketsContent',
 INSERT INTO `iw_log` VALUES ('2208', '1482566467', '1', '::1', 'TicketsContent', 'insert', '', '6', 'admin');
 INSERT INTO `iw_log` VALUES ('2209', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
 INSERT INTO `iw_log` VALUES ('2210', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
+INSERT INTO `iw_log` VALUES ('2211', '1491633647', null, '::1', 'UsersLogins', 'insert', '', '991', null);
 
 -- ----------------------------
 -- Table structure for iw_messages_emails_bank
@@ -3810,7 +3847,7 @@ CREATE TABLE `iw_users_logins` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `iw_users_logins_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `iw_users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=986 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=992 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_users_logins
@@ -4632,6 +4669,12 @@ INSERT INTO `iw_users_logins` VALUES ('982', '107', '::1', '1', '1480369289');
 INSERT INTO `iw_users_logins` VALUES ('983', '107', '::1', '1', '1480369300');
 INSERT INTO `iw_users_logins` VALUES ('984', '107', '::1', '1', '1480369312');
 INSERT INTO `iw_users_logins` VALUES ('985', '107', '::1', '1', '1480369319');
+INSERT INTO `iw_users_logins` VALUES ('986', '107', '::1', '1', '1491633256');
+INSERT INTO `iw_users_logins` VALUES ('987', '107', '::1', '1', '1491633391');
+INSERT INTO `iw_users_logins` VALUES ('988', '107', '::1', '1', '1491633528');
+INSERT INTO `iw_users_logins` VALUES ('989', '107', '::1', '1', '1491633629');
+INSERT INTO `iw_users_logins` VALUES ('990', '107', '::1', '1', '1491633637');
+INSERT INTO `iw_users_logins` VALUES ('991', '107', '::1', '1', '1491633647');
 
 -- ----------------------------
 -- Table structure for iw_users_options
