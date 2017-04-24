@@ -1,17 +1,20 @@
 <?php
 class iWebActiveRecord extends CActiveRecord
 {
-    public $otherClassNames = [
+    public static $otherClassNames = [
         'Events' => 'Ceremony',
+        'EventFilters' => 'Filter',
         'Tickets' => 'Ticket',
         'Notifications' => 'Notification',
+        'UsersPlaces' => 'Place',
     ];
 
     protected function afterSave()
     {
+        $otherClassNames = self::$otherClassNames;
         $module = get_called_class();
-        if(key_exists($module, $this->otherClassNames))
-            $module = $this->otherClassNames[$module];
+        if(key_exists($module, $otherClassNames))
+            $module = $otherClassNames[$module];
         if($module != "Log"){
             $logAttribute = array();
             $logAttribute["user_id"] = (isset(Yii::app()->user->userID)?Yii::app()->user->userID:NULL); // get user ID

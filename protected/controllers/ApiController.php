@@ -3,11 +3,6 @@ Yii::import('admins.models.*');
 class ApiController extends Controller
 {
 	/**
-	 * Key which has to be in HTTP USERNAME and PASSWORD headers
-	 */
-	Const APPLICATION_ID = 'ASCCPE';
-
-	/**
 	 * @return array action filters
 	 */
 	public function filters()
@@ -23,8 +18,10 @@ class ApiController extends Controller
 	{
 		$allModules = [
 			'Ceremony',
+			'Place',
 			'Notification',
-			'Ticket'
+			'Ticket',
+			'Filter',
 		];
 
 		$criteria = new CDbCriteria();
@@ -133,6 +130,13 @@ class ApiController extends Controller
 					$criteria->params[':time'] = time();
 					$list = Notifications::model()->{$func}($criteria);
 					break;
+				case 'Filter':
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(EventFilters::model()->tableSchema->primaryKey.' = :pk');
+					$criteria->addCondition('user_id = :user_id');
+					$criteria->params[':user_id'] = $this->loginArray['userID'];
+					$list = EventFilters::model()->{$func}($criteria);
+					break;
 				default:
 					$list = array();
 					break;
@@ -168,8 +172,16 @@ class ApiController extends Controller
 							$results['showEndTime'] = $model->showEndTime;
 							$results['moreDays'] = $model->more_days;
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
-								'invoice' => $results, 'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
+								'invoice' => $results,
+								'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
 						}
+						break;
+					case 'Filter':
+						$model = new EventFilters();
+						$model->attributes = $_POST[$entity];
+						$model->user_id = $this->loginArray['userID'];
+						if($model->save())
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'فیلتر با موفقیت ثبت شد.']), 'application/json');
 						break;
 					case 'Ticket':
 						Yii::app()->getModule('tickets');
@@ -213,7 +225,7 @@ class ApiController extends Controller
 				if(!is_array($_POST[$entity]))
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
 				switch($entity){
-						case 'Ceremony':
+					case 'Ceremony':
 						$model = Events::model()->findByPk($_POST['entityId']);
 						if($model === null)
 							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مراسم مورد نظر وجود ندارد.']), 'application/json');
@@ -236,6 +248,16 @@ class ApiController extends Controller
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
 								'invoice' => $results, 'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
 						}
+						break;
+					case 'Filter':
+						$model = EventFilters::model()->findByPk($_POST['entityId']);
+						if($model === null)
+							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مراسم مورد نظر وجود ندارد.']), 'application/json');
+						$model->unsetInvalidAttributes($_POST[$entity]);
+						$model->attributes = $_POST[$entity];
+						$model->user_id = $this->loginArray['userID'];
+						if($model->save())
+							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'فیلتر با موفقیت به روزرسانی شد.']), 'application/json');
 						break;
 					case 'User':
 						Yii::app()->getModule('users');
@@ -318,7 +340,7 @@ class ApiController extends Controller
 						if($transaction->save())
 						{
 							$Amount = doubleval($transaction->amount) * 10;
-							$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment';
+							$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?id='.$model->id;
 							$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
 							if (!$result['error']) {
 								$transaction->ref_id = $result['responseCode'];
@@ -349,29 +371,39 @@ class ApiController extends Controller
 
 	public function actionVerifyPayment()
 	{
-		$model = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
+		$transaction = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
 		$result = NULL;
 		if($_POST['ResCode'] == 0){
-			$result = Yii::app()->Payment->VerifyRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
+			$result = Yii::app()->Payment->VerifyRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
 		}
 		if($result != NULL){
 			$RecourceCode = (!is_array($result)?$result:$result['responseCode']);
 			if($RecourceCode == 0){
-				$model->status = 'paid';
+				$transaction->status = 'paid';
 				// Settle Payment
-				$settle = Yii::app()->Payment->SettleRequest($model->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
+				$settle = Yii::app()->Payment->SettleRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
 				if($settle)
-					$model->settle = 1;
+					$transaction->settle = 1;
 			}
 		}else{
 			$RecourceCode = $_POST['ResCode'];
 		}
-		$model->res_code = $RecourceCode;
-		$model->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
-		if($model->update())
-			$this->_sendResponse(200, CJSON::encode(['status' => true, 'message' => 'پرداخت با موفقیت انجام شد.']), 'application/json');
+		$transaction->res_code = $RecourceCode;
+		$transaction->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
+		if($transaction->update()){
+			switch($transaction->model_name){
+				case 'Events':
+					$model = Events::model()->findByPk($transaction->model_id);
+					$model->status = Events::STATUS_ACCEPTED;
+					$model->save(false);
+					break;
+				default:
+					break;
+			}
+			echo 'پرداخت با موفقیت انجام شد.';
+		}
 		else
-			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.']), 'application/json');
+			echo 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
 	}
 
 	/**************************************************** Base Actions ***********************************************************/
