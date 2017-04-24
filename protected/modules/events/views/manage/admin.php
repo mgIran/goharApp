@@ -35,7 +35,7 @@ $this->menu=array(
 		),
 		array(
 			'name'=>'creator_mobile',
-			'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:"-"',
+			'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:($data->user_mobile?$data->user_mobile." - ":"")."مدیر"',
 		),
 		array(
 			'header'=>'کد رهگیری',
@@ -78,7 +78,7 @@ $this->menu=array(
         ),
         array(
             'name'=>'creator_mobile',
-            'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:"-"',
+			'value'=>'($data->creator_type != "admin")?Users::model()->findByPk($data->creator_id)->mobile:($data->user_mobile?$data->user_mobile." - ":"")."مدیر"',
         ),
 		array(
 			'class'=>'CButtonColumn',

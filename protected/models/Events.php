@@ -14,8 +14,8 @@
  * @property string $conductor1
  * @property string $conductor2
  * @property string $sexed_guest
- * @property string $min_age_guests
- * @property string $max_age_guests
+ * @property integer $min_age_guests
+ * @property integer $max_age_guests
  * @property string $start_date_run
  * @property string $long_days_run
  * @property string $start_time_run
@@ -37,8 +37,6 @@
  * @property string $complete_details
  * @property string $reception
  * @property string $invitees
- * @property integer $activator_area_code
- * @property integer $activator_postal_code
  * @property string $ceremony_poster
  * @property string $state
  * @property string $city
@@ -53,6 +51,10 @@
  * @property string $showEndTime
  * @property string $create_date
  * @property integer $deleted
+ * @property string $confirm_date
+ * @property string $show_start_time
+ * @property string $show_end_time
+ * @property string $user_mobile
  *
  * The followings are the available model relations:
  * @property Users $user
@@ -103,19 +105,20 @@ class Events extends iWebActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('main_street, creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address', 'required'),
-            array('activator_area_code, activator_postal_code, deleted', 'numerical', 'integerOnly' => true),
+            array('main_street, creator_type, creator_id, type1, subject1, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, state_id, city_id, complete_address, conductor1', 'required'),
+            array('deleted, user_mobile', 'numerical', 'integerOnly' => true),
             array('subject1, subject2, conductor1, conductor2, reception, ceremony_poster', 'length', 'max' => 256),
             array('status', 'default', 'value' => self::STATUS_PENDING),
             array('type1, type2', 'length', 'max' => 255),
             array('sexed_guest', 'length', 'max' => 6),
             array('status, ceremony_public, deleted', 'length', 'max' => 1),
             array('min_age_guests, max_age_guests, long_days_run, more_days, area_code', 'length', 'max' => 2),
-            array('start_date_run, start_time_run, end_time_run, create_date', 'length', 'max' => 20),
+            array('start_date_run, start_time_run, end_time_run, create_date, confirm_date, show_start_time, show_end_time', 'length', 'max' => 20),
             array('state_id, city_id, postal_code, default_show_price, more_than_default_show_price, plan_off, tax', 'length', 'max' => 10),
             array('state_id, city_id', 'checkPlaces'),
             array('creator_type', 'length', 'max' => 50),
             array('creator_id', 'length', 'max' => 11),
+            array('user_mobile', 'length', 'is' => 11),
             array('create_date', 'default', 'value'=>time(), 'on'=>'insert'),
             array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max' => 25),
             array('state, city, complete_details, invitees', 'safe'),
@@ -127,7 +130,7 @@ class Events extends iWebActiveRecord
             array('creator_id', 'checkPlanCountEventsDaily'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('creator_mobile, ceremony_public, creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, activator_area_code, activator_postal_code, ceremony_poster, status, default_show_price, more_than_default_show_price, plan_off, tax, deleted', 'safe', 'on' => 'search'),
+            array('creator_mobile, ceremony_public, creator_type, creator_id, type1, type2, state, city, subject1, subject2, conductor1, conductor2, sexed_guest, min_age_guests, max_age_guests, start_date_run, long_days_run, start_time_run, end_time_run, more_days, state_id, city_id, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, complete_details, reception, invitees, ceremony_poster, status, default_show_price, more_than_default_show_price, plan_off, tax, deleted', 'safe', 'on' => 'search'),
         );
     }
 
@@ -229,13 +232,16 @@ class Events extends iWebActiveRecord
         $lastDay = (float)$this->start_date_run + (float)($this->long_days_run * (3600 * 24));
         $lastDateTime = strtotime(date('Y/m/d', $lastDay) . date(' H:i', $this->end_time_run));
 
-        if($this->start_date_run < time())
+        if (strtotime(date('Y/m/d', $this->start_date_run) . ' ' . date('H:i', $this->start_time_run)) < time())
             $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
 
-        if($lastDateTime < time())
+        if ($lastDateTime < time())
             $this->addError($attribute, 'تاریخ و زمان انتخاب شده صحیح نمی باشد.');
-        elseif($lastDateTime < (time() + ($params['distance'] * 60)))
+        elseif ($lastDateTime < (time() + ($params['distance'] * 60)))
             $this->addError($attribute, 'تاریخ و زمان آخرین جلسه از مراسم باید حداقل ' . $params['distance'] . ' دقیقه بعد باشد.');
+
+        if (($this->end_time_run - $this->start_time_run) < (15 * 60))
+            $this->addError($attribute, 'ساعت پایان مراسم باید حداقل ' . $params['distance'] . ' دقیقه بعد از ساعت شروع مراسم باشد.');
     }
 
     public function checkMoreDays()
@@ -297,7 +303,7 @@ class Events extends iWebActiveRecord
             'state' => 'استان',
             'city_id' => 'شهرستان',
             'city' => 'شهرستان',
-            'town' => 'شهرک',
+            'town' => 'شهرک/ده/روستا',
             'main_street' => 'خیابان اصلی',
             'by_street' => 'خیابان فرعی',
             'boulevard' => 'بلوار',
@@ -311,8 +317,6 @@ class Events extends iWebActiveRecord
             'complete_details' => 'توضیحات تکمیلی',
             'reception' => 'پذیرایی',
             'invitees' => 'مدعوین',
-            'activator_area_code' => 'فعال شدن منطقه شهرداری',
-            'activator_postal_code' => 'فعال شدن کدپستی',
             'ceremony_poster' => 'پوستر مراسم',
             'ceremony_public' => 'مراسم عمومی است',
             'selectedCategories' => 'نوع مراسم',
@@ -324,7 +328,14 @@ class Events extends iWebActiveRecord
             'tax' => 'مالیات ثبت مراسم',
             'showStartTime' => 'شروع نمایش',
             'showEndTime' => 'پایان نمایش',
+            'show_start_time' => 'شروع نمایش',
+            'show_end_time' => 'پایان نمایش',
             'create_date' => 'تاریخ ثبت',
+            'confirm_date' => 'تاریخ تایید یا واریز وجه',
+            'paymentStatus'=>'وضعیت پرداخت',
+            'bankName'=>'بانک عامل',
+            'bankRefID'=>'کد رهگیری بانک',
+            'user_mobile'=>'شماره موبایل ثبت کننده',
         );
     }
 
@@ -375,8 +386,6 @@ class Events extends iWebActiveRecord
         $criteria->compare('complete_details', $this->complete_details, true);
         $criteria->compare('reception', $this->reception, true);
         $criteria->compare('invitees', $this->invitees, true);
-        $criteria->compare('activator_area_code', $this->activator_area_code);
-        $criteria->compare('activator_postal_code', $this->activator_postal_code);
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
 
         $criteria->addCondition('deleted = 0');

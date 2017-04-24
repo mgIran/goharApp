@@ -146,6 +146,9 @@ class ManageController extends Controller
                 'more_than_default_show_price'=>$calculatedPrices['showMoreThanDefaultPrice'],
                 'plan_off'=>0,
                 'tax'=>$calculatedPrices['thisEventTax'],
+                'confirm_date'=>time(),
+                'show_start_time'=>$model->showStartTime,
+                'show_end_time'=>$model->showEndTime,
             ));
             if ($update) {
                 Yii::app()->user->setFlash('success', "اطلاعات با موفقیت ثبت شد.");
@@ -228,7 +231,11 @@ class ManageController extends Controller
                     rename($tmpDIR . $model->ceremony_poster, $posterDIR . $model->ceremony_poster);
 
                 Yii::app()->user->setFlash('success', 'اطلاعات با موفقیت ذخیره شد.');
-                $this->redirect(array("confirmBill", "id" => $model->id));
+
+                if($model->status==1)
+                    $this->redirect(array("view", "id" => $model->id));
+                else
+                    $this->redirect(array("confirmBill", "id" => $model->id));
             } else
                 Yii::app()->user->setFlash('failed', 'در ثبت اطلاعات خطایی رخ داده است!');
         }
@@ -285,7 +292,7 @@ class ManageController extends Controller
         }
 
         foreach ($model->search('status = 0')->getData() as $event) {
-            if ($event and time() >= ((float)$event->create_date + (15 * 60))) {
+            if ($event and time() >= ((float)$event->create_date + (30 * 60))) {
                 $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
                 @unlink($posterDIR . $event->ceremony_poster);
                 $event->deleted = 1;

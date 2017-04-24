@@ -100,37 +100,29 @@
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'start_time_run'); ?>
-		<?php if($model->status==1):?>
-			<span><?php echo date("H:i", $model->start_time_run);?></span>
-		<?php else:?>
-			<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-				'id'=>'start-time-run',
-				'model'=>$model,
-				'attribute'=>'start_time_run',
-				'options'=>array(
-					'format'=>'HH:mm',
-					'onlyTimePicker'=>true,
-				),
-			));?>
-		<?php endif;?>
+		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+			'id'=>'start-time-run',
+			'model'=>$model,
+			'attribute'=>'start_time_run',
+			'options'=>array(
+				'format'=>'HH:mm',
+				'onlyTimePicker'=>true,
+			),
+		));?>
 		<?php echo $form->error($model,'start_time_run'); ?>
 	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($model,'end_time_run'); ?>
-		<?php if($model->status==1):?>
-			<span><?php echo date("H:i", $model->end_time_run);?></span>
-		<?php else:?>
-			<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
-				'id'=>'end-time-run',
-				'model'=>$model,
-				'attribute'=>'end_time_run',
-				'options'=>array(
-					'format'=>'HH:mm',
-					'onlyTimePicker'=>true,
-				),
-			));?>
-		<?php endif;?>
+		<?php $this->widget('application.extensions.PDatePicker.PDatePicker', array(
+			'id'=>'end-time-run',
+			'model'=>$model,
+			'attribute'=>'end_time_run',
+			'options'=>array(
+				'format'=>'HH:mm',
+				'onlyTimePicker'=>true,
+			),
+		));?>
 		<?php echo $form->error($model,'end_time_run'); ?>
 	</div>
 
@@ -317,18 +309,6 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'activator_area_code'); ?>
-		<?php echo $form->dropDownList($model,'activator_area_code', array('0'=>'غیر فعال', '1'=>'فعال')); ?>
-		<?php echo $form->error($model,'activator_area_code'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'activator_postal_code'); ?>
-        <?php echo $form->dropDownList($model,'activator_postal_code', array('0'=>'غیر فعال', '1'=>'فعال')); ?>
-		<?php echo $form->error($model,'activator_postal_code'); ?>
-	</div>
-
-	<div class="row">
 		<?php echo $form->labelEx($model,'selectedCategories'); ?>
         <div style="display: inline-block;vertical-align: top;">
 		    <?php echo $form->checkBoxList($model,'selectedCategories',$categories); ?>
@@ -360,6 +340,12 @@
                 }
 		')); ?>
 		<?php echo $form->error($model,'ceremony_poster'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'user_mobile'); ?>
+		<?php echo $form->textField($model,'user_mobile',array('size'=>60,'maxlength'=>11)); ?>
+		<?php echo $form->error($model,'user_mobile'); ?>
 	</div>
 
 	<div class="row">

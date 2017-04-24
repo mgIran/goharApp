@@ -20,6 +20,11 @@
  */
 class AppTransactions extends CActiveRecord
 {
+    public static $statusLabels = array(
+        'paid'=>'پرداخت شده',
+        'unpaid'=>'پرداخت نشده',
+    );
+
 	/**
 	 * @return string the associated database table name
 	 */
