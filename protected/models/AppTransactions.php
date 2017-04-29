@@ -17,6 +17,7 @@
  * @property string $model_name
  * @property string $model_id
  * @property integer $user_id
+ * @property integer $bank_name
  *
  * The followings are the available model relations:
  * @property Users $user
@@ -27,11 +28,11 @@ class AppTransactions extends CActiveRecord
 	const TRANSACTION_UNPAID = "unpaid";
 	const TRANSACTION_DELETED = "deleted";
 
-    public static $statusLabels = array(
-        self::TRANSACTION_PAID =>'پرداخت شده',
-		self::TRANSACTION_UNPAID =>'پرداخت نشده',
-		self::TRANSACTION_DELETED =>'حذف شده',
-    );
+	public $statusLabels = array(
+		self::TRANSACTION_PAID => 'پرداخت شده',
+		self::TRANSACTION_UNPAID => 'پرداخت نشده',
+		self::TRANSACTION_DELETED => 'حذف شده',
+	);
 
 	/**
 	 * @return string the associated database table name
@@ -49,16 +50,17 @@ class AppTransactions extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('order_id, res_code, settle, user_id', 'numerical', 'integerOnly'=>true),
+			array('order_id, res_code, settle, user_id', 'numerical', 'integerOnly' => true),
 			array('amount', 'numerical'),
-			array('date', 'length', 'max'=>20),
-			array('status', 'length', 'max'=>7),
-			array('description', 'length', 'max'=>200),
-			array('ref_id, sale_reference_id, model_name', 'length', 'max'=>50),
-			array('model_id', 'length', 'max'=>11),
+			array('date', 'length', 'max' => 20),
+			array('bank_name', 'length', 'max' => 50),
+			array('status', 'length', 'max' => 7),
+			array('description', 'length', 'max' => 200),
+			array('ref_id, sale_reference_id, model_name', 'length', 'max' => 50),
+			array('model_id', 'length', 'max' => 11),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, amount, date, status, description, order_id, ref_id, res_code, sale_reference_id, settle, model_name, model_id, user_id', 'safe', 'on'=>'search'),
+			array('id, amount, date, status, description, order_id, ref_id, res_code, sale_reference_id, settle, model_name, model_id, user_id, bank_name', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -93,6 +95,7 @@ class AppTransactions extends CActiveRecord
 			'model_name' => 'Model Name',
 			'model_id' => 'Model',
 			'user_id' => 'کاربر',
+			'bank_name' => 'بانک عامل',
 		);
 	}
 
@@ -112,24 +115,25 @@ class AppTransactions extends CActiveRecord
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria=new CDbCriteria;
+		$criteria = new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('amount',$this->amount);
-		$criteria->compare('date',$this->date,true);
-		$criteria->compare('status',$this->status,true);
-		$criteria->compare('description',$this->description,true);
-		$criteria->compare('order_id',$this->order_id);
-		$criteria->compare('ref_id',$this->ref_id,true);
-		$criteria->compare('res_code',$this->res_code);
-		$criteria->compare('sale_reference_id',$this->sale_reference_id,true);
-		$criteria->compare('settle',$this->settle);
-		$criteria->compare('model_name',$this->model_name,true);
-		$criteria->compare('model_id',$this->model_id,true);
-		$criteria->compare('user_id',$this->user_id);
+		$criteria->compare('id', $this->id, true);
+		$criteria->compare('amount', $this->amount);
+		$criteria->compare('date', $this->date, true);
+		$criteria->compare('status', $this->status, true);
+		$criteria->compare('description', $this->description, true);
+		$criteria->compare('order_id', $this->order_id);
+		$criteria->compare('ref_id', $this->ref_id, true);
+		$criteria->compare('res_code', $this->res_code);
+		$criteria->compare('sale_reference_id', $this->sale_reference_id, true);
+		$criteria->compare('settle', $this->settle);
+		$criteria->compare('model_name', $this->model_name, true);
+		$criteria->compare('model_id', $this->model_id, true);
+		$criteria->compare('user_id', $this->user_id);
+		$criteria->compare('bank_name', $this->bank_name);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
+			'criteria' => $criteria,
 		));
 	}
 
@@ -139,8 +143,43 @@ class AppTransactions extends CActiveRecord
 	 * @param string $className active record class name.
 	 * @return AppTransactions the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	protected function beforeSave()
+	{
+		if(parent::beforeSave()){
+			if($this->isNewRecord){
+				$this->newOrderId();
+			}
+			return true;
+		}else
+			return false;
+	}
+
+	/**
+	 * create unique order id for any transaction
+	 */
+	public function newOrderId()
+	{
+		$lastOrderId = Yii::app()->db->createCommand()
+			->select("MAX(order_id) as max")
+			->from("{{app_transactions}}")
+			->queryScalar();
+		if($this->order_id && $this->order_id <= $lastOrderId)
+			$this->order_id = (int)$lastOrderId + 10;
+		elseif(!$this->order_id){
+			if($lastOrderId)
+				$this->order_id = (int)$lastOrderId + 10;
+			else
+				$this->order_id = 1100;
+		}
+	}
+
+	public function getStatusLabel()
+	{
+		return $this->statusLabels[$this->status];
 	}
 }

@@ -121,9 +121,9 @@ return array(
         ),
 		'Payment' => array(
 			'class'=> 'ext.MellatPayment.MellatPayment',
-			'terminalId' => '',
-			'userName' => '',
-			'userPassword' => '',
+			'terminalId' => '1765162',
+			'userName' => 'gohar14',
+			'userPassword' => '71085322',
 		),
     ),
     'controllerMap' => array(
