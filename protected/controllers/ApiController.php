@@ -9,7 +9,7 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + changes, getList, create, update, upload, payment' ,
+			'RestUserAccessControl + changes, getList, create, update, upload, payment, inquiryPayment' ,
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -153,7 +153,7 @@ class ApiController extends Controller
 	 */
 	public function actionCreate()
 	{
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(isset($_POST[$entity])){
 				if(!is_array($_POST[$entity]))
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
@@ -166,7 +166,7 @@ class ApiController extends Controller
 						if($model->save()){
 							$results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
 							$results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
-							$results['showStartDate'] = date($model->start_date_run);
+							$results['showStartDate'] = $model->start_date_run;
 							$results['longDaysRun'] = $model->long_days_run;
 							$results['showStartTime'] = $model->showStartTime;
 							$results['showEndTime'] = $model->showEndTime;
@@ -217,7 +217,7 @@ class ApiController extends Controller
 	 */
 	public function actionUpdate()
 	{
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(isset($_POST[$entity])){
 				if($entity!= "User" && !isset($_POST['entityId']))
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
@@ -240,7 +240,7 @@ class ApiController extends Controller
 						if($model->save()){
 							$results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
 							$results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
-							$results['showStartDate'] = date($model->start_date_run);
+							$results['showStartDate'] = $model->start_date_run;
 							$results['longDaysRun'] = $model->long_days_run;
 							$results['showStartTime'] = $model->showStartTime;
 							$results['showEndTime'] = $model->showEndTime;
@@ -316,7 +316,7 @@ class ApiController extends Controller
 	}
 
 	public function actionPayment(){
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(isset($_POST[$entity])){
 				if(!isset($_POST['entityId']) && (int)$_POST['entityId'])
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
@@ -349,6 +349,8 @@ class ApiController extends Controller
 								$this->_sendResponse(200, CJSON::encode(['status' => true,
 									'urlPay' => Yii::app()->Payment->getUrl(),
 									'payParams' => array('RefId' => $ReferenceId),
+									'transactionId' => $transaction->id,
+									'entityId' => $entityId,
 								]), 'application/json');
 							} else {
 								$this->_sendResponse(200, CJSON::encode(['status' => false,
@@ -404,6 +406,40 @@ class ApiController extends Controller
 		}
 		else
 			echo 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
+	}
+
+	public function actionInquiryPayment()
+	{
+		if(isset($_POST['id']) && $id = $_POST['id']){
+			$model = AppTransactions::model()->findByPk((int)$id);
+			if($model === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'تراکنش موردنظر یافت نشد.']), 'application/json');
+		}elseif(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity']))) && isset($_POST['entityId']) && (int)$_POST['entityId']){
+			$entityId = $_POST['entityId'];
+			switch($entity){
+				case 'Ceremony':
+					$transaction = AppTransactions::model()->findByAttributes(array('model_name' => "Events", 'model_id' => $entityId));
+					$model = Events::model()->findByPk($entityId);
+					break;
+				default:
+					$transaction = null;
+					$model = null;
+					break;
+			}
+			if($transaction === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'تراکنش موردنظر یافت نشد.']), 'application/json');
+			if($model === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت موردنظر یافت نشد.']), 'application/json');
+			if($transaction->status == AppTransactions::TRANSACTION_PAID)
+			{
+				$details = [
+					
+				];
+				$result = $model->calculatePrice($transaction->user->activePlan->plansBuys->plan->extension_discount);
+				$this->_sendResponse(200, CJSON::encode(['status' => true, 'transactionDetail' => $details]), 'application/json');
+			}
+		}else
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'پارامتر های مورد نیاز ارسال نشده است.']), 'application/json');
 	}
 
 	/**************************************************** Base Actions ***********************************************************/

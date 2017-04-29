@@ -17,9 +17,16 @@
  * @property string $model_name
  * @property string $model_id
  * @property integer $user_id
+ *
+ * The followings are the available model relations:
+ * @property Users $user
  */
 class AppTransactions extends CActiveRecord
 {
+	const TRANSACTION_PAID = "paid";
+	const TRANSACTION_UNPAID = "unpaid";
+	const TRANSACTION_DELETED = "deleted";
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -57,6 +64,7 @@ class AppTransactions extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'user' => array(self::BELONGS_TO, 'Users', 'user_id')
 		);
 	}
 
