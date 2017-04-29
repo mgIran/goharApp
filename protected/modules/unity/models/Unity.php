@@ -56,8 +56,9 @@ class Unity extends CActiveRecord
     public function unique($attribute, $params)
     {
         $models = self::model()->findAll();
+		/* @var $model Unity */
         foreach ($models as $model)
-            if (date("Y/m/d", $model->date) == date("Y/m/d", $this->$attribute))
+            if (date("Y/m/d", $model->date) == date("Y/m/d", $this->$attribute) and $model->id != $this->id)
                 $this->addError($attribute, "قبلا در این تاریخ یک همصدایی ثبت شده است.");
     }
 

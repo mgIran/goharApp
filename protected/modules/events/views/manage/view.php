@@ -55,11 +55,11 @@ $this->menu=array(
 		'more_days',
 		array(
 			'name'=>'showStartTime',
-			'value'=>JalaliDate::date('d F Y - H:i', $model->showStartTime)
+			'value'=>JalaliDate::date('d F Y - H:i', ($model->status)?$model->show_start_time:$model->showStartTime)
 		),
 		array(
 			'name'=>'showEndTime',
-			'value'=>JalaliDate::date('d F Y - H:i', $model->showEndTime)
+			'value'=>JalaliDate::date('d F Y - H:i', ($model->status)?$model->show_end_time:$model->showEndTime)
 		),
 		array(
 			'name'=>'state_id',
@@ -87,14 +87,6 @@ $this->menu=array(
 			'value'=>$model->implodeInvitees('<br>'),
             'type'=>'raw'
 		),
-		array(
-            'name'=>'activator_area_code',
-            'value'=>$model->activator_area_code?'فعال':'غیرفعال'
-        ),
-        array(
-            'name'=>'activator_postal_code',
-            'value'=>$model->activator_postal_code?'فعال':'غیرفعال'
-        ),
 		array(
 			'name'=>'ceremony_poster',
 			'value'=>CHtml::image(Yii::app()->baseUrl.'/uploads/events/'.$model->ceremony_poster, '', array(

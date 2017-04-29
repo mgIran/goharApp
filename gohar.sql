@@ -120,14 +120,16 @@ CREATE TABLE `iw_app_transactions` (
   `model_name` varchar(50) DEFAULT NULL,
   `model_id` int(11) unsigned DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'کاربر',
+  `bank_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'بانک عامل',
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of iw_app_transactions
 -- ----------------------------
+INSERT INTO `iw_app_transactions` VALUES ('1', '2000', '', 'paid', 'test', '12', '13456', '432', '2', '1', 'Events', '10', '107', 'انصار');
 
 -- ----------------------------
 -- Table structure for iw_buys
@@ -667,8 +669,8 @@ CREATE TABLE `iw_events` (
   `conductor1` varchar(255) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'میزبان',
   `conductor2` varchar(255) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'میزبان',
   `sexed_guest` enum('male','female','both') COLLATE utf8_persian_ci NOT NULL COMMENT 'جنسیت',
-  `min_age_guests` varchar(2) COLLATE utf8_persian_ci NOT NULL COMMENT 'حداقل سن میهمان',
-  `max_age_guests` varchar(2) COLLATE utf8_persian_ci NOT NULL COMMENT 'حداکثر سن میهمان',
+  `min_age_guests` decimal(2,0) NOT NULL COMMENT 'حداقل سن میهمان',
+  `max_age_guests` decimal(2,0) NOT NULL COMMENT 'حداکثر سن میهمان',
   `start_date_run` varchar(20) COLLATE utf8_persian_ci NOT NULL COMMENT 'تاریخ شروع',
   `long_days_run` int(2) unsigned NOT NULL COMMENT 'مدت مراسم',
   `start_time_run` varchar(20) COLLATE utf8_persian_ci NOT NULL COMMENT 'ساعت شروع',
@@ -690,8 +692,6 @@ CREATE TABLE `iw_events` (
   `complete_details` text COLLATE utf8_persian_ci COMMENT 'توضیحات تکمیلی',
   `reception` varchar(256) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'پذیرایی',
   `invitees` text COLLATE utf8_persian_ci COMMENT 'مدعوین',
-  `activator_area_code` tinyint(1) unsigned DEFAULT '0' COMMENT 'فعال شدن منطقه شهرداری',
-  `activator_postal_code` tinyint(1) unsigned DEFAULT '0' COMMENT 'فعال شدن کدپستی',
   `ceremony_poster` varchar(256) CHARACTER SET latin1 DEFAULT NULL COMMENT 'پوستر مراسم',
   `ceremony_public` decimal(1,0) unsigned DEFAULT '1',
   `status` decimal(1,0) DEFAULT '0' COMMENT 'وضعیت',
@@ -701,12 +701,17 @@ CREATE TABLE `iw_events` (
   `tax` int(10) unsigned DEFAULT '0' COMMENT 'مالیات ثبت مراسم',
   `create_date` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'تاریخ ثبت',
   `deleted` decimal(1,0) DEFAULT '0' COMMENT 'حذف شده',
+  `confirm_date` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'تاریخ تایید یا واریز وجه',
+  `show_start_time` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'شروع نمایش',
+  `show_end_time` varchar(20) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'پایان نمایش',
+  `user_mobile` varchar(11) COLLATE utf8_persian_ci DEFAULT NULL COMMENT 'شماره موبایل ثبت کننده',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
 
 -- ----------------------------
 -- Records of iw_events
 -- ----------------------------
+INSERT INTO `iw_events` VALUES ('10', 'admin', '1', 'مذهبی', 'فرهنگی', 'مراسم آزمایشی', '', '123', '', 'male', '0', '0', '1493103046', '6', '1493017246', '1493020846', '0', '19', '316', '', 'امامزاده ابراهیم', '', '', '', '', '', '', '0', '', 'سوم خرداد', '', '', '{\"executer\":[\"\"],\"reader\":[\"\"],\"poet\":[\"\"],\"speaker\":[\"\"],\"maddah\":[\"\"],\"singer\":[\"\"],\"team\":[\"\"],\"other\":[\"\"]}', '', '0', '1', '3000', '0', '0', '5', '1493116701', '0', '1493041820', '1492844400', '1493535600', '09123456789');
 
 -- ----------------------------
 -- Table structure for iw_event_filters
@@ -762,7 +767,7 @@ CREATE TABLE `iw_log` (
   KEY `user_id` (`user_id`),
   KEY `pk` (`pk`) USING BTREE,
   KEY `module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=2212 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2220 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of iw_log
@@ -2958,6 +2963,15 @@ INSERT INTO `iw_log` VALUES ('2207', '1482566220', '1', '::1', 'TicketsContent',
 INSERT INTO `iw_log` VALUES ('2208', '1482566467', '1', '::1', 'TicketsContent', 'insert', '', '6', 'admin');
 INSERT INTO `iw_log` VALUES ('2209', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
 INSERT INTO `iw_log` VALUES ('2210', '1489401001', '1', '::1', 'Ceremony', 'delete', '', null, 'admin');
+INSERT INTO `iw_log` VALUES ('2211', '1493041127', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2212', '1493041183', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2213', '1493041809', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2214', '1493041835', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2215', '1493042228', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2216', '1493042322', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2217', '1493042378', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2218', '1493042443', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
+INSERT INTO `iw_log` VALUES ('2219', '1493043630', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
 INSERT INTO `iw_log` VALUES ('2211', '1491633647', null, '::1', 'UsersLogins', 'insert', '', '991', null);
 
 -- ----------------------------
@@ -3726,7 +3740,7 @@ CREATE TABLE `iw_unity` (
 -- ----------------------------
 -- Records of iw_unity
 -- ----------------------------
-INSERT INTO `iw_unity` VALUES ('9', 'اولین همصدایی', 'محتوای اولین همصدایی...', '1489138200', '1488706200', 'foN121488361046.jpg', '0');
+INSERT INTO `iw_unity` VALUES ('9', 'اولین همصدایی آزمایشی', 'محتوای اولین همصدایی...', '1489138200', '1488706200', 'foN121488361046.jpg', '0');
 
 -- ----------------------------
 -- Table structure for iw_users

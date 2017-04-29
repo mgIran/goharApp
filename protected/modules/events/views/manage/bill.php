@@ -83,16 +83,36 @@ $eventPriceWithOff = $eventSubmitPrice - (float)($model->plan_off * $eventSubmit
 		),
 		'more_days',
 		array(
-			'name'=>'showStartTime',
-			'value'=>JalaliDate::date('d F Y - H:i', $model->showStartTime)
+			'name'=>'show_start_time',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->show_start_time)
 		),
 		array(
-			'name'=>'showEndTime',
-			'value'=>JalaliDate::date('d F Y - H:i', $model->showEndTime)
+			'name'=>'show_end_time',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->show_end_time)
 		),
 		array(
 			'name'=>'creator_mobile',
 			'value'=>($model->creator_type != "admin")?Users::model()->findByPk($model->creator_id)->mobile:"-",
 		),
+		array(
+			'name'=>'confirm_date',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->confirm_date)
+		),
+		array(
+			'name'=>'create_date',
+			'value'=>JalaliDate::date('d F Y - H:i', $model->create_date)
+		),
+        array(
+            'name'=>'paymentStatus',
+            'value'=>($model->creator_type == 'admin')?'تایید شده توسط مدیر':AppTransactions::$statusLabels[AppTransactions::model()->find('model_name = :model_name and model_id = :model_id', array(':model_name'=>'Events', ':model_id'=>$model->id))->status],
+        ),
+        array(
+            'name'=>'bankName',
+            'value'=>($model->creator_type == 'admin')?'-':AppTransactions::model()->find('model_name = :model_name and model_id = :model_id', array(':model_name'=>'Events', ':model_id'=>$model->id))->bank_name,
+        ),
+        array(
+            'name'=>'bankRefID',
+            'value'=>($model->creator_type == 'admin')?'-':AppTransactions::model()->find('model_name = :model_name and model_id = :model_id', array(':model_name'=>'Events', ':model_id'=>$model->id))->ref_id,
+        ),
 	),
 ));?>

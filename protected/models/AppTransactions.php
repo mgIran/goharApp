@@ -27,6 +27,12 @@ class AppTransactions extends CActiveRecord
 	const TRANSACTION_UNPAID = "unpaid";
 	const TRANSACTION_DELETED = "deleted";
 
+    public static $statusLabels = array(
+        self::TRANSACTION_PAID =>'پرداخت شده',
+		self::TRANSACTION_UNPAID =>'پرداخت نشده',
+		self::TRANSACTION_DELETED =>'حذف شده',
+    );
+
 	/**
 	 * @return string the associated database table name
 	 */
