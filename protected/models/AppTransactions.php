@@ -22,7 +22,7 @@
  * The followings are the available model relations:
  * @property Users $user
  */
-class AppTransactions extends CActiveRecord
+class AppTransactions extends iWebActiveRecord
 {
 	const TRANSACTION_PAID = "paid";
 	const TRANSACTION_UNPAID = "unpaid";
@@ -151,9 +151,8 @@ class AppTransactions extends CActiveRecord
 	protected function beforeSave()
 	{
 		if(parent::beforeSave()){
-			if($this->isNewRecord){
+			if($this->isNewRecord && !$this->order_id)
 				$this->newOrderId();
-			}
 			return true;
 		}else
 			return false;

@@ -32,26 +32,14 @@
       $cs->registerScriptFile($baseUrl.'/js/persian-date.js');
 	  $cs->registerScriptFile($baseUrl.'/js/bootstrap.min.js');
 	  $cs->registerScriptFile($baseUrl.'/js/jquery.form.js');
-      $cs->registerScriptFile($baseUrl.'/js/scripts.js');
 	?>
   </head>
 
 <body>
-
-<section id="navigation-main">   
-<!-- Require the navigation -->
-<?php require_once('tpl_navigation.php')?>
-</section><!-- /#navigation-main -->
-    
-<section class="container">
-    <div class="container-fluid">
-            <!-- Include content pages -->
+    <section class="container">
+        <div class="container-fluid">
             <?php echo $content; ?>
-    </div>
-</section>
-
-<!-- Require the footer -->
-<?php require_once('tpl_footer.php')?>
-
-  </body>
+        </div>
+    </section>
+</body>
 </html>
