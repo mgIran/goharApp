@@ -83,6 +83,8 @@ class ApiController extends Controller
 				'delete',
 				'deleteAll',
 			);
+
+			//
 			if(isset($_POST['query']) && !empty($_POST['query'])){
 				$query = strtolower(trim($_POST['query']));
 				if(in_array($query,$validQueries))
@@ -91,8 +93,6 @@ class ApiController extends Controller
 					$func = 'findAll';
 			}else
 				$func = 'findAll';
-			//
-
 			// Set Pk
 			if(isset($_POST['pk']) && !empty($_POST['pk']) && $pk = (int)$_POST['pk'])
 			{
@@ -104,14 +104,22 @@ class ApiController extends Controller
 			//
 			switch(trim($entity)){
 				case 'Place':
-					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(UsersPlaces::model()->tableSchema->primaryKey.' = :pk');
-					$list = UsersPlaces::model()->{$func}($criteria);
+					if($func != 'delete' && $func != 'deleteAll'){
+						if(isset($pk) && !empty($pk))
+							$criteria->addCondition(UsersPlaces::model()->tableSchema->primaryKey . ' = :pk');
+						$list = UsersPlaces::model()->{$func}($criteria);
+					}else
+						$list = null;
 					break;
 				case 'Ceremony':
 					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
-					$criteria->addCondition('ceremony_public = 1');
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey . ' = :pk');
+					if(isset($_POST['ceremony_public']) && $_POST['ceremony_public'] == true)
+						$criteria->compare('ceremony_public', 1);
+					if((isset($_POST['myself']) && $_POST['myself'] == true) || $func == 'delete' || $func == 'deleteAll'){
+						$criteria->addCondition('user_id = :user_id');
+						$criteria->params[':user_id'] = $this->loginArray['userID'];
+					}
 					$list = Events::model()->{$func}($criteria);
 					break;
 				case 'Ticket':
@@ -123,12 +131,16 @@ class ApiController extends Controller
 					$list = Tickets::model()->with('ticketsContents')->{$func}($criteria);
 					break;
 				case 'Notification':
-					Yii::app()->getModule('notifications');
-					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Notifications::model()->tableSchema->primaryKey.' = :pk');
-					$criteria->addCondition('send_date < :time AND  expire_date > :time');
-					$criteria->params[':time'] = time();
-					$list = Notifications::model()->{$func}($criteria);
+					if($func != 'delete' && $func != 'deleteAll'){
+
+						Yii::app()->getModule('notifications');
+						if(isset($pk) && !empty($pk))
+							$criteria->addCondition(Notifications::model()->tableSchema->primaryKey . ' = :pk');
+						$criteria->addCondition('send_date < :time AND  expire_date > :time');
+						$criteria->params[':time'] = time();
+						$list = Notifications::model()->{$func}($criteria);
+					}else
+						$list = null;
 					break;
 				case 'Filter':
 					if(isset($pk) && !empty($pk))
