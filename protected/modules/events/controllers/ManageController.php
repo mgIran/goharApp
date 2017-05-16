@@ -141,7 +141,7 @@ class ManageController extends Controller
             $model=$this->loadModel($id);
             $calculatedPrices=$model->calculatePrice();
             $update=Events::model()->updateByPk($id, array(
-                'status' => '1',
+                'status' => Events::STATUS_ACCEPTED,
                 'default_show_price'=>$calculatedPrices['defaultPrice'],
                 'more_than_default_show_price'=>$calculatedPrices['showMoreThanDefaultPrice'],
                 'plan_off'=>0,

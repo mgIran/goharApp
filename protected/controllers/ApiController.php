@@ -9,7 +9,7 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + changes, getList, create, update, upload, payment' ,
+			'RestUserAccessControl + changes, getList, create, update, upload, payment, inquiryPayment' ,
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -83,6 +83,8 @@ class ApiController extends Controller
 				'delete',
 				'deleteAll',
 			);
+
+			//
 			if(isset($_POST['query']) && !empty($_POST['query'])){
 				$query = strtolower(trim($_POST['query']));
 				if(in_array($query,$validQueries))
@@ -91,8 +93,6 @@ class ApiController extends Controller
 					$func = 'findAll';
 			}else
 				$func = 'findAll';
-			//
-
 			// Set Pk
 			if(isset($_POST['pk']) && !empty($_POST['pk']) && $pk = (int)$_POST['pk'])
 			{
@@ -104,31 +104,43 @@ class ApiController extends Controller
 			//
 			switch(trim($entity)){
 				case 'Place':
-					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
-					$list = UsersPlaces::model()->{$func}($criteria);
+					if($func != 'delete' && $func != 'deleteAll'){
+						if(isset($pk) && !empty($pk))
+							$criteria->addCondition(UsersPlaces::model()->tableSchema->primaryKey . ' = :pk');
+						$list = UsersPlaces::model()->{$func}($criteria);
+					}else
+						$list = null;
 					break;
 				case 'Ceremony':
 					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
-					$criteria->addCondition('ceremony_public = 1');
+						$criteria->addCondition(Events::model()->tableSchema->primaryKey . ' = :pk');
+					if(isset($_POST['ceremony_public']) && $_POST['ceremony_public'] == true)
+						$criteria->compare('ceremony_public', 1);
+					if((isset($_POST['myself']) && $_POST['myself'] == true) || $func == 'delete' || $func == 'deleteAll'){
+						$criteria->addCondition('user_id = :user_id');
+						$criteria->params[':user_id'] = $this->loginArray['userID'];
+					}
 					$list = Events::model()->{$func}($criteria);
 					break;
 				case 'Ticket':
 					Yii::app()->getModule('tickets');
 					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
+						$criteria->addCondition(Tickets::model()->tableSchema->primaryKey.' = :pk');
 					$criteria->addCondition('user_id = :user_id');
 					$criteria->params[':user_id'] = $this->loginArray['userID'];
 					$list = Tickets::model()->with('ticketsContents')->{$func}($criteria);
 					break;
 				case 'Notification':
-					Yii::app()->getModule('notifications');
-					if(isset($pk) && !empty($pk))
-						$criteria->addCondition(Events::model()->tableSchema->primaryKey.' = :pk');
-					$criteria->addCondition('send_date < :time AND  expire_date > :time');
-					$criteria->params[':time'] = time();
-					$list = Notifications::model()->{$func}($criteria);
+					if($func != 'delete' && $func != 'deleteAll'){
+
+						Yii::app()->getModule('notifications');
+						if(isset($pk) && !empty($pk))
+							$criteria->addCondition(Notifications::model()->tableSchema->primaryKey . ' = :pk');
+						$criteria->addCondition('send_date < :time AND  expire_date > :time');
+						$criteria->params[':time'] = time();
+						$list = Notifications::model()->{$func}($criteria);
+					}else
+						$list = null;
 					break;
 				case 'Filter':
 					if(isset($pk) && !empty($pk))
@@ -136,6 +148,14 @@ class ApiController extends Controller
 					$criteria->addCondition('user_id = :user_id');
 					$criteria->params[':user_id'] = $this->loginArray['userID'];
 					$list = EventFilters::model()->{$func}($criteria);
+					break;
+				case 'Transaction':
+					AppTransactions::model()->deleteAll('date < :deleteDate',array(':deleteDate'=>(time() - 60 * 24 * 60 * 60)));
+					if(isset($pk) && !empty($pk))
+						$criteria->addCondition(AppTransactions::model()->tableSchema->primaryKey.' = :pk');
+					$criteria->addCondition('user_id = :user_id');
+					$criteria->params[':user_id'] = $this->loginArray['userID'];
+					$list = AppTransactions::model()->{$func}($criteria);
 					break;
 				default:
 					$list = array();
@@ -153,7 +173,7 @@ class ApiController extends Controller
 	 */
 	public function actionCreate()
 	{
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(isset($_POST[$entity])){
 				if(!is_array($_POST[$entity]))
 					$_POST[$entity] = CJSON::decode($_POST[$entity]);
@@ -166,7 +186,7 @@ class ApiController extends Controller
 						if($model->save()){
 							$results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
 							$results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
-							$results['showStartDate'] = date($model->start_date_run);
+							$results['showStartDate'] = $model->start_date_run;
 							$results['longDaysRun'] = $model->long_days_run;
 							$results['showStartTime'] = $model->showStartTime;
 							$results['showEndTime'] = $model->showEndTime;
@@ -217,7 +237,7 @@ class ApiController extends Controller
 	 */
 	public function actionUpdate()
 	{
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(isset($_POST[$entity])){
 				if($entity!= "User" && !isset($_POST['entityId']))
 					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
@@ -238,13 +258,19 @@ class ApiController extends Controller
 						if($model->ceremony_poster != $currentPoster)
 							$model->deletePoster($currentPoster);
 						if($model->save()){
-							$results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
+							$model->plan_off = $model->user->activePlan->plansBuys->plan->extension_discount;
+							$results = $model->calculatePrice($model->plan_off);
 							$results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
-							$results['showStartDate'] = date($model->start_date_run);
+							$results['showStartDate'] = $model->start_date_run;
 							$results['longDaysRun'] = $model->long_days_run;
 							$results['showStartTime'] = $model->showStartTime;
 							$results['showEndTime'] = $model->showEndTime;
 							$results['moreDays'] = $model->more_days;
+							$model->default_show_price = $results['defaultPrice'];
+							$model->more_than_default_show_price = $results['showMoreThanDefaultPrice'];
+							$model->more_than_default_show_price = $results['showMoreThanDefaultPrice'];
+							$model->tax = $results['thisEventTax'];
+							@$model->save(false);
 							$this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
 								'invoice' => $results, 'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
 						}
@@ -315,95 +341,169 @@ class ApiController extends Controller
 		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
 
-	public function actionPayment(){
-		if(isset($_POST['entity']) && $entity = ucfirst(trim($_POST['entity']))){
-			if(isset($_POST[$entity])){
-				if(!isset($_POST['entityId']) && (int)$_POST['entityId'])
-					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
-				$entityId = $_POST['entityId'];
-				if(!is_array($_POST[$entity]))
-					$_POST[$entity] = CJSON::decode($_POST[$entity]);
-				switch($entity){
-					case 'Ceremony':
-						$model = Events::model()->findByPk($_POST['entityId']);
-						if($model === null)
-							$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مراسم مورد نظر وجود ندارد.']), 'application/json');
-						
-						$transaction = new AppTransactions();
-						$transaction->user_id = $this->loginArray['userID'];
-						$transaction->amount = $model->getPrice();
-						$transaction->description = 'پرداخت هزینه فاکتور مراسم با شناسه #' . $entityId .'';
-						$transaction->date = time();
-						$transaction->model_name = 'Events';
-						$transaction->model_id = $entityId;
-						$transaction->newOrderId();
-						if($transaction->save())
-						{
-							$Amount = doubleval($transaction->amount) * 10;
-							$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?id='.$model->id;
-							$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
-							if (!$result['error']) {
-								$transaction->ref_id = $result['responseCode'];
-								$transaction->update();
-								$ReferenceId = $result['responseCode'];
-								$this->_sendResponse(200, CJSON::encode(['status' => true,
-									'urlPay' => Yii::app()->Payment->getUrl(),
-									'payParams' => array('RefId' => $ReferenceId),
-								]), 'application/json');
-							} else {
-								$this->_sendResponse(200, CJSON::encode(['status' => false,
-									'message' => Yii::app()->Payment->getResponseText($result['responseCode']),
-								]), 'application/json');
-							}
-						}
-						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه مشکلی در ثبت اطلاعات تراکنش بوجود آمده است! لطفا مجددا تلاش فرمایید.']), 'application/json');
-						break;
-					default:
+	public function actionPayment()
+	{
+		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
+			if(!isset($_POST['entityId']) && (int)$_POST['entityId'])
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
+			$entityId = $_POST['entityId'];
+			switch($entity){
+				case 'Ceremony':
+					$model = Events::model()->findByPk($_POST['entityId']);
+					if($model === null)
 						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
-						break;
-				}
-				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه مشکلی در ثبت اطلاعات تراکنش بوجود آمده است! لطفا مجددا تلاش فرمایید.']), 'application/json');
+					if($model->status == Events::STATUS_ACCEPTED)
+						$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'تراکنش مربوط به این موجودیت قبلا پرداخت شده و تایید گردیده است.']), 'application/json');
+					$transaction = new AppTransactions();
+					$transaction->user_id = $this->loginArray['userID'];
+					$transaction->amount = $model->getPrice();
+					$transaction->description = 'پرداخت هزینه فاکتور مراسم با شناسه #' . $entityId;
+					$transaction->date = time();
+					$transaction->model_name = 'Events';
+					$transaction->model_id = $entityId;
+					$transaction->bank_name = "ملت";
+					$transaction->newOrderId();
+					if($transaction->save()){
+						$Amount = doubleval($transaction->amount) * 10;
+						$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?id=' . $model->id;
+						$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
+						if(!$result['error']){
+							$transaction->ref_id = $result['responseCode'];
+							$transaction->save();
+							$ReferenceId = $result['responseCode'];
+							$this->_sendResponse(200, CJSON::encode(['status' => true,
+								'urlPay' => Yii::app()->createAbsoluteUrl("/api/paymentPage?ref={$ReferenceId}"),
+								'transactionId' => $transaction->id,
+							]), 'application/json');
+						}else{
+							$this->_sendResponse(200, CJSON::encode(['status' => false,
+								'transactionId' => $transaction->id,
+								'message' => Yii::app()->Payment->getResponseText($result['responseCode']),
+							]), 'application/json');
+						}
+					}
+					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه مشکلی در ثبت اطلاعات تراکنش بوجود آمده است! لطفا مجددا تلاش فرمایید.']), 'application/json');
+					break;
+				default:
+					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+					break;
 			}
-			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات پرداخت تراکنش ارسال نشده است.']), 'application/json');
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه مشکلی در ثبت اطلاعات تراکنش بوجود آمده است! لطفا مجددا تلاش فرمایید.']), 'application/json');
 		}
 		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
 
+	public function actionPaymentPage()
+	{
+		$this->layout = '//layouts/public';
+		if(isset($_GET['ref']) && !empty($_GET['ref'])){
+			$refId = $_GET['ref'];
+			$transaction = AppTransactions::model()->findByAttributes(array('ref_id' => $refId));
+			if($transaction === null)
+				throw new CHttpException(404, 'تراکنش موردنظر موجود نمی باشد.');
+			$this->render('ext.MellatPayment.views._redirect',array(
+				'status' => $transaction->status,
+				'ReferenceId' => $refId
+			));
+		}
+	}
+
 	public function actionVerifyPayment()
 	{
-		$transaction = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
+		$this->layout = '//layouts/public';
+		if(isset($_POST['RefId']))
+			$transaction = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
+		else if(isset($_GET['id']))
+			$transaction = AppTransactions::model()->findByAttributes(array('model_name' => 'Events', 'model_id' => $_GET['id']));
 		$result = NULL;
-		if($_POST['ResCode'] == 0){
-			$result = Yii::app()->Payment->VerifyRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
-		}
-		if($result != NULL){
-			$RecourceCode = (!is_array($result)?$result:$result['responseCode']);
-			if($RecourceCode == 0){
-				$transaction->status = 'paid';
-				// Settle Payment
-				$settle = Yii::app()->Payment->SettleRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
-				if($settle)
-					$transaction->settle = 1;
+		if($transaction->status != AppTransactions::TRANSACTION_PAID){
+			if($_POST['ResCode'] == 0){
+				$result = Yii::app()->Payment->VerifyRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
 			}
-		}else{
-			$RecourceCode = $_POST['ResCode'];
-		}
-		$transaction->res_code = $RecourceCode;
-		$transaction->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
-		if($transaction->update()){
-			switch($transaction->model_name){
+			if($result != NULL){
+				$RecourceCode = (!is_array($result)?$result:$result['responseCode']);
+				if($RecourceCode == 0){
+					$transaction->status = AppTransactions::TRANSACTION_PAID;
+					// Settle Payment
+					$settle = Yii::app()->Payment->SettleRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
+					if($settle)
+						$transaction->settle = 1;
+				}
+			}else{
+				$RecourceCode = $_POST['ResCode'];
+			}
+			$transaction->res_code = $RecourceCode;
+			$transaction->sale_reference_id = isset($_POST['SaleReferenceId'])?$_POST['SaleReferenceId']:null;
+			if($transaction->save()){
+				switch($transaction->model_name){
+					case 'Events':
+						$model = Events::model()->findByPk($transaction->model_id);
+						$model->status = Events::STATUS_ACCEPTED;
+						$model->confirm_date = time();
+						$model->show_start_time = $model->showStartTime;
+						$model->show_end_time = $model->showEndTime;
+						$model->save(false);
+						break;
+					default:
+						break;
+				}
+				$msg = 'پرداخت با موفقیت انجام شد.';
+			}else
+				$msg = 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
+		}else
+			$msg = 'پرداخت با موفقیت انجام شد.';
+		$this->render('verify',array(
+			'status' => $transaction->status,
+			'message' => $msg
+		));
+	}
+
+	public function actionInquiryPayment()
+	{
+		if(isset($_POST['id']) && $id = $_POST['id']){
+			$transaction = AppTransactions::model()->findByPk((int)$id);
+			if($transaction === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'تراکنش موردنظر یافت نشد.']), 'application/json');
+			$entity = $transaction->model_name;
+			$entityId = $transaction->model_id;
+			switch($entity){
 				case 'Events':
-					$model = Events::model()->findByPk($transaction->model_id);
-					$model->status = Events::STATUS_ACCEPTED;
-					$model->save(false);
+					$model = Events::model()->findByPk($entityId);
 					break;
 				default:
+					$transaction = null;
+					$model = null;
 					break;
 			}
-			echo 'پرداخت با موفقیت انجام شد.';
-		}
-		else
-			echo 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
+			if($model === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت موردنظر یافت نشد.']), 'application/json');
+			$details = [
+				'status' => $transaction->status,
+				'statusLabel' => $transaction->getStatusLabel(),
+				'trackingCode' => $transaction->sale_reference_id,
+				'transactionId' => $transaction->id,
+				'bankName' => $transaction->bank_name,
+				'paymentAmount' => $transaction->amount,
+				'date' => $transaction->date,
+				'startDateRun' => $model->start_date_run,
+				'longDaysRun' => $model->long_days_run,
+				'showStartTime' => $model->show_start_time,
+				'showEndTime' => $model->show_end_time,
+				'moreDays' => $model->more_days,
+				'subject1' => $model->subject1,
+				'subject2' => $model->subject2,
+				'conductor1' => $model->conductor1,
+				'conductor2' => $model->conductor2
+			];
+			$this->_sendResponse(200, CJSON::encode([
+				'status' => $transaction->status == AppTransactions::TRANSACTION_PAID?true:false,
+				'transactionDetail' => $details,
+				'message' => $transaction->status == AppTransactions::TRANSACTION_PAID?
+					'مراسم شما با موفقیت در گُهر ثبت شد و در زمان مقرر، خودکار نمایش داده میشود.':
+					'مراسم شما به علت عدم پرداخت وجه در گُهر ثبت نشد و به عنوان پیش نویس ذخیره شد.'
+			]), 'application/json');
+		}else
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'پارامتر های مورد نیاز ارسال نشده است.']), 'application/json');
 	}
 
 	/**************************************************** Base Actions ***********************************************************/

@@ -7,6 +7,7 @@ class iWebActiveRecord extends CActiveRecord
         'Tickets' => 'Ticket',
         'Notifications' => 'Notification',
         'UsersPlaces' => 'Place',
+        'AppTransactions' => 'Transaction',
     ];
 
     protected function afterSave()
