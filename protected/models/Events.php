@@ -249,7 +249,7 @@ class Events extends iWebActiveRecord
         Yii::app()->getModule('setting');
         $showEventMoreThanDefault = SiteOptions::getOption('show_event_more_than_default');
 
-        if($this->more_days > $showEventMoreThanDefault)
+        if ($this->more_days > $showEventMoreThanDefault and $this->status == self::STATUS_PENDING)
             $this->addError('more_days', $this->getAttributeLabel('more_days') . ' نمی تواند بیشتر از ' . $showEventMoreThanDefault . ' باشد.');
     }
 
@@ -260,7 +260,7 @@ class Events extends iWebActiveRecord
 
         if($this->long_days_run < 1)
             $this->addError('long_days_run', $this->getAttributeLabel('long_days_run') . ' نمی تواند کمتر از 1 باشد.');
-        elseif($this->long_days_run > $eventMaxLongDays)
+        elseif($this->long_days_run > $eventMaxLongDays and $this->status == self::STATUS_PENDING)
             $this->addError('long_days_run', $this->getAttributeLabel('long_days_run') . ' نمی تواند بیشتر از ' . $eventMaxLongDays . ' باشد.');
     }
 
@@ -387,6 +387,7 @@ class Events extends iWebActiveRecord
         $criteria->compare('reception', $this->reception, true);
         $criteria->compare('invitees', $this->invitees, true);
         $criteria->compare('ceremony_poster', $this->ceremony_poster, true);
+        $criteria->compare('user_mobile', $this->user_mobile, true);
 
         $criteria->addCondition('deleted = 0');
 
@@ -403,15 +404,22 @@ class Events extends iWebActiveRecord
         if(!empty($_GET['Events']['state_id']))
             $criteria->compare('state_id', $this->state_id);
 
-        if(!empty($_GET['Events']['creator_mobile'])){
-            $criteria->addCondition("creator_id IN (SELECT id FROM iw_users WHERE mobile LIKE :mobile)");
-            $criteria->params[':mobile'] = '%' . $this->creator_mobile . '%';
+        if(!empty($_GET['Events']['creator_mobile'])) {
+            if ($_GET['Events']['creator_mobile'] == 'مدیر')
+                $criteria->addCondition('user_mobile = "" OR user_mobile IS NULL');
+            else {
+                $criteria->addCondition("creator_id IN (SELECT id FROM iw_users WHERE mobile LIKE :mobile)");
+                $criteria->compare('user_mobile', $this->creator_mobile, true, 'OR');
+                $criteria->params[':mobile'] = '%' . $this->creator_mobile . '%';
+            }
         }
 
         if(!is_null($condition))
             $criteria->addCondition($condition);
 
         $criteria->order = 'id DESC';
+
+//        var_dump($criteria);exit;
 
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,

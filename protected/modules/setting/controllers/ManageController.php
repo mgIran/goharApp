@@ -183,6 +183,15 @@ class ManageController extends Controller
                             $errors[] = $item;
             }
 
+            if (isset($_POST['showEventMoreThanDefault'])) {
+                $showEventMoreThanDefault->value = $_POST['showEventMoreThanDefault'];
+
+                if (!$showEventMoreThanDefault->save())
+                    foreach ($showEventMoreThanDefault->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
             if (isset($_POST['eventMaxLongDays'])) {
                 $eventMaxLongDays->value = $_POST['eventMaxLongDays'];
 

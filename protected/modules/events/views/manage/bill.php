@@ -114,5 +114,9 @@ $eventPriceWithOff = $eventSubmitPrice - (float)($model->plan_off * $eventSubmit
             'name'=>'bankRefID',
             'value'=>($model->creator_type == 'admin')?'-':AppTransactions::model()->find('model_name = :model_name and model_id = :model_id', array(':model_name'=>'Events', ':model_id'=>$model->id))->ref_id,
         ),
+		array(
+            'name'=>'user_mobile',
+            'value'=>($model->user_mobile)?$model->user_mobile:'-',
+        ),
 	),
 ));?>
