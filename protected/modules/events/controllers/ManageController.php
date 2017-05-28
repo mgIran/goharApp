@@ -282,23 +282,23 @@ class ManageController extends Controller
         $model->unsetAttributes();  // clear any default values
 
         /* @var $event Events */
-        foreach ($model->search('status = 1')->getData() as $event) {
-            if (time() >= $event->showEndTime) {
-                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
-                @unlink($posterDIR . $event->ceremony_poster);
-                $event->deleted = 1;
-                $event->update();
-            }
-        }
-
-        foreach ($model->search('status = 0')->getData() as $event) {
-            if ($event and time() >= ((float)$event->create_date + (30 * 60))) {
-                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
-                @unlink($posterDIR . $event->ceremony_poster);
-                $event->deleted = 1;
-                $event->update();
-            }
-        }
+//        foreach ($model->search('status = 1')->getData() as $event) {
+//            if (time() >= $event->showEndTime) {
+//                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
+//                @unlink($posterDIR . $event->ceremony_poster);
+//                $event->deleted = 1;
+//                $event->update();
+//            }
+//        }
+//
+//        foreach ($model->search('status = 0')->getData() as $event) {
+//            if ($event and time() >= ((float)$event->create_date + (30 * 60))) {
+//                $posterDIR = Yii::getPathOfAlias("webroot") . "/uploads/events/";
+//                @unlink($posterDIR . $event->ceremony_poster);
+//                $event->deleted = 1;
+//                $event->update();
+//            }
+//        }
 
         if (isset($_GET['Events']))
             $model->attributes = $_GET['Events'];
