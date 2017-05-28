@@ -10,6 +10,8 @@
 /* @var $submitGeneralEvents SiteOptions */
 /* @var $program array */
 /* @var $baseLine SiteOptions */
+/* @var $filterFreeCount SiteOptions */
+/* @var $additionalFilterCost SiteOptions */
 /* @var $appVersion SiteOptions */
 /* @var $eventTaxEnabled SiteOptions */
 /* @var $signupStatus SiteOptions */
@@ -104,6 +106,15 @@ $this->breadcrumbs=array(
             <div class="row">
                 <?php echo CHtml::label('شماره خط مجازی','baseLine'); ?>
                 <?php echo CHtml::textField('baseLine', $baseLine->value); ?>
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::label('تعداد فیلتر رایگان','filterFreeCount'); ?>
+                <?php echo CHtml::textField('filterFreeCount', $filterFreeCount->value); ?> عدد
+            </div>
+            <div class="row">
+                <?php echo CHtml::label('هزینه فیلتر اضافه','additionalFilterCost'); ?>
+                <?php echo CHtml::textField('additionalFilterCost', $additionalFilterCost->value); ?> تومان
             </div>
         </div>
         <div id="version" class="tab-pane fade">

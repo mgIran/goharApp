@@ -87,6 +87,8 @@ class ManageController extends Controller
         $submitGeneralEvents =
         $goharYabProgram =
         $baseLine =
+        $filterFreeCount =
+        $additionalFilterCost =
         $appVersion =
         $eventTaxEnabled =
         $signupStatus =
@@ -118,6 +120,10 @@ class ManageController extends Controller
                 $goharYabProgram = $setting;
             elseif ($setting->name == 'base_line')
                 $baseLine = $setting;
+            elseif ($setting->name == 'filter_free_count')
+                $filterFreeCount = $setting;
+            elseif ($setting->name == 'additional_filter_cost')
+                $additionalFilterCost = $setting;
             elseif ($setting->name == 'app_version')
                 $appVersion = $setting;
             elseif ($setting->name == 'event_tax_enabled')
@@ -215,6 +221,24 @@ class ManageController extends Controller
 
                 if (!$baseLine->save())
                     foreach ($baseLine->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['filterFreeCount'])) {
+                $filterFreeCount->value = $_POST['filterFreeCount'];
+
+                if (!$filterFreeCount->save())
+                    foreach ($filterFreeCount->errors as $error)
+                        foreach ($error as $item)
+                            $errors[] = $item;
+            }
+
+            if (isset($_POST['additionalFilterCost'])) {
+                $additionalFilterCost->value = $_POST['additionalFilterCost'];
+
+                if (!$additionalFilterCost->save())
+                    foreach ($additionalFilterCost->errors as $error)
                         foreach ($error as $item)
                             $errors[] = $item;
             }
@@ -382,6 +406,8 @@ class ManageController extends Controller
             'submitGeneralEvents' => $submitGeneralEvents,
             'program' => $program,
             'baseLine' => $baseLine,
+            'filterFreeCount' => $filterFreeCount,
+            'additionalFilterCost' => $additionalFilterCost,
             'appVersion' => $appVersion,
             'eventTaxEnabled' => $eventTaxEnabled,
             'signupStatus' => $signupStatus,

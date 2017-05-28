@@ -49,15 +49,15 @@ class EventFilters extends iWebActiveRecord
 		// will receive user inputs.
 		return array(
 			array('type, subject, conductor, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, invitees, filter_type', 'required'),
-			array('user_id', 'numerical', 'integerOnly'=>true),
-			array('title', 'length', 'max'=>100),
-			array('filter_type', 'length', 'max'=>20),
-			array('sexed_guest', 'length', 'max'=>255),
-			array('min_age_guest, max_age_guest', 'length', 'max'=>3),
+			array('user_id', 'numerical', 'integerOnly' => true),
+			array('title', 'length', 'max' => 100),
+			array('filter_type', 'length', 'max' => 20),
+			array('sexed_guest', 'length', 'max' => 255),
+			array('min_age_guest, max_age_guest', 'length', 'max' => 3),
 			array('type, subject, conductor, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, invitees', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, user_id, title, type, subject, conductor, sexed_guest, min_age_guest, max_age_guest, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, invitees', 'safe', 'on'=>'search'),
+			array('id, user_id, title, type, subject, conductor, sexed_guest, min_age_guest, max_age_guest, town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter, area_code, postal_code, complete_address, invitees', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -119,32 +119,32 @@ class EventFilters extends iWebActiveRecord
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria=new CDbCriteria;
+		$criteria = new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('user_id',$this->user_id);
-		$criteria->compare('title',$this->title,true);
-		$criteria->compare('type',$this->type,true);
-		$criteria->compare('subject',$this->subject,true);
-		$criteria->compare('conductor',$this->conductor,true);
-		$criteria->compare('sexed_guest',$this->sexed_guest,true);
-		$criteria->compare('min_age_guest',$this->min_age_guest,true);
-		$criteria->compare('max_age_guest',$this->max_age_guest,true);
-		$criteria->compare('town',$this->town,true);
-		$criteria->compare('main_street',$this->main_street,true);
-		$criteria->compare('by_street',$this->by_street,true);
-		$criteria->compare('boulevard',$this->boulevard,true);
-		$criteria->compare('afew_ways',$this->afew_ways,true);
-		$criteria->compare('squary',$this->squary,true);
-		$criteria->compare('bridge',$this->bridge,true);
-		$criteria->compare('quarter',$this->quarter,true);
-		$criteria->compare('area_code',$this->area_code,true);
-		$criteria->compare('postal_code',$this->postal_code,true);
-		$criteria->compare('complete_address',$this->complete_address,true);
-		$criteria->compare('invitees',$this->invitees,true);
+		$criteria->compare('id', $this->id, true);
+		$criteria->compare('user_id', $this->user_id);
+		$criteria->compare('title', $this->title, true);
+		$criteria->compare('type', $this->type, true);
+		$criteria->compare('subject', $this->subject, true);
+		$criteria->compare('conductor', $this->conductor, true);
+		$criteria->compare('sexed_guest', $this->sexed_guest, true);
+		$criteria->compare('min_age_guest', $this->min_age_guest, true);
+		$criteria->compare('max_age_guest', $this->max_age_guest, true);
+		$criteria->compare('town', $this->town, true);
+		$criteria->compare('main_street', $this->main_street, true);
+		$criteria->compare('by_street', $this->by_street, true);
+		$criteria->compare('boulevard', $this->boulevard, true);
+		$criteria->compare('afew_ways', $this->afew_ways, true);
+		$criteria->compare('squary', $this->squary, true);
+		$criteria->compare('bridge', $this->bridge, true);
+		$criteria->compare('quarter', $this->quarter, true);
+		$criteria->compare('area_code', $this->area_code, true);
+		$criteria->compare('postal_code', $this->postal_code, true);
+		$criteria->compare('complete_address', $this->complete_address, true);
+		$criteria->compare('invitees', $this->invitees, true);
 
 		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
+			'criteria' => $criteria,
 		));
 	}
 
@@ -154,7 +154,7 @@ class EventFilters extends iWebActiveRecord
 	 * @param string $className active record class name.
 	 * @return EventFilters the static model class
 	 */
-	public static function model($className=__CLASS__)
+	public static function model($className = __CLASS__)
 	{
 		return parent::model($className);
 	}
@@ -172,5 +172,17 @@ class EventFilters extends iWebActiveRecord
 		foreach($attributes as $key => $item)
 			if(in_array($key, $invalidChangeAttributes))
 				unset($attributes[$key]);
+	}
+
+	public function checkFilterCreatePermission($user_id)
+	{
+		$freeCount = SiteOptions::getOption('filter_free_count');
+		$userFilterCount = $this->countByAttributes(array('user_id' => $user_id));
+		$userPaidFilterCount = AppTransactions::model()->countByAttributes(array(
+			'user_id' => $user_id,
+			'status' => AppTransactions::TRANSACTION_PAID,
+			'model_name' => "EventFilters"
+		));
+		return (int)$userFilterCount < ((int)$freeCount + (int)$userPaidFilterCount)?true:false;
 	}
 }

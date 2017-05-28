@@ -198,6 +198,12 @@ class ApiController extends Controller
 						break;
 					case 'Filter':
 						$model = new EventFilters();
+						if(!$model->checkFilterCreatePermission($this->loginArray['userID']))
+							$this->_sendResponse(200, CJSON::encode([
+								'status' => false,
+								'message' => 'تعداد فیلتر ثبت شده بیشتر از حد رایگان است. جهت ثبت فیلتر جدید باید هزینه پرداخت کنید.',
+								'payApi' => Yii::app()->createAbsoluteUrl('/api/payment/?entity=Filter')
+							]), 'application/json');
 						$model->attributes = $_POST[$entity];
 						$model->user_id = $this->loginArray['userID'];
 						if($model->save())
@@ -343,7 +349,44 @@ class ApiController extends Controller
 
 	public function actionPayment()
 	{
-		if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
+		if(isset($_GET['entity']) && $entity = ucfirst(strtolower(trim($_GET['entity'])))){ // pay open
+			switch($entity){
+				case 'Filter':
+					$transaction = new AppTransactions();
+					$transaction->user_id = $this->loginArray['userID'];
+					$transaction->amount = SiteOptions::getOption('additional_filter_cost');
+					$transaction->description = 'پرداخت هزینه جهت ثبت فیلتر اضافه';
+					$transaction->date = time();
+					$transaction->model_name = 'EventFilters';
+					$transaction->model_id = null;
+					$transaction->bank_name = "ملت";
+					$transaction->newOrderId();
+					if($transaction->save()){
+						$Amount = doubleval($transaction->amount) * 10;
+						$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment';
+						$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
+						if(!$result['error']){
+							$transaction->ref_id = $result['responseCode'];
+							$transaction->save();
+							$ReferenceId = $result['responseCode'];
+							$this->_sendResponse(200, CJSON::encode(['status' => true,
+								'urlPay' => Yii::app()->createAbsoluteUrl("/api/paymentPage?ref={$ReferenceId}"),
+								'transactionId' => $transaction->id,
+							]), 'application/json');
+						}else{
+							$this->_sendResponse(200, CJSON::encode(['status' => false,
+								'transactionId' => $transaction->id,
+								'message' => Yii::app()->Payment->getResponseText($result['responseCode']),
+							]), 'application/json');
+						}
+					}
+					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه مشکلی در ثبت اطلاعات تراکنش بوجود آمده است! لطفا مجددا تلاش فرمایید.']), 'application/json');
+					break;
+				default:
+					$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+					break;
+			}
+		}else if(isset($_POST['entity']) && $entity = ucfirst(strtolower(trim($_POST['entity'])))){
 			if(!isset($_POST['entityId']) && (int)$_POST['entityId'])
 				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entityId ارسال نشده است.']), 'application/json');
 			$entityId = $_POST['entityId'];
@@ -365,7 +408,7 @@ class ApiController extends Controller
 					$transaction->newOrderId();
 					if($transaction->save()){
 						$Amount = doubleval($transaction->amount) * 10;
-						$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?id=' . $model->id;
+						$CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment?model=Events&id=' . $model->id;
 						$result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
 						if(!$result['error']){
 							$transaction->ref_id = $result['responseCode'];
@@ -411,11 +454,15 @@ class ApiController extends Controller
 	public function actionVerifyPayment()
 	{
 		$this->layout = '//layouts/public';
+		$transaction = null;
+		$result = null;
 		if(isset($_POST['RefId']))
 			$transaction = AppTransactions::model()->findByAttributes(array('ref_id' => $_POST['RefId']));
-		else if(isset($_GET['id']))
-			$transaction = AppTransactions::model()->findByAttributes(array('model_name' => 'Events', 'model_id' => $_GET['id']));
-		$result = NULL;
+		else if(isset($_GET['id']) && isset($_GET['model']))
+			$transaction = AppTransactions::model()->findByAttributes(array('model_name' => $_GET['model'], 'model_id' => $_GET['id']));
+
+		if($transaction === null)
+			throw new CHttpException(404, 'تراکنش مورد نظر موجود نمی باشد.');
 		if($transaction->status != AppTransactions::TRANSACTION_PAID){
 			if($_POST['ResCode'] == 0){
 				$result = Yii::app()->Payment->VerifyRequest($transaction->order_id, $_POST['SaleOrderId'], $_POST['SaleReferenceId']);
@@ -452,7 +499,7 @@ class ApiController extends Controller
 				$msg = 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
 		}else
 			$msg = 'پرداخت با موفقیت انجام شد.';
-		$this->render('verify',array(
+		$this->render('verify', array(
 			'status' => $transaction->status,
 			'message' => $msg
 		));
@@ -461,6 +508,8 @@ class ApiController extends Controller
 	public function actionInquiryPayment()
 	{
 		if(isset($_POST['id']) && $id = $_POST['id']){
+			$details = null;
+			$message = null;
 			$transaction = AppTransactions::model()->findByPk((int)$id);
 			if($transaction === null)
 				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'تراکنش موردنظر یافت نشد.']), 'application/json');
@@ -469,6 +518,27 @@ class ApiController extends Controller
 			switch($entity){
 				case 'Events':
 					$model = Events::model()->findByPk($entityId);
+					$message = $transaction->status == AppTransactions::TRANSACTION_PAID?
+						'مراسم شما با موفقیت در گُهر ثبت شد و در زمان مقرر، خودکار نمایش داده میشود.':
+						'مراسم شما به علت عدم پرداخت وجه در گُهر ثبت نشد و به عنوان پیش نویس ذخیره شد.';
+					$details = [
+						'status' => $transaction->status,
+						'statusLabel' => $transaction->getStatusLabel(),
+						'trackingCode' => $transaction->sale_reference_id,
+						'transactionId' => $transaction->id,
+						'bankName' => $transaction->bank_name,
+						'paymentAmount' => $transaction->amount,
+						'date' => $transaction->date,
+						'startDateRun' => $model->start_date_run,
+						'longDaysRun' => $model->long_days_run,
+						'showStartTime' => $model->show_start_time,
+						'showEndTime' => $model->show_end_time,
+						'moreDays' => $model->more_days,
+						'subject1' => $model->subject1,
+						'subject2' => $model->subject2,
+						'conductor1' => $model->conductor1,
+						'conductor2' => $model->conductor2
+					];
 					break;
 				default:
 					$transaction = null;
@@ -477,35 +547,14 @@ class ApiController extends Controller
 			}
 			if($model === null)
 				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت موردنظر یافت نشد.']), 'application/json');
-			$details = [
-				'status' => $transaction->status,
-				'statusLabel' => $transaction->getStatusLabel(),
-				'trackingCode' => $transaction->sale_reference_id,
-				'transactionId' => $transaction->id,
-				'bankName' => $transaction->bank_name,
-				'paymentAmount' => $transaction->amount,
-				'date' => $transaction->date,
-				'startDateRun' => $model->start_date_run,
-				'longDaysRun' => $model->long_days_run,
-				'showStartTime' => $model->show_start_time,
-				'showEndTime' => $model->show_end_time,
-				'moreDays' => $model->more_days,
-				'subject1' => $model->subject1,
-				'subject2' => $model->subject2,
-				'conductor1' => $model->conductor1,
-				'conductor2' => $model->conductor2
-			];
 			$this->_sendResponse(200, CJSON::encode([
 				'status' => $transaction->status == AppTransactions::TRANSACTION_PAID?true:false,
 				'transactionDetail' => $details,
-				'message' => $transaction->status == AppTransactions::TRANSACTION_PAID?
-					'مراسم شما با موفقیت در گُهر ثبت شد و در زمان مقرر، خودکار نمایش داده میشود.':
-					'مراسم شما به علت عدم پرداخت وجه در گُهر ثبت نشد و به عنوان پیش نویس ذخیره شد.'
+				'message' => $message
 			]), 'application/json');
 		}else
 			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'پارامتر های مورد نیاز ارسال نشده است.']), 'application/json');
 	}
-
 	/**************************************************** Base Actions ***********************************************************/
 	public function actionGetLastVer()
 	{
