@@ -189,10 +189,12 @@ class ApiController extends Controller
 			if($filter === null)
 				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'فیلتر موردنظر موجود نیست.']), 'application/json');
 			if($filter->filter_type == 'public'){
-				$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+				$criteria->addCondition('ceremony_public = 1 OR (creator_type = :creator_type AND creator_id = :user_id)');
+				$criteria->params[':creator_type'] = "user";
 				$criteria->params[':user_id'] = $this->loginArray['userID'];
 			}elseif($filter->filter_type == 'favorite'){
-				$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+				$criteria->addCondition('ceremony_public = 1 OR (creator_type = :creator_type AND creator_id = :user_id)');
+				$criteria->params[':creator_type'] = "user";
 				$criteria->params[':user_id'] = $this->loginArray['userID'];
 				// @todo مراسم های خصوصی هم نشون بده
 			}
@@ -203,7 +205,8 @@ class ApiController extends Controller
 			$filter->attributes = $_POST['Filter'];
 //			$filter->user_id = $this->loginArray['userID'];
 			$filter->loadSearchFields();
-			$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+			$criteria->addCondition('ceremony_public = 1 OR (creator_type = :creator_type AND creator_id = :user_id)');
+			$criteria->params[':creator_type'] = "user";
 			$criteria->params[':user_id'] = $this->loginArray['userID'];
 		}
 		$filter->searchCriteria($criteria);
