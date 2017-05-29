@@ -188,16 +188,25 @@ class ApiController extends Controller
 			));
 			if($filter === null)
 				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'فیلتر موردنظر موجود نیست.']), 'application/json');
+			if($filter->filter_type == 'public'){
+				$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+				$criteria->params[':user_id'] = $this->loginArray['userID'];
+			}elseif($filter->filter_type == 'favorite'){
+				$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+				$criteria->params[':user_id'] = $this->loginArray['userID'];
+				// @todo مراسم های خصوصی هم نشون بده
+			}
 			$filter->loadSearchFields();
 		}elseif(isset($_POST['Filter'])){
+			$_POST['Filter'] = CJSON::decode($_POST['Filter'])?CJSON::decode($_POST['Filter']):$_POST['Filter'];
 			$filter = new EventFilters();
 			$filter->attributes = $_POST['Filter'];
-			$filter->user_id = $this->loginArray['userID'];
+//			$filter->user_id = $this->loginArray['userID'];
 			$filter->loadSearchFields();
+			$criteria->addCondition('ceremony_public = 1 OR user_id = :user_id');
+			$criteria->params[':user_id'] = $this->loginArray['userID'];
 		}
 		$filter->searchCriteria($criteria);
-		// $criteria->addCondition('user_id != :user_id');
-		// $criteria->params[':user_id'] = $this->loginArray['userID'];
 		$list = Events::model()->{$func}($criteria);
 		if($list){
 			$this->_sendResponse(200, CJSON::encode(['status' => true, 'list' => $list]), 'application/json');

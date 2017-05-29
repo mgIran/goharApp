@@ -211,8 +211,8 @@ class EventFilters extends iWebActiveRecord
 	public $postalCodeSearch = null;
 	public $userMobileSearch = null;
 	public $inviteesSearch = null;
-	public $date = null;
-	public $filterTypeSearch = null;
+	public $startDateSearch = null;
+	public $endDateSearch = null;
 
 	/**
 	 * Load Search fields from filter or query string
