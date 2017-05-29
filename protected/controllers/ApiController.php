@@ -9,7 +9,7 @@ class ApiController extends Controller
 	{
 		return array(
 			'RestAccessControl + getLastVer,downloadApp,checkNumber',
-			'RestUserAccessControl + changes, getList, create, update, upload, payment, inquiryPayment' ,
+			'RestUserAccessControl + changes, getList, getFilteredList, create, update, upload, payment, inquiryPayment' ,
 //			'RestAdminAccessControl +'
 		);
 	}
@@ -168,6 +168,43 @@ class ApiController extends Controller
 		}
 	}
 
+	public function actionGetFilteredList()
+	{
+		$filter = new EventFilters();
+		$criteria = new CDbCriteria();
+		// set LIMIT and OFFSET in Query
+		if(isset($_POST['limit']) && !empty($_POST['limit']) && $limit = (int)$_POST['limit']){
+			$criteria->limit = $limit;
+			if(isset($_POST['offset']) && !empty($_POST['offset']) && $offset = (int)$_POST['offset'])
+				$criteria->offset = $offset;
+		}
+		//
+		$func = 'findAll';
+		// set Filter
+		if(isset($_POST['filterId']) && !empty($_POST['filterId'])){
+			$filter = EventFilters::model()->findByAttributes(array(
+				'user_id' => $this->loginArray['userID'],
+				'id' => $_POST['filterId']
+			));
+			if($filter === null)
+				$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'فیلتر موردنظر موجود نیست.']), 'application/json');
+			$filter->loadSearchFields();
+		}elseif(isset($_POST['Filter'])){
+			$filter = new EventFilters();
+			$filter->attributes = $_POST['Filter'];
+			$filter->user_id = $this->loginArray['userID'];
+			$filter->loadSearchFields();
+		}
+		$filter->searchCriteria($criteria);
+		// $criteria->addCondition('user_id != :user_id');
+		// $criteria->params[':user_id'] = $this->loginArray['userID'];
+		$list = Events::model()->{$func}($criteria);
+		if($list){
+			$this->_sendResponse(200, CJSON::encode(['status' => true, 'list' => $list]), 'application/json');
+		}else
+			$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعاتی برای دریافت موجود نیست.']), 'application/json');
+	}
+
 	/**
 	 * Create Model from Entity
 	 */
@@ -237,7 +274,6 @@ class ApiController extends Controller
 		}
 		$this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'مقدار entity نمی تواند خالی باشد.']), 'application/json');
 	}
-
 	/**
 	 * Update Model from Entity
 	 */
