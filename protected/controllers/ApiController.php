@@ -64,43 +64,43 @@ class ApiController extends Controller
 		if(isset($_POST['entity']) && $entity = $_POST['entity']){
 			$criteria = new CDbCriteria();
 			// Set Last ID
-			if(isset($_POST['lastId']) && !empty($_POST['lastId']) && $lastId = (int)$_POST['lastId']){
-				$criteria->addCondition('t.id > :last_id');
-				$criteria->params[':last_id'] = $lastId;
-			}
-			// set LIMIT and OFFSET in Query
-			if(isset($_POST['limit']) && !empty($_POST['limit']) && $limit = (int)$_POST['limit']){
-				$criteria->limit = $limit;
-				if(isset($_POST['offset']) && !empty($_POST['offset']) && $offset = (int)$_POST['offset'])
-					$criteria->offset = $offset;
-			}
-			//
-			// Set Function
-			$validQueries = array(
-				'find',
-				'findAll',
-				'count',
-				'delete',
-				'deleteAll',
-			);
-
-			//
-			if(isset($_POST['query']) && !empty($_POST['query'])){
-				$query = strtolower(trim($_POST['query']));
-				if(in_array($query,$validQueries))
-					$func = $query;
-				else
+				if(isset($_POST['lastId']) && !empty($_POST['lastId']) && $lastId = (int)$_POST['lastId']){
+					$criteria->addCondition('t.id > :last_id');
+					$criteria->params[':last_id'] = $lastId;
+				}
+				// set LIMIT and OFFSET in Query
+				if(isset($_POST['limit']) && !empty($_POST['limit']) && $limit = (int)$_POST['limit']){
+					$criteria->limit = $limit;
+					if(isset($_POST['offset']) && !empty($_POST['offset']) && $offset = (int)$_POST['offset'])
+						$criteria->offset = $offset;
+				}
+				//
+				// Set Function
+				$validQueries = array(
+					'find',
+					'findAll',
+					'count',
+					'delete',
+					'deleteAll',
+				);
+	
+				//
+				if(isset($_POST['query']) && !empty($_POST['query'])){
+					$query = strtolower(trim($_POST['query']));
+					if(in_array($query,$validQueries))
+						$func = $query;
+					else
+						$func = 'findAll';
+				}else
 					$func = 'findAll';
-			}else
-				$func = 'findAll';
-			// Set Pk
-			if(isset($_POST['pk']) && !empty($_POST['pk']) && $pk = (int)$_POST['pk'])
-			{
-				$criteria->params[':pk'] = $pk;
-				$func = 'find';
-				$criteria->limit = 1;
-				$criteria->offset = 0;
-			}
+				// Set Pk
+				if(isset($_POST['pk']) && !empty($_POST['pk']) && $pk = (int)$_POST['pk'])
+				{
+					$criteria->params[':pk'] = $pk;
+					$func = 'find';
+					$criteria->limit = 1;
+					$criteria->offset = 0;
+				}
 			//
 			switch(trim($entity)){
 				case 'Place':
