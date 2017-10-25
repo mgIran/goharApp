@@ -687,8 +687,8 @@ class ApiController extends Controller
             $criteria = new CDbCriteria();
             $criteria->compare('text', 'GoharActivate', true);
             $criteria->compare('sender', $sim, true);
-            if ($baseLine)
-                $criteria->compare('t.to', $baseLine->value);
+//            if ($baseLine)
+//                $criteria->compare('t.to', $baseLine->value);
             $criteria->addCondition('date >= :date');
             $criteria->params[':date'] = time() - 10 * 60;
             $criteria->order = 'date DESC';
