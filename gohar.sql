@@ -2972,7 +2972,6 @@ INSERT INTO `iw_log` VALUES ('2216', '1493042322', '1', '::1', 'Ceremony', 'upda
 INSERT INTO `iw_log` VALUES ('2217', '1493042378', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
 INSERT INTO `iw_log` VALUES ('2218', '1493042443', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
 INSERT INTO `iw_log` VALUES ('2219', '1493043630', '1', '::1', 'Ceremony', 'update', '', '10', 'admin');
-INSERT INTO `iw_log` VALUES ('2211', '1491633647', null, '::1', 'UsersLogins', 'insert', '', '991', null);
 
 -- ----------------------------
 -- Table structure for iw_messages_emails_bank
