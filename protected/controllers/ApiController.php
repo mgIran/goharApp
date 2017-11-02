@@ -671,7 +671,7 @@ class ApiController extends Controller
     }
 
     public function actionCheckNumber()
-    {
+	{
         if (isset($_POST['token']) && isset($_POST['sim']) && isset($_POST['activateCode'])) {
             $baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
             Yii::import('users.models.*');
@@ -683,7 +683,7 @@ class ApiController extends Controller
             $criteria->addCondition('date <= :date');
             $criteria->params[':date'] = time() - 10 * 60;
             $criteria->order = 'date DESC';
-            TextMessagesReceive::model()->deleteAll($criteria);
+//            TextMessagesReceive::model()->deleteAll($criteria);
             //
             $criteria = new CDbCriteria();
             $criteria->compare('text', 'GoharActivate', true);

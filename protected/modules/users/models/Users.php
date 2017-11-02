@@ -165,7 +165,7 @@ class Users extends iWebActiveRecord
             array('user_name', 'length', 'min' => 5, 'max' => 254),
             array('first_name,last_name', 'length', 'min' => 3, 'max' => 100),
             array('email', 'length', 'min' => 5, 'max' => 254),
-            array('mobile', 'length', 'min' => 11, 'max' => 11),
+            array('mobile', 'length', 'min' => 12, 'max' => 12),
             array('status', 'default', 'value' => 1, 'except' => 'changeValue,upload'),
             array('agent_id', 'default', 'setOnEmpty' => TRUE, 'value' => NULL, 'except' => 'changeValue,upload'),
             array('agent_id', 'exist', 'className' => 'Users', 'attributeName' => 'id'),
