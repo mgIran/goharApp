@@ -65,6 +65,7 @@ Yii::import('application.modules.plans.models.*');
  * @property string $favorite_address_2
  * @property string $favorite_phone_prefix_2
  * @property integer $favorite_phone_number_2
+ * @property integer $edit_number
  *
  * The followings are the available model relations:
  * @property AgentsCommissions[] $agentsCommissions
@@ -134,14 +135,14 @@ class Users extends iWebActiveRecord
     public function rules()
     {
         $required = 'first_name';
-        if(($this->scenario == 'changePassword') AND isset($this->activePlan->plansBuys->plan->required_fields)){
+        if (($this->scenario == 'changePassword') AND isset($this->activePlan->plansBuys->plan->required_fields)) {
             $requiredFields = CJSON::decode($this->activePlan->plansBuys->plan->required_fields, TRUE);
 
             $required = array();
-            if(is_string($requiredFields))
+            if (is_string($requiredFields))
                 $requiredFields = CJSON::decode($requiredFields);
-            foreach($requiredFields as $field => $isRequired){
-                if($isRequired == '1'){
+            foreach ($requiredFields as $field => $isRequired) {
+                if ($isRequired == '1') {
                     $required[] = $field;
                 }
             }
@@ -190,17 +191,17 @@ class Users extends iWebActiveRecord
 
             array('national_id', 'length', 'max' => 10),
             array('national_id', 'validateNationalId', 'on' => 'changePassword,changePasswordValidation'),
-            array('national_id', 'matchPrefixNumberValidator', 'values' => isset($this->birthCity)?((is_null($this->birthCity->national_id_prefix) OR empty($this->birthCity->national_id_prefix))?$this->birthCity->parent->national_id_prefix:$this->birthCity->national_id_prefix):'', 'message' => "محل تولد و کدملی خود را کنترل کنید", 'on' => 'changePasswordValidation'),
+            array('national_id', 'matchPrefixNumberValidator', 'values' => isset($this->birthCity) ? ((is_null($this->birthCity->national_id_prefix) OR empty($this->birthCity->national_id_prefix)) ? $this->birthCity->parent->national_id_prefix : $this->birthCity->national_id_prefix) : '', 'message' => "محل تولد و کدملی خود را کنترل کنید", 'on' => 'changePasswordValidation'),
             array('national_id', 'unique'),
 
             array('home_postal_code, work_postal_code', 'length', 'min' => 10),
-            array('home_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity)?((is_null($this->homeCity->postal_code_prefix) OR empty($this->homeCity->postal_code_prefix))?$this->homeCity->parent->postal_code_prefix:$this->homeCity->postal_code_prefix):'', 'on' => 'changePasswordValidation'),
-            array('work_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->workCity)?((is_null($this->workCity->postal_code_prefix) OR empty($this->workCity->postal_code_prefix))?$this->workCity->parent->postal_code_prefix:$this->workCity->postal_code_prefix):'', 'on' => 'changePasswordValidation'),
+            array('home_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity) ? ((is_null($this->homeCity->postal_code_prefix) OR empty($this->homeCity->postal_code_prefix)) ? $this->homeCity->parent->postal_code_prefix : $this->homeCity->postal_code_prefix) : '', 'on' => 'changePasswordValidation'),
+            array('work_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->workCity) ? ((is_null($this->workCity->postal_code_prefix) OR empty($this->workCity->postal_code_prefix)) ? $this->workCity->parent->postal_code_prefix : $this->workCity->postal_code_prefix) : '', 'on' => 'changePasswordValidation'),
             //array('home_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity) ? $this->homeCity->postal_code_prefix : '', 'on' => 'changePassword'),
             //array('work_postal_code', 'matchPrefixNumberValidator', 'values' => isset($this->workCity) ? $this->workCity->postal_code_prefix : '', 'on' => 'changePassword'),
             array('home_phone_prefix, work_phone_prefix', 'length', 'max' => 6),
-            array('home_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity)?((is_null($this->homeCity->phone_number_prefix) OR empty($this->homeCity->phone_number_prefix))?$this->homeCity->parent->phone_number_prefix:$this->homeCity->phone_number_prefix):'', 'on' => 'changePasswordValidation'),
-            array('work_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->workCity)?((is_null($this->workCity->phone_number_prefix) OR empty($this->workCity->phone_number_prefix))?$this->workCity->parent->phone_number_prefix:$this->workCity->phone_number_prefix):'', 'on' => 'changePasswordValidation'),
+            array('home_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity) ? ((is_null($this->homeCity->phone_number_prefix) OR empty($this->homeCity->phone_number_prefix)) ? $this->homeCity->parent->phone_number_prefix : $this->homeCity->phone_number_prefix) : '', 'on' => 'changePasswordValidation'),
+            array('work_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->workCity) ? ((is_null($this->workCity->phone_number_prefix) OR empty($this->workCity->phone_number_prefix)) ? $this->workCity->parent->phone_number_prefix : $this->workCity->phone_number_prefix) : '', 'on' => 'changePasswordValidation'),
             /*array('home_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->homeCity) ? $this->homeCity->phone_number_prefix : '', 'equal' => TRUE, 'on' => 'changePassword'),
             array('work_phone_prefix', 'matchPrefixNumberValidator', 'values' => isset($this->workCity) ? $this->workCity->phone_number_prefix : '', 'equal' => TRUE, 'on' => 'changePassword'),*/
             array('home_phone_number, work_phone_number', 'length', 'max' => 9),
@@ -217,7 +218,16 @@ class Users extends iWebActiveRecord
             //app token
             array('app_token', 'required', 'on' => 'app_update'),
             array('app_token', 'unique', 'on' => 'app_update'),
+
+            // Increase edit_number on update
+            array('edit_number', 'increase', 'on' => 'update'),
+            array('edit_number', 'numerical'),
         );
+    }
+
+    public function increase($attribute, $params)
+    {
+        $this->$attribute += 1;
     }
 
     public function findPasswords($attribute, $params)
