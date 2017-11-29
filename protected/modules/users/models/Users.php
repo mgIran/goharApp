@@ -65,6 +65,16 @@ Yii::import('application.modules.plans.models.*');
  * @property string $favorite_address_2
  * @property string $favorite_phone_prefix_2
  * @property integer $favorite_phone_number_2
+ * @property integer $home_city_id_2
+ * @property string $home_postal_code_2
+ * @property string $home_address_2
+ * @property string $home_phone_prefix_2
+ * @property string $home_phone_number_2
+ * @property integer $work_city_id_2
+ * @property string $work_postal_code_2
+ * @property string $work_address_2
+ * @property string $work_phone_prefix_2
+ * @property string $work_phone_number_2
  * @property integer $edit_number
  *
  * The followings are the available model relations:
@@ -88,10 +98,14 @@ Yii::import('application.modules.plans.models.*');
  * @property UsersPlaces $favoriteCityId1
  * @property UsersPlaces $birthCity
  * @property UsersPlaces $homeCity
+ * @property UsersPlaces $homeCity2
  * @property UsersPlaces $workCity
+ * @property UsersPlaces $workCity2
+ * @property UsersPlaces $schoolingCity1
+ * @property UsersPlaces $schoolingCity2
+ * @property UsersPlaces $favoriteCity1
+ * @property UsersPlaces $favoriteCity2
  * @property UsersRoles $role
- * @property UsersPlaces $schoolingCityId1
- * @property UsersPlaces $schoolingCityId2
  * @property UsersLogins[] $usersLogins
  * @property UsersOptions[] $usersOptions
  * @property Buys $activePlan
@@ -161,11 +175,11 @@ class Users extends iWebActiveRecord
             array('password, repeat_password', 'required', 'on' => 'recoverPassword'),
             //array('old_password', 'findPasswords', 'on' => 'changePassword'),
             array('email', 'CEmailValidator'),
-            array('role_id, mobile', 'numerical', 'integerOnly' => true, 'message' => '{attribute} باید عددی باشد.'),
+            array('role_id, mobile, home_city_id_2, work_city_id_2', 'numerical', 'integerOnly' => true, 'message' => '{attribute} باید عددی باشد.'),
             array('user_name', 'length', 'min' => 5, 'max' => 254),
             array('first_name,last_name', 'length', 'min' => 3, 'max' => 100),
             array('email', 'length', 'min' => 5, 'max' => 254),
-            array('mobile', 'length', 'min' => 12, 'max' => 12),
+            array('mobile', 'length', 'min' => 7, 'max' => 20),
             array('status', 'default', 'value' => 1, 'except' => 'changeValue,upload'),
             array('agent_id', 'default', 'setOnEmpty' => TRUE, 'value' => NULL, 'except' => 'changeValue,upload'),
             array('agent_id', 'exist', 'className' => 'Users', 'attributeName' => 'id'),
@@ -186,7 +200,7 @@ class Users extends iWebActiveRecord
 
             // legal documents
             array('birth_city_id, home_city_id,work_city_id', 'numerical', 'integerOnly' => true),
-            array('birth_city_id, home_city_id', 'required', 'on' => 'register'),
+            array('home_city_id', 'required', 'on' => 'register'),
             array('personal_image, father_name, national_card_front, national_card_rear, birth_certificate_first,business_license,activity_permission', 'length', 'max' => 100),
 
             array('national_id', 'length', 'max' => 10),
@@ -227,7 +241,10 @@ class Users extends iWebActiveRecord
 
     public function increase($attribute, $params)
     {
-        $this->$attribute += 1;
+        if($this->$attribute < 99)
+            $this->$attribute += 1;
+        else
+            $this->$attribute = 1;
     }
 
     public function findPasswords($attribute, $params)
@@ -299,8 +316,16 @@ class Users extends iWebActiveRecord
             'commissions' => array(self::HAS_MANY, 'AgentsCommissions', 'user_id'),
             //legal documents
             'homeCity' => array(self::BELONGS_TO, 'UsersPlaces', 'home_city_id'),
+            'homeCity2' => array(self::BELONGS_TO, 'UsersPlaces', 'home_city_id_2'),
             'birthCity' => array(self::BELONGS_TO, 'UsersPlaces', 'birth_city_id'),
+            'birthCity2' => array(self::BELONGS_TO, 'UsersPlaces', 'birth_city_id_2'),
             'workCity' => array(self::BELONGS_TO, 'UsersPlaces', 'work_city_id'),
+            'workCity2' => array(self::BELONGS_TO, 'UsersPlaces', 'work_city_id_2'),
+
+            'schoolingCity1' => array(self::BELONGS_TO, 'UsersPlaces', 'schooling_city_id_1'),
+            'schoolingCity2' => array(self::BELONGS_TO, 'UsersPlaces', 'schooling_city_id_2'),
+            'favoriteCity1' => array(self::BELONGS_TO, 'UsersPlaces', 'favorite_city_id_1'),
+            'favoriteCity2' => array(self::BELONGS_TO, 'UsersPlaces', 'favorite_city_id_2'),
 
             'agentStatus' => array(self::HAS_ONE, 'UsersOptions', 'user_id', 'condition' => "options = 'user_info_status'"),
         );
@@ -371,7 +396,18 @@ class Users extends iWebActiveRecord
             'charge_desc' => 'علت تراکنش',
             'credit_charge' => 'اعتبار نقدی کاربر',
             'sms_charge' => 'اعتبار گهر پیامک',
-            'email_charge' => 'اعتبار گهر میل'
+            'email_charge' => 'اعتبار گهر میل',
+
+            'home_city_id_2' => 'محل سکونت 2',
+            'home_postal_code_2' => 'کد پستی محل سکونت 2',
+            'home_address_2' => 'آدرس محل سکونت 2',
+            'home_phone_prefix_2' => 'پیش شماره تلفن محل سکونت 2',
+            'home_phone_number_2' => 'شماره محل سکونت 2',
+            'work_city_id_2' => 'محل کار 2',
+            'work_postal_code_2' => 'کد پستی محل کار 2',
+            'work_address_2' => 'آدرس محل کار 2',
+            'work_phone_prefix_2' => 'پیش شماره تلفن محل کار 2',
+            'work_phone_number_2' => 'شماره محل کار 2',
         );
     }
 
@@ -678,7 +714,7 @@ class Users extends iWebActiveRecord
             'username',
             'password',
             'status',
-            'email',
+            //'email',
             'deleted',
             'agent_id',
             'sms_charge',

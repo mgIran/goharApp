@@ -9,7 +9,7 @@ class ApiController extends Controller
     {
         return array(
             'RestAccessControl + getLastVer,downloadApp,checkNumber',
-            'RestUserAccessControl + changes, getList, getFilteredList, create, update, upload, payment, inquiryPayment',
+            'RestUserAccessControl + changes, getList, getFilteredList, create, update, upload, payment, inquiryPayment, events',
 //			'RestAdminAccessControl +'
         );
     }
@@ -344,17 +344,48 @@ class ApiController extends Controller
                         /* @var $model Users */
                         $model = Users::model()->findByPk($this->loginArray['userID']);
                         if ($model === null)
-                            $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'کاربر مورد نظر وجود ندارد.']), 'application/json');
+                            $this->_sendResponse(200, CJSON::encode([
+                                'status' => false,
+                                'message' => 'NoUser',
+                                'details' => [
+                                    'entity' => 'User',
+                                    'entityId' => $_POST['entityId'],
+                                ]
+                            ]), 'application/json');
                         $currentAvatar = $model->avatar;
                         $model->unsetInvalidAttributes($_POST[$entity]);
                         $model->attributes = $_POST[$entity];
                         if ($model->avatar != $currentAvatar)
                             $model->deleteFile('avatar', $currentAvatar);
-                        if ($model->save())
-                            $this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id, 'message' => 'اطلاعات با موفقیت به روزرسانی شد.', 'model' => $model, 'edit' => $model->edit_number]), 'application/json');
+                        if ($model->save()) {
+                            $modelAttr = CJSON::decode(CJSON::encode($model));
+                            unset($modelAttr['edit_number']);
+                            $this->_sendResponse(200, CJSON::encode([
+                                    'status' => true,
+                                    'message' => 'اطلاعات با موفقیت به روزرسانی شد.',
+                                    'details' => array_merge([
+                                        'entity' => 'User',
+                                        'entityId' => $model->app_token,
+                                        'edit' => $model->edit_number,
+                                    ], $modelAttr)
+                            ]), 'application/json');
+                        }else
+                            $this->_sendResponse(200, CJSON::encode([
+                                'status' => false,
+                                'message' => 'در انجام عملیات خطایی رخ داده است.',
+                                'errorDetails' => $model->errors,
+                                'details' => [
+                                    'entity' => 'User',
+                                    'entityId' => $model->app_token,
+                                    'id' => $model->id,
+                                ]
+                            ]), 'application/json');
                         break;
                     default:
-                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'موجودیت مورد نظر وجود ندارد.']), 'application/json');
+                        $this->_sendResponse(200, CJSON::encode([
+                            'status' => false,
+                            'message' => 'موجودیت مورد نظر وجود ندارد.'
+                        ]), 'application/json');
                         break;
                 }
                 $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'متاسفانه در به روزرسانی اطلاعات خطایی رخ داده است.', 'errors' => $this->implodeErrors($model)]), 'application/json');
@@ -740,59 +771,189 @@ class ApiController extends Controller
 
     public function actionEvents()
     {
-        if (isset($_POST['entity']) and isset($_POST['entityId']) and isset($_POST['edit'])) {
+        if (isset($_POST['entity'])) {
             switch ($_POST['entity']) {
                 case 'User':
+                    if (!isset($_POST['edit']) or !isset($_POST['entityId']))
+                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+
+                    /* @var Users $user */
                     $user = Users::model()->find('app_token = :token', [':token' => $_POST['entityId']]);
                     if ($user) {
-                        if($user->edit_number != $_POST['edit']) {
+                        if ($user->edit_number != $_POST['edit']) {
                             $this->_sendResponse(200, CJSON::encode([
                                 'status' => true,
+                                'newRecord' => 0,
+                                'allRecord' => Users::model()->count(),
+                                'message' => 'تغییرات جدید ارسال شد.',
                                 'change' => [
                                     'entity' => 'User',
-                                    'recordType' => 'recordId',
                                     'entityId' => $user->app_token,
-                                    'recordId' => [
-                                        'firstName' => $user->first_name,
-                                        'lastName' => $user->last_name,
-                                        'fatherName' => $user->father_name,
-                                        'nationalCode' => $user->national_id,
-                                        'avatar' => $user->avatar,
-                                        'mobile' => $user->mobile,
-                                        'email' => $user->email,
-                                        'birthTown' => (isset($user->birth_city_id)) ? $user->birthCity->parent->title : NULL,
-                                        'birthCity' => (isset($user->birth_city_id)) ? $user->birthCity->title : NULL,
-                                        'homeTown' => (isset($user->home_city_id)) ? $user->homeCity->parent->title : NULL,
-                                        'homeCity' => (isset($user->home_city_id)) ? $user->homeCity->title : NULL,
-                                        'workTown' => (isset($user->work_city_id)) ? $user->workCity->parent->title : NULL,
-                                        'workCity' => (isset($user->work_city_id)) ? $user->workCity->title : NULL,
-                                    ]
+                                    'edit' => $user->edit_number,
+                                    'id' => $user->id,
+                                    'firstName' => $user->first_name,
+                                    'lastName' => $user->last_name,
+                                    'fatherName' => $user->father_name,
+                                    'nationalCode' => $user->national_id,
+                                    'avatar' => $user->avatar,
+                                    'mobile' => $user->mobile,
+                                    'email' => $user->email,
+                                    'birthCity' => $user->birth_city_id,
+                                    'homeCity1' => $user->home_city_id,
+                                    'homeCity2' => $user->home_city_id_2,
+                                    'workCity1' => $user->work_city_id,
+                                    'workCity2' => $user->work_city_id_2,
+                                    'schoolingCity1' => $user->schooling_city_id_1,
+                                    'schoolingCity2' => $user->schooling_city_id_2,
+                                    'favoriteCity1' => $user->favorite_city_id_1,
+                                    'favoriteCity2' => $user->favorite_city_id_2,
                                 ],
-                                'report' => [
-                                    'entity' => 'User',
-                                    'recordType' => 'recordId',
-                                    'newRecord' => 0,
-                                    'allRecord' => 1,
-                                    'message' => 'تغییرات جدید ارسال شد.',
-                                ]
                             ]), 'application/json');
-                        }else {
+                        } else {
                             $this->_sendResponse(200, CJSON::encode([
                                 'status' => true,
-                                'report' => [
-                                    'entity' => 'User',
-                                    'recordType' => 'recordId',
-                                    'newRecord' => 0,
-                                    'allRecord' => 1,
-                                    'message' => 'تغییرات جدیدی یافت نشد.',
+                                'allRecord' => Users::model()->count(),
+                                'noChange' => [
+                                    'entityId' => $user->app_token,
                                 ]
                             ]), 'application/json');
                         }
                     } else
-                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'NoUser']), 'application/json');
+                        $this->_sendResponse(200, CJSON::encode([
+                            'status' => false,
+                            'newRecord' => 0,
+                            'allRecord' => Users::model()->count(),
+                            'message' => 'NoUser'
+                        ]), 'application/json');
+                    break;
+
+                case 'Place':
+                    if (!isset($_POST['record_list']))
+                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+
+                    if (!is_array($_POST['record_list']))
+                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+
+                    if (empty($_POST['record_list']))
+                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+
+                    $requestedIDs = $new = $change = $noChange = $delete = [];
+                    $countries = $_POST['record_list'];
+                    foreach ($countries as $country) {
+                        if (!isset($country['entityId']) or !isset($country['edit'])) {
+                            $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+                            break;
+                        }
+                        $requestedIDs[] = $country['entityId'];
+                        /* @var $record UsersPlaces */
+                        $criteria = new CDbCriteria();
+                        $criteria->addCondition('id = :id');
+                        $criteria->addCondition('parent_id IS NULL');
+                        $criteria->params[':id'] = $country['entityId'];
+                        $record = UsersPlaces::model()->find($criteria);
+                        if (!$record)
+                            $delete[] = $country['entityId'];
+                        else {
+                            if ($record->edit_number != $country['edit']) {
+                                $temp = [
+                                    'entity' => 'Place',
+                                    'entityId' => $record->id,
+                                    'edit' => $record->edit_number,
+                                    'title' => $record->title,
+                                    'phone_number_prefix' => str_replace('+', '', $record->phone_number_prefix),
+                                ];
+
+                                $towns = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $record->id]);
+                                $townsTemp = [];
+                                foreach ($towns as $town) {
+                                    $cities = [];
+                                    $thisCities = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $town->id]);
+                                    foreach ($thisCities as $city)
+                                        array_push($cities, [
+                                            'id' => $city->id,
+                                            'title' => $city->title,
+                                            'parentId' => $city->parent_id,
+                                        ]);
+
+                                    $townsTemp[] = [
+                                        'id' => $town->id,
+                                        'title' => $town->title,
+                                        'parentId' => $town->parent_id,
+                                        'cities' => $cities
+                                    ];
+                                }
+
+                                $temp['towns'] = $townsTemp;
+                                $change[] = $temp;
+                            } else
+                                $noChange[] = $record->id;
+                        }
+                    }
+
+                    // Check for new records
+                    $criteria = new CDbCriteria();
+                    $criteria->addNotInCondition('id', $requestedIDs);
+                    $criteria->addCondition('parent_id IS NULL');
+                    $newCountries = UsersPlaces::model()->findAll($criteria);
+                    if ($newCountries) {
+                        $temp = [];
+                        foreach ($newCountries as $country) {
+                            $temp = [
+                                'entity' => 'Place',
+                                'entityId' => $country->id,
+                                'title' => $country->title,
+                                'edit' => $country->edit_number,
+                                'phone_number_prefix' => str_replace('+', '', $country->phone_number_prefix),
+                            ];
+
+                            $towns = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $country->id]);
+                            $townsTemp = [];
+                            foreach($towns as $town){
+                                $cities = [];
+                                $thisCities = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $town->id]);
+                                foreach($thisCities as $city)
+                                    array_push($cities, [
+                                        'id' => $city->id,
+                                        'title' => $city->title,
+                                        'parentId' => $city->parent_id,
+                                    ]);
+
+                                $townsTemp[] = [
+                                    'id' => $town->id,
+                                    'title' => $town->title,
+                                    'parentId' => $town->parent_id,
+                                    'cities' => $cities
+                                ];
+                            }
+
+                            $temp['towns'] = $townsTemp;
+                            $new[] = $temp;
+                        }
+                    }
+
+                    if (empty($new) and empty($change) and empty($delete))
+                        $this->_sendResponse(200, CJSON::encode([
+                            'status' => true,
+                            'report' => [
+                                'entity' => 'Place',
+                                'message' => 'تغییرات جدیدی یافت نشد.',
+                            ]
+                        ]), 'application/json');
+                    else {
+                        $this->_sendResponse(200, CJSON::encode([
+                            'status' => true,
+                            'newRecord' => count($new),
+                            'allRecord' => count(UsersPlaces::countries()),
+                            'message' => 'تغییرات جدید ارسال شد.',
+                            'change' => $change,
+                            'noChange' => $noChange,
+                            'new' => $new,
+                            'delete' => $delete,
+                        ]), 'application/json');
+                    }
                     break;
             }
-        }else
+        } else
             $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
     }
 

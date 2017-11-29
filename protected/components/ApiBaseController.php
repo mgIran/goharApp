@@ -112,7 +112,7 @@ class ApiBaseController extends CController
 
     /**
      * @param string $userType
-     * return bool
+     * @return bool
      */
     protected function _checkAuth($userType = 'admin')
     {
@@ -139,7 +139,11 @@ class ApiBaseController extends CController
         if($identity && $identity->errorCode===$identity::ERROR_NONE && $this->getLoginArray())
             return true;
         elseif($identity && $identity->errorCode!==$identity::ERROR_NONE)
-            $this->_sendResponse(401, 'Error: '.$identity->getErrorMessage());
+            $this->_sendResponse(401, CJSON::encode([
+                'status' => false,
+                'allRecord' => Users::model()->count(),
+                'message' => 'NoUser'
+            ]), 'application/json');
         elseif(!$this->getLoginArray())
             $this->_sendResponse(401, 'Error: Not Authorized.');
         return true;
