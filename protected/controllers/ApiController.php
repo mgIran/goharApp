@@ -355,6 +355,31 @@ class ApiController extends Controller
                         $currentAvatar = $model->avatar;
                         $model->unsetInvalidAttributes($_POST[$entity]);
                         $model->attributes = $_POST[$entity];
+
+                        // Check places
+                        $places = [
+                            $model->home_city_id,
+                            $model->birth_city_id,
+                            $model->work_city_id,
+                            $model->home_city_id_2,
+                            $model->work_city_id_2,
+                            $model->schooling_city_id_1,
+                            $model->schooling_city_id_2,
+                            $model->favorite_city_id_1,
+                            $model->favorite_city_id_2,
+                        ];
+                        $criteria = new CDbCriteria();
+                        $criteria->addInCondition('id', $places);
+                        if(UsersPlaces::model()->count($criteria) != count($places))
+                            $this->_sendResponse(200, CJSON::encode([
+                                'status' => false,
+                                'message' => 'NoPlace',
+                                'details' => [
+                                    'entity' => 'User',
+                                    'entityId' => $_POST['entityId'],
+                                ]
+                            ]), 'application/json');
+
                         if ($model->avatar != $currentAvatar)
                             $model->deleteFile('avatar', $currentAvatar);
                         if ($model->save()) {
