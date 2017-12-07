@@ -353,48 +353,76 @@ class ApiController extends Controller
                                 ]
                             ]), 'application/json');
                         $currentAvatar = $model->avatar;
-                        $model->unsetInvalidAttributes($_POST[$entity]);
+
+                        $model->unsetInvalidAttributes($_POST[$entity], ['email', 'username', 'password']);
                         $model->attributes = $_POST[$entity];
 
+                        if(isset($_POST[$entity]['password'])) {
+                            $model->setScenario('changePassword');
+                            $model->passwordSet = 1;
+                        }
+
                         // Check places
-                        $places = [
-                            $model->home_city_id,
-                            $model->birth_city_id,
-                            $model->work_city_id,
-                            $model->home_city_id_2,
-                            $model->work_city_id_2,
-                            $model->schooling_city_id_1,
-                            $model->schooling_city_id_2,
-                            $model->favorite_city_id_1,
-                            $model->favorite_city_id_2,
-                        ];
-                        $criteria = new CDbCriteria();
-                        $criteria->addInCondition('id', $places);
-                        if(UsersPlaces::model()->count($criteria) != count($places))
-                            $this->_sendResponse(200, CJSON::encode([
-                                'status' => false,
-                                'message' => 'NoPlace',
-                                'details' => [
-                                    'entity' => 'User',
-                                    'entityId' => $_POST['entityId'],
-                                ]
-                            ]), 'application/json');
+                        $places = [];
+
+                        if (isset($_POST[$entity]['home_city_id']) and !empty($_POST[$entity]['home_city_id']))
+                            array_push($places, $_POST[$entity]['home_city_id']);
+
+                        if (isset($_POST[$entity]['birth_city_id']) and !empty($_POST[$entity]['birth_city_id']))
+                            array_push($places, $_POST[$entity]['birth_city_id']);
+
+                        if (isset($_POST[$entity]['work_city_id']) and !empty($_POST[$entity]['work_city_id']))
+                            array_push($places, $_POST[$entity]['work_city_id']);
+
+                        if (isset($_POST[$entity]['home_city_id_2']) and !empty($_POST[$entity]['home_city_id_2']))
+                            array_push($places, $_POST[$entity]['home_city_id_2']);
+
+                        if (isset($_POST[$entity]['work_city_id_2']) and !empty($_POST[$entity]['work_city_id_2']))
+                            array_push($places, $_POST[$entity]['work_city_id_2']);
+
+                        if (isset($_POST[$entity]['schooling_city_id_1']) and !empty($_POST[$entity]['schooling_city_id_1']))
+                            array_push($places, $_POST[$entity]['schooling_city_id_1']);
+
+                        if (isset($_POST[$entity]['schooling_city_id_2']) and !empty($_POST[$entity]['schooling_city_id_2']))
+                            array_push($places, $_POST[$entity]['schooling_city_id_2']);
+
+                        if (isset($_POST[$entity]['favorite_city_id_1']) and !empty($_POST[$entity]['favorite_city_id_1']))
+                            array_push($places, $_POST[$entity]['favorite_city_id_1']);
+
+                        if (isset($_POST[$entity]['favorite_city_id_2']) and !empty($_POST[$entity]['favorite_city_id_2']))
+                            array_push($places, $_POST[$entity]['favorite_city_id_2']);
+
+                        if (count($places) != 0) {
+                            $criteria = new CDbCriteria();
+                            $criteria->addInCondition('id', $places);
+                            if (UsersPlaces::model()->count($criteria) != count($places))
+                                $this->_sendResponse(200, CJSON::encode([
+                                    'status' => false,
+                                    'message' => 'NoPlace',
+                                    'details' => [
+                                        'entity' => 'User',
+                                        'entityId' => $_POST['entityId'],
+                                    ]
+                                ]), 'application/json');
+                        }
 
                         if ($model->avatar != $currentAvatar)
                             $model->deleteFile('avatar', $currentAvatar);
+
                         if ($model->save()) {
                             $modelAttr = CJSON::decode(CJSON::encode($model));
                             unset($modelAttr['edit_number']);
+                            unset($modelAttr['password']);
                             $this->_sendResponse(200, CJSON::encode([
-                                    'status' => true,
-                                    'message' => 'اطلاعات با موفقیت به روزرسانی شد.',
-                                    'details' => array_merge([
-                                        'entity' => 'User',
-                                        'entityId' => $model->app_token,
-                                        'edit' => $model->edit_number,
-                                    ], $modelAttr)
+                                'status' => true,
+                                'message' => 'اطلاعات با موفقیت به روزرسانی شد.',
+                                'details' => array_merge([
+                                    'entity' => 'User',
+                                    'entityId' => $model->app_token,
+                                    'edit' => $model->edit_number,
+                                ], $modelAttr)
                             ]), 'application/json');
-                        }else
+                        } else
                             $this->_sendResponse(200, CJSON::encode([
                                 'status' => false,
                                 'message' => 'در انجام عملیات خطایی رخ داده است.',
@@ -816,6 +844,7 @@ class ApiController extends Controller
                                     'entityId' => $user->app_token,
                                     'edit' => $user->edit_number,
                                     'id' => $user->id,
+                                    'userName' => $user->user_name,
                                     'firstName' => $user->first_name,
                                     'lastName' => $user->last_name,
                                     'fatherName' => $user->father_name,

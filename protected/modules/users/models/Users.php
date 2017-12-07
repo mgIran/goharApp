@@ -190,16 +190,16 @@ class Users extends iWebActiveRecord
             array('repeat_password', 'compare', 'compareAttribute' => 'password', 'message' => "رمز عبور و تکرار رمز عبور یکسان نیستند", 'except' => 'delete,activate,changeValue,upload,update'),
             //array('repeat_password', 'compare', 'compareAttribute'=>'password', 'message'=>"رمز عبور و تکرار رمز عبور یکسان نیستند" , 'allowEmpty'=>TRUE, 'on'=>'update' ),
             //array('password', 'CRegularExpressionValidator', 'pattern'=>"/^(?=.*\d(?=.*\d))(?=.*[a-zA-Z](?=.*[a-zA-Z])).{5,}$/","message"=>"رمز عبور ایمن نیست"),
-            array('user_name', 'unique', 'className' => 'Users', "message" => 'نام کاربری "{value}" قبلا ثبت شده است، لطفا نام کاربری دیگری را وارد نمایید', 'on' => array('insert', 'register')),
-            array('email', 'unique', 'className' => 'Users', "message" => 'این پست الکترونیک قبلا ثبت شده است!', 'on' => array('insert', 'register')),
-            array('mobile', 'unique', 'className' => 'Users', "message" => 'این شماره قبلا ثبت شده است!', 'on' => array('insert', 'register')),
+            array('user_name', 'unique', 'className' => 'Users', "message" => 'نام کاربری "{value}" قبلا ثبت شده است، لطفا نام کاربری دیگری را وارد نمایید', 'on' => array('insert', 'register', 'update')),
+            array('email', 'unique', 'className' => 'Users', "message" => 'این پست الکترونیک قبلا ثبت شده است!', 'on' => array('insert', 'register', 'update')),
+            array('mobile', 'unique', 'className' => 'Users', "message" => 'این شماره قبلا ثبت شده است!', 'on' => array('insert', 'register', 'update')),
             array('user_name, email, mobile, first_name, last_name', 'filter', 'filter' => 'trim'),
             array('verifyCode', 'captcha', 'allowEmpty' => !CCaptcha::checkRequirements(), 'on' => 'register'),
 
             array('sitePolicy', 'CCompareValidator', 'compareValue' => '1', 'message' => 'برای ثبت نام،شما باید قوانین سایت را پذیرفته باشید.', 'on' => 'register'),
 
             // legal documents
-            array('birth_city_id, home_city_id,work_city_id', 'numerical', 'integerOnly' => true),
+            array('birth_city_id, home_city_id, home_city_id_2, work_city_id, work_city_id_2, schooling_city_id_1, schooling_city_id_2, favorite_city_id_1, favorite_city_id_2', 'numerical', 'integerOnly' => true),
             array('home_city_id', 'required', 'on' => 'register'),
             array('personal_image, father_name, national_card_front, national_card_rear, birth_certificate_first,business_license,activity_permission', 'length', 'max' => 100),
 
@@ -704,9 +704,10 @@ class Users extends iWebActiveRecord
 
     /**
      * unset invalid attributes
-     * @param $attributes
+     * @param array $attributes
+     * @param array $except
      */
-    public function unsetInvalidAttributes(&$attributes)
+    public function unsetInvalidAttributes(&$attributes, $except = [])
     {
         $invalidChangeAttributes = array(
             'id',
@@ -714,7 +715,7 @@ class Users extends iWebActiveRecord
             'username',
             'password',
             'status',
-            //'email',
+            'email',
             'deleted',
             'agent_id',
             'sms_charge',
@@ -723,6 +724,11 @@ class Users extends iWebActiveRecord
             'other_legal_documents',
             'app_token',
         );
+
+        foreach($except as $exceptItem)
+            if (in_array($exceptItem, $invalidChangeAttributes))
+                array_splice($invalidChangeAttributes, array_search($exceptItem, $invalidChangeAttributes), 1);
+
         foreach($attributes as $key => $item)
             if(in_array($key, $invalidChangeAttributes))
                 unset($attributes[$key]);
