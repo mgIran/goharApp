@@ -28,7 +28,7 @@ class AppTransactions extends iWebActiveRecord
 	const TRANSACTION_UNPAID = "unpaid";
 	const TRANSACTION_DELETED = "deleted";
 
-	public $statusLabels = array(
+	public static $statusLabels = array(
 		self::TRANSACTION_PAID => 'پرداخت شده',
 		self::TRANSACTION_UNPAID => 'پرداخت نشده',
 		self::TRANSACTION_DELETED => 'حذف شده',

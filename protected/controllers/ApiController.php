@@ -227,21 +227,144 @@ class ApiController extends Controller
                     $_POST[$entity] = CJSON::decode($_POST[$entity]);
                 switch ($entity) {
                     case 'Ceremony':
+                        if(!isset($_POST['scenario']))
+                            $this->_sendResponse(401, CJSON::encode([
+                                'status' => false,
+                                'message' => 'ScenarioError',
+                                'errorDetails' => [
+                                    'scenario' => 'سناریو نمی تواند خالی باشد.'
+                                ]
+                            ]), 'application/json');
+
                         $model = new Events();
                         $model->attributes = $_POST[$entity];
                         $model->creator_type = $this->loginArray['type'];
                         $model->creator_id = $this->loginArray['userID'];
-                        if ($model->save()) {
-                            $results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
-                            $results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
-                            $results['showStartDate'] = $model->start_date_run;
-                            $results['longDaysRun'] = $model->long_days_run;
-                            $results['showStartTime'] = $model->showStartTime;
-                            $results['showEndTime'] = $model->showEndTime;
-                            $results['moreDays'] = $model->more_days;
-                            $this->_sendResponse(200, CJSON::encode(['status' => true, 'entityId' => $model->id,
-                                'invoice' => $results,
-                                'message' => 'پیش فاکتور محاسبه گردید.']), 'application/json');
+
+                        if(!$model->validate()) {
+                            $message = '';
+                            if($model->hasErrors('scenarioError'))
+                                $message = 'Impossibility';
+                            elseif($model->hasErrors('end_time_run'))
+                                $message = 'ErrorsRecord';
+                            elseif($model->hasErrors('more_days'))
+                                $message = 'ErrorsRecord';
+                            elseif($model->hasErrors('long_days_run'))
+                                $message = 'ErrorsRecord';
+                            elseif($model->hasErrors('country_id'))
+                                $message = 'NoPlace';
+                            elseif($model->hasErrors('state_id'))
+                                $message = 'NoPlace';
+                            elseif($model->hasErrors('city_id'))
+                                $message = 'NoPlace';
+                            elseif($model->hasErrors('ceremony_public'))
+                                $message = 'ErrorsRecord';
+
+                            $this->_sendResponse(401, CJSON::encode([
+                                'status' => false,
+                                'message' => $message,
+                                'errorDetails' => $model->errors,
+                            ]), 'application/json');
+                        }
+
+                        /* @var Users $user */
+                        $user = Users::model()->findByPk($this->loginArray['userID']);
+                        if($user->activePlan->plansBuys->plan->max_events_daily == Events::getConfirmedEvents($user->id))
+                            $this->_sendResponse(401, CJSON::encode([
+                                'status' => false,
+                                'message' => 'MoreMax'
+                            ]), 'application/json');
+
+                        if($_POST['scenario'] == 'submit') {
+                            if ($model->save()) {
+                                $results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
+                                $results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
+                                $results['showStartDate'] = $model->start_date_run;
+                                $results['longDaysRun'] = $model->long_days_run;
+                                $results['showStartTime'] = $model->showStartTime;
+                                $results['showEndTime'] = $model->showEndTime;
+
+                                $transaction = new AppTransactions();
+                                $transaction->user_id = $this->loginArray['userID'];
+                                $transaction->amount = $results['price'];
+                                $transaction->description = 'پرداخت هزینه جهت ثبت مراسم';
+                                $transaction->date = time();
+                                $transaction->model_name = 'Events';
+                                $transaction->model_id = $model->id;
+                                $transaction->bank_name = "ملت";
+                                $transaction->newOrderId();
+                                if ($transaction->save()) {
+                                    $Amount = doubleval($transaction->amount) * 10;
+                                    $CallbackURL = Yii::app()->getBaseUrl(true) . '/api/verifyPayment';
+                                    $result = Yii::app()->Payment->PayRequest($Amount, $transaction->order_id, $CallbackURL);
+                                    if (!$result['error']) {
+                                        $transaction->ref_id = $result['responseCode'];
+                                        $transaction->save();
+                                        $ReferenceId = $result['responseCode'];
+                                        $this->_sendResponse(200, CJSON::encode([
+                                            'status' => true,
+                                            'message' => 'صورتحساب نهایی فاکتور شما محاسبه شد',
+                                            'recordDetails' => [
+                                                'entity' => 'Ceremony',
+                                                'entityId' => $model->id,
+                                                'edit' => $model->edit,
+                                                'startTimeRun' => $model->start_time_run,
+                                                'endTimeRun' => $model->end_time_run,
+                                                'longDaysRun' => $model->long_days_run,
+                                                'showStartTime' => $model->showStartTime,
+                                                'showEndTime' => $model->showEndTime,
+                                                'moreDays' => $model->more_days,
+                                                'maxMoreDays' => SiteOptions::getOption('show_event_more_than_default'),
+                                                'eventMaxLongDays' => SiteOptions::getOption('event_max_long_days'),
+                                                'subject' => $model->subject1,
+                                            ],
+                                            'FactorDetails' => [
+                                                'unitPrice' => SiteOptions::getOption('show_event_more_than_default_price'),
+                                                'defaultShowPrice' => $results['defaultPrice'],
+                                                'planOff' => $results['planOff'],
+                                                'tax' => $results['tax'],
+                                                'taxAmount' => $results['taxPrice'],
+                                                'status' => 'waitPaid',
+                                                'factorAmount' => $results['price'],
+                                                'urlPay' => Yii::app()->createAbsoluteUrl("/api/paymentPage?ref={$ReferenceId}"),
+                                                'transactionId' => $transaction->id,
+                                            ],
+                                        ]), 'application/json');
+                                    } else {
+                                        $this->_sendResponse(200, CJSON::encode(['status' => false,
+                                            'transactionId' => $transaction->id,
+                                            'message' => Yii::app()->Payment->getResponseText($result['responseCode']),
+                                        ]), 'application/json');
+                                    }
+                                }
+                            }
+                        }elseif($_POST['scenario'] == 'calculate'){
+                            $calculatedPrices = $model->calculatePrice($user->activePlan->plansBuys->plan->extension_discount);
+                            $this->_sendResponse(200, CJSON::encode([
+                                'status' => true,
+                                'message' => 'پیش فاکتور محاسبه گردید',
+                                'recordDetails' => [
+                                    'entity' => 'Ceremony',
+                                    'startTimeRun' => $model->start_time_run,
+                                    'endTimeRun' => $model->end_time_run,
+                                    'longDaysRun' => $model->long_days_run,
+                                    'showStartTime' => $model->showStartTime,
+                                    'showEndTime' => $model->showEndTime,
+                                    'moreDays' => $model->more_days,
+                                    'maxMoreDays' => SiteOptions::getOption('show_event_more_than_default'),
+                                    'eventMaxLongDays' => SiteOptions::getOption('event_max_long_days'),
+                                    'subject' => $model->subject1,
+                                ],
+                                'FactorDetails' => [
+                                    'unitPrice' => SiteOptions::getOption('show_event_more_than_default_price'),
+                                    'defaultShowPrice' => $calculatedPrices['defaultPrice'],
+                                    'planOff' => $calculatedPrices['planOff'],
+                                    'tax' => $calculatedPrices['tax'],
+                                    'taxAmount' => $calculatedPrices['taxPrice'],
+                                    'status' => 'draft',
+                                    'factorAmount' => $calculatedPrices['price'],
+                                ],
+                            ]), 'application/json');
                         }
                         break;
                     case 'Filter':
@@ -615,19 +738,22 @@ class ApiController extends Controller
             $transaction->res_code = $RecourceCode;
             $transaction->sale_reference_id = isset($_POST['SaleReferenceId']) ? $_POST['SaleReferenceId'] : null;
             if ($transaction->save()) {
-                switch ($transaction->model_name) {
-                    case 'Events':
-                        $model = Events::model()->findByPk($transaction->model_id);
-                        $model->status = Events::STATUS_ACCEPTED;
-                        $model->confirm_date = time();
-                        $model->show_start_time = $model->showStartTime;
-                        $model->show_end_time = $model->showEndTime;
-                        $model->save(false);
-                        break;
-                    default:
-                        break;
-                }
-                $msg = 'پرداخت با موفقیت انجام شد.';
+                if ($RecourceCode == 0) {
+                    switch ($transaction->model_name) {
+                        case 'Events':
+                            $model = Events::model()->findByPk($transaction->model_id);
+                            $model->status = Events::STATUS_ACCEPTED;
+                            $model->confirm_date = time();
+                            $model->show_start_time = $model->showStartTime;
+                            $model->show_end_time = $model->showEndTime;
+                            $model->save(false);
+                            break;
+                        default:
+                            break;
+                    }
+                    $msg = 'پرداخت با موفقیت انجام شد.';
+                } else
+                    $msg = 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
             } else
                 $msg = 'در فرآیند پرداخت مشکلی بوجود آمده است. لطفا با بخش پشتیبانی تماس بگیرید.';
         } else
@@ -1005,6 +1131,25 @@ class ApiController extends Controller
                             'delete' => $delete,
                         ]), 'application/json');
                     }
+                    break;
+            }
+        } else
+            $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'اطلاعات کافی ارسال نشده است.']), 'application/json');
+    }
+
+    public function actionFactorStatus()
+    {
+        if (isset($_POST['entity']) and isset($_POST['entityId']) and isset($_POST['transactionId'])) {
+            switch ($_POST['entity']) {
+                case 'Ceremony':
+                    $event = Events::model()->findByPk($_POST['entityId']);
+                    if($event){
+                        $message = '';
+                        $bill = $event->calculatePrice($event->user->activePlan->plansBuys->plan->extension_discount);
+                        if($bill['price'] == 0)
+                            $message = 'AutoPaid';
+                    }else
+                        $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'noCeremony']), 'application/json');
                     break;
             }
         } else

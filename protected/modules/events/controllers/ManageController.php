@@ -139,12 +139,12 @@ class ManageController extends Controller
     {
         if (isset($_POST['confirm'])) {
             $model=$this->loadModel($id);
-            $calculatedPrices=$model->calculatePrice();
+            $calculatedPrices=$model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
             $update=Events::model()->updateByPk($id, array(
                 'status' => Events::STATUS_ACCEPTED,
                 'default_show_price'=>$calculatedPrices['defaultPrice'],
                 'more_than_default_show_price'=>$calculatedPrices['showMoreThanDefaultPrice'],
-                'plan_off'=>0,
+                'plan_off'=>$calculatedPrices['planOff'],
                 'tax'=>$calculatedPrices['thisEventTax'],
                 'confirm_date'=>time(),
                 'show_start_time'=>$model->showStartTime,

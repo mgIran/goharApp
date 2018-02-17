@@ -14,7 +14,7 @@ $this->menu=array(
 	array('label'=>'لیست مراسمات', 'url'=>array('admin')),
 );
 
-$billInfo=$model->calculatePrice();
+$billInfo=$model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
 ?>
 
 <?php $this->renderPartial("//layouts/_flashMessage");?>
