@@ -148,7 +148,7 @@
 		<?php if($model->isNewRecord):?>
         	<?php echo $form->dropDownList($model,'city_id',array(),array('prompt'=>'لطفا انتخاب کنید','disabled'=>true)); ?>
 		<?php else:?>
-        	<?php echo $form->dropDownList($model,'city_id',UsersPlaces::citiesByTown($model->state_id),array('prompt'=>'لطفا انتخاب کنید')); ?>
+        	<?php  echo $form->dropDownList($model,'city_id',UsersPlaces::citiesByTown($model->state_id),array('prompt'=>'لطفا انتخاب کنید')); ?>
 		<?php endif;?>
 		<?php echo $form->error($model,'city_id'); ?>
 	</div>

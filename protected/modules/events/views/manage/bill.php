@@ -20,9 +20,10 @@ $eventPriceWithOff = $eventSubmitPrice - (float)($model->plan_off * $eventSubmit
 
 <?php $this->renderPartial("//layouts/_flashMessage");?>
 
-<h1><?php echo $model->subject1; ?></h1>
+<h1><?php  echo $model->subject1; ?></h1>
 
 <h3>پیش فاکتور</h3>
+
 <?php $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
@@ -58,7 +59,8 @@ $eventPriceWithOff = $eventSubmitPrice - (float)($model->plan_off * $eventSubmit
 ));?>
 <hr>
 <h3>اطلاعات مراسم</h3>
-<?php $this->widget('zii.widgets.CDetailView', array(
+
+<?php  $this->widget('zii.widgets.CDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
 		'subject1',

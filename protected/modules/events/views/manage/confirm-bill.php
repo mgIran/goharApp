@@ -13,7 +13,6 @@ $this->menu=array(
 	array('label'=>'حذف این مراسم', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>'آیا از حذف این مراسم مطمئن هستید؟')),
 	array('label'=>'لیست مراسمات', 'url'=>array('admin')),
 );
-
 $billInfo=$model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
 ?>
 

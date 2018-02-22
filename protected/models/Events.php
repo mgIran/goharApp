@@ -66,6 +66,7 @@ class Events extends iWebActiveRecord
 {
     const STATUS_PENDING = 0;
     const STATUS_ACCEPTED = 1;
+    const STATUS_USER_PAID = 2;
 
     public $scenarioError;
     public $selectedCategories;
