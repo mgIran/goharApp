@@ -241,6 +241,11 @@ class ApiController extends Controller
                         $model->attributes = $_POST[$entity];
                         $model->creator_type = $this->loginArray['type'];
                         $model->creator_id = $this->loginArray['userID'];
+                        $billInfo = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
+                        $model->default_show_price = $billInfo['defaultPrice'];
+                        $model->more_than_default_show_price = $billInfo['showMoreThanDefaultPrice'];
+                        $model->plan_off = $billInfo['planOffPrice'];
+                        $model->tax = $billInfo['taxPrice'];
 
                         if (!$model->validate()) {
                             $message = '';
