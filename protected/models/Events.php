@@ -125,7 +125,7 @@ class Events extends iWebActiveRecord
             array('create_date', 'default', 'value' => time(), 'on' => 'insert'),
             array('town, main_street, by_street, boulevard, afew_ways, squary, bridge, quarter', 'length', 'max' => 25),
             array('state, city, complete_details, invitees', 'safe'),
-            array('selectedCategories', 'safe'),
+            array('selectedCategories, recepiant_contact', 'safe'),
             array('scenarioError', 'checkSubmitEvents'),
             array('more_days', 'checkMoreDays'),
             array('long_days_run', 'checkLongDays'),
