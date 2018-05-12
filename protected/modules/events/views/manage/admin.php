@@ -17,7 +17,7 @@ $this->menu=array(
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'confirmed-events-grid',
-	'dataProvider'=>$model->search('status = 1'),
+	'dataProvider'=>$model->search('status != '.Events::STATUS_PENDING),
 	'filter'=>$model,
 	'columns'=>array(
 		array(
@@ -60,7 +60,7 @@ $this->menu=array(
 
 <?php $this->widget('zii.widgets.grid.CGridView', array(
 	'id'=>'events-grid',
-	'dataProvider'=>$model->search('status = 0'),
+	'dataProvider'=>$model->search('status = '.Events::STATUS_PENDING),
 	'filter'=>$model,
 	'columns'=>array(
 		array(

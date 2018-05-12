@@ -1,5 +1,6 @@
 <?php
 Yii::import('admins.models.*');
+
 class ApiController extends Controller
 {
     /**
@@ -9,7 +10,7 @@ class ApiController extends Controller
     {
         return array(
             'RestAccessControl + getLastVer,downloadApp,checkNumber',
-            'RestUserAccessControl + changes, getList, getFilteredList, create, update, upload, payment, inquiryPayment, events',
+            'RestUserAccessControl + changes, getList, getFilteredList, create, update, upload, payment, inquiryPayment, events , factorStatus',
 //			'RestAdminAccessControl +'
         );
     }
@@ -227,7 +228,7 @@ class ApiController extends Controller
                     $_POST[$entity] = CJSON::decode($_POST[$entity]);
                 switch ($entity) {
                     case 'Ceremony':
-                        if(!isset($_POST['scenario']))
+                        if (!isset($_POST['scenario']))
                             $this->_sendResponse(401, CJSON::encode([
                                 'status' => false,
                                 'message' => 'ScenarioError',
@@ -246,23 +247,23 @@ class ApiController extends Controller
                         $model->plan_off = $billInfo['planOffPrice'];
                         $model->tax = $billInfo['taxPrice'];
 
-                        if(!$model->validate()) {
+                        if (!$model->validate()) {
                             $message = '';
-                            if($model->hasErrors('scenarioError'))
+                            if ($model->hasErrors('scenarioError'))
                                 $message = 'Impossibility';
-                            elseif($model->hasErrors('end_time_run'))
+                            elseif ($model->hasErrors('end_time_run'))
                                 $message = 'ErrorsRecord';
-                            elseif($model->hasErrors('more_days'))
+                            elseif ($model->hasErrors('more_days'))
                                 $message = 'ErrorsRecord';
-                            elseif($model->hasErrors('long_days_run'))
+                            elseif ($model->hasErrors('long_days_run'))
                                 $message = 'ErrorsRecord';
-                            elseif($model->hasErrors('country_id'))
+                            elseif ($model->hasErrors('country_id'))
                                 $message = 'NoPlace';
-                            elseif($model->hasErrors('state_id'))
+                            elseif ($model->hasErrors('state_id'))
                                 $message = 'NoPlace';
-                            elseif($model->hasErrors('city_id'))
+                            elseif ($model->hasErrors('city_id'))
                                 $message = 'NoPlace';
-                            elseif($model->hasErrors('ceremony_public'))
+                            elseif ($model->hasErrors('ceremony_public'))
                                 $message = 'ErrorsRecord';
 
                             $this->_sendResponse(401, CJSON::encode([
@@ -274,13 +275,13 @@ class ApiController extends Controller
 
                         /* @var Users $user */
                         $user = Users::model()->findByPk($this->loginArray['userID']);
-                        if($user->activePlan->plansBuys->plan->max_events_daily == Events::getConfirmedEvents($user->id))
+                        if ($user->activePlan->plansBuys->plan->max_events_daily == Events::getConfirmedEvents($user->id))
                             $this->_sendResponse(401, CJSON::encode([
                                 'status' => false,
                                 'message' => 'MoreMax'
                             ]), 'application/json');
 
-                        if($_POST['scenario'] == 'submit') {
+                        if ($_POST['scenario'] == 'submit') {
                             if ($model->save()) {
                                 $results = $model->calculatePrice($model->user->activePlan->plansBuys->plan->extension_discount);
                                 $results['maxShowMoreThanDefault'] = SiteOptions::getOption('show_event_more_than_default');
@@ -343,7 +344,7 @@ class ApiController extends Controller
                                     }
                                 }
                             }
-                        }elseif($_POST['scenario'] == 'calculate'){
+                        } elseif ($_POST['scenario'] == 'calculate') {
                             $calculatedPrices = $model->calculatePrice($user->activePlan->plansBuys->plan->extension_discount);
                             $this->_sendResponse(200, CJSON::encode([
                                 'status' => true,
@@ -485,7 +486,7 @@ class ApiController extends Controller
                         $model->unsetInvalidAttributes($_POST[$entity], ['email', 'username', 'password']);
                         $model->attributes = $_POST[$entity];
 
-                        if(isset($_POST[$entity]['password'])) {
+                        if (isset($_POST[$entity]['password'])) {
                             $model->setScenario('changePassword');
                             $model->passwordSet = 1;
                         }
@@ -747,7 +748,7 @@ class ApiController extends Controller
                     switch ($transaction->model_name) {
                         case 'Events':
                             $model = Events::model()->findByPk($transaction->model_id);
-                            $model->status = Events::STATUS_ACCEPTED;
+                            $model->status = Events::STATUS_USER_PAID;
                             $model->confirm_date = time();
                             $model->show_start_time = $model->showStartTime;
                             $model->show_end_time = $model->showEndTime;
@@ -886,7 +887,7 @@ class ApiController extends Controller
     }
 
     public function actionCheckNumber()
-	{
+    {
         if (isset($_POST['token']) && isset($_POST['sim']) && isset($_POST['activateCode'])) {
             $baseLine = SiteOptions::model()->findByAttributes(['name' => 'base_line']);
             Yii::import('users.models.*');
@@ -1093,10 +1094,10 @@ class ApiController extends Controller
 
                             $towns = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $country->id]);
                             $townsTemp = [];
-                            foreach($towns as $town){
+                            foreach ($towns as $town) {
                                 $cities = [];
                                 $thisCities = UsersPlaces::model()->findAll('parent_id = :parent', [':parent' => $town->id]);
-                                foreach($thisCities as $city)
+                                foreach ($thisCities as $city)
                                     array_push($cities, [
                                         'id' => $city->id,
                                         'title' => $city->title,
@@ -1148,12 +1149,21 @@ class ApiController extends Controller
             switch ($_POST['entity']) {
                 case 'Ceremony':
                     $event = Events::model()->findByPk($_POST['entityId']);
-                    if($event){
+                    if ($event) {
                         $message = '';
                         $bill = $event->calculatePrice($event->user->activePlan->plansBuys->plan->extension_discount);
-                        if($bill['price'] == 0)
+                        if ($bill['price'] == 0)
                             $message = 'AutoPaid';
-                    }else
+                        elseif ($bill['price'] > 0) {
+                           if($event->status == Events::STATUS_PENDING)
+                               $message= 'WaitPaid';
+                           elseif ($event->status == Events::STATUS_USER_PAID)
+                               $message = 'UserPaid';
+                           elseif ($event->status == Events::STATUS_ACCEPTED)
+                               $message = 'AdminOK';
+                        }
+                      $this->_sendResponse(200,CJSON::encode(['status'=>true , 'message'=>$message]),'application/json');
+                    } else
                         $this->_sendResponse(200, CJSON::encode(['status' => false, 'message' => 'noCeremony']), 'application/json');
                     break;
             }
